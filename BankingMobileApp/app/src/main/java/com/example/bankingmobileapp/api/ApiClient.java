@@ -1,0 +1,33 @@
+package com.example.bankingmobileapp.api;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public final class ApiClient {
+    private static final String BASE_URL = "http://10.0.2.2:8080/";
+    private static BankingApi api;
+
+    private ApiClient() {
+    }
+
+    public static BankingApi getApi() {
+        if (api == null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .build();
+
+            api = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(BankingApi.class);
+        }
+        return api;
+    }
+}
