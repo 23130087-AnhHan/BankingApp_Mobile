@@ -2,6 +2,7 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -15,6 +16,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HistoryActivity extends Activity {
+    private static final String TAG = "HistoryActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,17 +40,18 @@ public class HistoryActivity extends Activity {
     }
 
     private void loadHistory(EditText accountNumberInput, TextView historyText) {
-        historyText.setText("Loading transactions...");
+        historyText.setText("Đang tải lịch sử giao dịch...");
         ApiClient.getApi().getTransactions(Ui.text(accountNumberInput)).enqueue(new Callback<List<TransactionResponse>>() {
             @Override
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (!response.isSuccessful()) {
-                    historyText.setText("Load history failed. HTTP " + response.code());
+                    Log.e(TAG, "Load history failed. HTTP " + response.code());
+                    historyText.setText("Tải lịch sử thất bại.\n" + Ui.messageForHttpCode(response.code()));
                     return;
                 }
                 List<TransactionResponse> transactions = response.body();
                 if (transactions == null || transactions.isEmpty()) {
-                    historyText.setText("No transactions found.");
+                    historyText.setText("Chưa có giao dịch nào.");
                     return;
                 }
 
@@ -70,7 +74,8 @@ public class HistoryActivity extends Activity {
 
             @Override
             public void onFailure(Call<List<TransactionResponse>> call, Throwable throwable) {
-                historyText.setText("Load history failed: " + throwable.getMessage());
+                Log.e(TAG, "Load history network failure", throwable);
+                historyText.setText("Tải lịch sử thất bại.\nKhông kết nối được server.");
             }
         });
     }

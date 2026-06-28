@@ -22,7 +22,6 @@ public class TransferActivity extends Activity {
         TextView resultText = findViewById(R.id.resultText);
 
         fromAccountInput.setText(AppSession.getAccountNumber(this));
-        amountInput.setText("100");
 
         findViewById(R.id.transferButton).setOnClickListener(v -> {
             String fromAccount = Ui.text(fromAccountInput);
@@ -59,7 +58,7 @@ public class TransferActivity extends Activity {
                     toAccount,
                     amount
             );
-            Ui.runCall("Transfer", resultText, ApiClient.getApi().transfer(request));
+            Ui.runCall("Chuyển tiền", resultText, ApiClient.getApi().transfer(request));
         });
     }
 }

@@ -20,13 +20,8 @@
         android:testOnly="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true" >
-        <activity android:name="com.example.bankingmobileapp.HistoryActivity" />
-        <activity android:name="com.example.bankingmobileapp.TransferActivity" />
-        <activity android:name="com.example.bankingmobileapp.TransactionActivity" />
-        <activity android:name="com.example.bankingmobileapp.AccountActivity" />
-        <activity android:name="com.example.bankingmobileapp.RegisterActivity" />
         <activity
-            android:name="com.example.bankingmobileapp.MainActivity"
+            android:name="com.example.bankingmobileapp.WelcomeActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,6 +29,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.bankingmobileapp.QuickLoginActivity" />
+        <activity android:name="com.example.bankingmobileapp.LoginActivity" />
+        <activity android:name="com.example.bankingmobileapp.HistoryActivity" />
+        <activity android:name="com.example.bankingmobileapp.TransferActivity" />
+        <activity android:name="com.example.bankingmobileapp.TransactionActivity" />
+        <activity android:name="com.example.bankingmobileapp.AccountActivity" />
+        <activity android:name="com.example.bankingmobileapp.RegisterActivity" />
+        <activity android:name="com.example.bankingmobileapp.MainActivity" />
     </application>
 
 </manifest>

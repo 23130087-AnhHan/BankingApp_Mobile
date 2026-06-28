@@ -42,6 +42,27 @@
             <EditText android:id="@+id/passwordInput" style="@style/Input" android:hint="Nhập mật khẩu đăng nhập" android:inputType="textPassword" />
 
             <Button android:id="@+id/registerButton" style="@style/PrimaryButton" android:text="Tạo hồ sơ khách hàng" />
+            <Button android:id="@+id/loginButton" style="@style/SecondaryButton" android:text="Quay lại đăng nhập" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Panel" android:orientation="vertical">
+            <TextView style="@style/SectionTitle" android:text="Mở tài khoản bằng User ID" />
+            <TextView
+                style="@style/MutedText"
+                android:layout_marginBottom="16dp"
+                android:text="Backend hiện chưa trả User ID sau đăng ký. Khi đã có User ID do hệ thống cấp, nhập vào đây để mở tài khoản tiết kiệm." />
+
+            <TextView style="@style/FieldLabel" android:text="User ID" />
+            <EditText
+                android:id="@+id/userIdInput"
+                style="@style/Input"
+                android:hint="Nhập User ID"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/openAccountButton"
+                style="@style/PrimaryButton"
+                android:text="Mở tài khoản bằng User ID" />
         </LinearLayout>
 
         <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Kết quả đăng ký sẽ hiển thị tại đây." />

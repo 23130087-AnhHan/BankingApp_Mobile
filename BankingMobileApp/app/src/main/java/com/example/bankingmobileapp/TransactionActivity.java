@@ -30,8 +30,6 @@ public class TransactionActivity extends Activity {
 
         accountNumberInput.setText(AppSession.getAccountNumber(this));
         transactionTypeInput.setText("DEPOSIT");
-        amountInput.setText("1000");
-        descriptionInput.setText("Cash deposit");
 
         findViewById(R.id.depositButton).setOnClickListener(v -> submit("DEPOSIT"));
         findViewById(R.id.withdrawButton).setOnClickListener(v -> submit("WITHDRAWAL"));
@@ -69,6 +67,6 @@ public class TransactionActivity extends Activity {
                 amount,
                 Ui.text(descriptionInput)
         );
-        Ui.runCall(type, resultText, ApiClient.getApi().createTransaction(request));
+        Ui.runCall(type.equals("DEPOSIT") ? "Nạp tiền" : "Rút tiền", resultText, ApiClient.getApi().createTransaction(request));
     }
 }

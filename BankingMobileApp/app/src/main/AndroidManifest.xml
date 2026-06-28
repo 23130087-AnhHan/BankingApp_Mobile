@@ -10,13 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".TransferActivity" />
-        <activity android:name=".TransactionActivity" />
-        <activity android:name=".AccountActivity" />
-        <activity android:name=".RegisterActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +19,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".QuickLoginActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".HistoryActivity" />
+        <activity android:name=".TransferActivity" />
+        <activity android:name=".TransactionActivity" />
+        <activity android:name=".AccountActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

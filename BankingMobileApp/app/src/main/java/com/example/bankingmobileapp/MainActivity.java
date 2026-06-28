@@ -2,6 +2,7 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
@@ -12,6 +13,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends Activity {
+    private static final String TAG = "MainActivity";
+
     private TextView accountNumberText;
     private TextView balanceText;
     private TextView statusText;
@@ -20,6 +23,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppSession.isLoggedIn(this)) {
+            openLoginAndFinish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         accountNumberText = findViewById(R.id.accountNumberText);
@@ -27,12 +35,12 @@ public class MainActivity extends Activity {
         statusText = findViewById(R.id.statusText);
         userIdText = findViewById(R.id.userIdText);
 
-        findViewById(R.id.registerTile).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.depositTile).setOnClickListener(v -> Ui.open(this, TransactionActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.historyTile).setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
         findViewById(R.id.refreshButton).setOnClickListener(v -> refreshAccount());
+        findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
     }
 
     @Override
@@ -56,12 +64,13 @@ public class MainActivity extends Activity {
                 public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                     if (!response.isSuccessful() || response.body() == null) {
                         balanceText.setText("0 ₫");
-                        statusText.setText("Chưa có tài khoản");
+                        statusText.setText(response.code() == 404 ? "Chưa có tài khoản" : "Lỗi đồng bộ");
+                        Log.e(TAG, "Refresh account failed. HTTP " + response.code());
                         return;
                     }
                     AccountResponse account = response.body();
                     String resolvedAccountNumber = account.accountNumber == null ? "" : account.accountNumber;
-                    AppSession.saveAccountNumber(MainActivity.this, resolvedAccountNumber);
+                    AppSession.saveAccount(MainActivity.this, account);
                     accountNumberText.setText(resolvedAccountNumber.isEmpty()
                             ? "Chưa có số tài khoản"
                             : "STK  •  " + resolvedAccountNumber);
@@ -75,11 +84,21 @@ public class MainActivity extends Activity {
                 public void onFailure(Call<AccountResponse> call, Throwable throwable) {
                     balanceText.setText("-- ₫");
                     statusText.setText("Mất kết nối");
+                    Log.e(TAG, "Refresh account network failure", throwable);
                 }
             });
         } catch (NumberFormatException ex) {
             balanceText.setText("-- ₫");
             statusText.setText("User ID không hợp lệ");
         }
+    }
+
+    private void logout() {
+        AppSession.clearLoginState(this);
+        Ui.openAndClear(this, WelcomeActivity.class);
+    }
+
+    private void openLoginAndFinish() {
+        Ui.openAndClear(this, WelcomeActivity.class);
     }
 }

@@ -2,6 +2,7 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AccountActivity extends Activity {
+    private static final String TAG = "AccountActivity";
+
     private EditText userIdInput;
     private EditText accountTypeInput;
     private EditText accountNumberInput;
@@ -64,7 +67,7 @@ public class AccountActivity extends Activity {
                 BigDecimal.ZERO,
                 parsedUserId
         );
-        Ui.runCall("Open account", resultText, ApiClient.getApi().createAccount(request));
+        Ui.runCall("Mở tài khoản", resultText, ApiClient.getApi().createAccount(request));
     }
 
     private void findAccount() {
@@ -87,21 +90,25 @@ public class AccountActivity extends Activity {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {
-                    resultText.setText("Find account failed. HTTP " + response.code());
+                    Log.e(TAG, "Find account failed. HTTP " + response.code());
+                    resultText.setText("Tìm tài khoản thất bại.\n" + Ui.messageForHttpCode(response.code()));
                     return;
                 }
                 AccountResponse account = response.body();
                 accountNumberInput.setText(account.accountNumber);
-                AppSession.saveAccountNumber(AccountActivity.this, account.accountNumber);
-                resultText.setText("Account found\nNumber: " + account.accountNumber
-                        + "\nType: " + account.accountType
-                        + "\nStatus: " + account.accountStatus
-                        + "\nBalance: " + account.availableBalance);
+                AppSession.saveAccount(AccountActivity.this, account);
+                resultText.setText("Đã tìm thấy tài khoản"
+                        + "\nSố tài khoản: " + account.accountNumber
+                        + "\nLoại: " + account.accountType
+                        + "\nTrạng thái: " + account.accountStatus
+                        + "\nSố dư: " + account.availableBalance
+                        + "\n\nNếu chưa đăng nhập, vui lòng quay lại màn đăng nhập và nhập User ID.");
             }
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
-                resultText.setText("Find account failed: " + throwable.getMessage());
+                Log.e(TAG, "Find account network failure", throwable);
+                resultText.setText("Tìm tài khoản thất bại.\nKhông kết nối được server.");
             }
         });
     }
@@ -114,7 +121,7 @@ public class AccountActivity extends Activity {
         }
         AppSession.saveAccountNumber(this, accountNumber);
         Ui.runCall(
-                "Activate account",
+                "Kích hoạt tài khoản",
                 resultText,
                 ApiClient.getApi().activateAccount(accountNumber, new AccountStatusRequest("ACTIVE"))
         );
@@ -127,6 +134,6 @@ public class AccountActivity extends Activity {
             return;
         }
         AppSession.saveAccountNumber(this, accountNumber);
-        Ui.runCall("Check balance", resultText, ApiClient.getApi().getBalance(accountNumber));
+        Ui.runCall("Xem số dư", resultText, ApiClient.getApi().getBalance(accountNumber));
     }
 }

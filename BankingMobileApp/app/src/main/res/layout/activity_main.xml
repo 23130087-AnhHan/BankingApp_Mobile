@@ -97,6 +97,11 @@
             style="@style/SecondaryButton"
             android:text="Làm mới số dư" />
 
+        <Button
+            android:id="@+id/logoutButton"
+            style="@style/WarningButton"
+            android:text="Đăng xuất" />
+
         <TextView
             style="@style/SectionTitle"
             android:layout_marginTop="26dp"
@@ -151,17 +156,5 @@
                 android:drawableTop="@drawable/ic_history"
                 android:text="Lịch sử" />
         </LinearLayout>
-
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_marginTop="26dp"
-            android:text="Dành cho khách hàng mới" />
-
-        <TextView
-            android:id="@+id/registerTile"
-            style="@style/ActionTileWide"
-            android:drawableStart="@drawable/ic_user_add"
-            android:drawablePadding="14dp"
-            android:text="Đăng ký hồ sơ khách hàng" />
     </LinearLayout>
 </ScrollView>
