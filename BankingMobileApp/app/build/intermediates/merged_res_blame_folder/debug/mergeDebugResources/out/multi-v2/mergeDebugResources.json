@@ -4,78 +4,56 @@
             "outputFile": "com.example.bankingmobileapp-debug-4:/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\colors.xml",
                     "from": {
-                        "startLines": "77,89,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "startColumns": "4,4,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "startOffsets": "3305,3860,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "endLines": "87,91,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "endColumns": "12,12,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "endOffsets": "3854,3984,-1,-1,-1,-1,-1,-1,-1,-1,-1"
+                        "startLines": "7,3,4,5,2,6,14,15,16,8,9,12,13,10,11,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "285,99,143,192,55,241,624,665,707,334,376,518,568,422,469,754,796",
+                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
+                        "endOffsets": "329,138,187,236,94,280,660,702,749,371,417,563,619,464,513,791,838"
                     },
                     "to": {
-                        "startLines": "3,14,17,24,34,40,47,54,63,73,76",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,659,788,1177,1684,1955,2277,2613,3058,3553,3683",
-                        "endLines": "13,16,23,33,39,46,53,62,72,75,83",
-                        "endColumns": "12,12,12,12,12,12,12,12,12,12,12",
-                        "endOffsets": "654,783,1172,1679,1950,2272,2608,3053,3548,3678,4063"
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,104,148,197,246,290,334,375,417,464,506,552,602,658,705,754,796",
+                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
+                        "endOffsets": "99,143,192,241,285,329,370,412,459,501,547,597,653,700,749,791,838"
                     }
                 },
                 {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
                     "from": {
-                        "startLines": "-1",
-                        "startColumns": "-1",
-                        "startOffsets": "-1"
+                        "startLines": "114,129,50,1,30,96,39,89,80,11,58,102,70,20,75",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "5189,5910,2350,16,1413,4387,1823,4101,3704,562,2703,4619,3286,949,3498",
+                        "endLines": "127,134,56,9,37,100,48,94,87,18,68,112,73,28,78",
+                        "endColumns": "12,12,12,12,12,12,12,12,12,12,12,12,12,12,12",
+                        "endOffsets": "5904,6209,2697,556,1817,4613,2344,4381,4095,943,3280,5183,3492,1407,3698"
                     },
                     "to": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "49",
-                        "endOffsets": "100"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "C:\\Users\\84923\\.gradle\\daemon\\9.0.0\\com.example.bankingmobileapp-debug-4:\\values_values.arsc.flat",
-            "map": [
-                {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
-                    "from": {
-                        "startLines": "1,26,9,37,46,17",
-                        "startColumns": "4,4,4,4,4,4",
-                        "startOffsets": "16,1129,406,1637,2029,743",
-                        "endLines": "7,35,15,44,48,24",
-                        "endColumns": "12,12,12,12,12,12",
-                        "endOffsets": "400,1631,737,2023,2154,1123"
-                    },
-                    "to": {
-                        "startLines": "3,10,20,27,35,38",
-                        "startColumns": "4,4,4,4,4,4",
-                        "startOffsets": "105,494,1001,1337,1728,1858",
-                        "endLines": "9,19,26,34,37,45",
-                        "endColumns": "12,12,12,12,12,12",
-                        "endOffsets": "489,996,1332,1723,1853,2238"
+                        "startLines": "20,34,40,47,56,64,69,79,85,93,101,112,123,127,136",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "893,1613,1917,2269,2814,3223,3454,3980,4265,4661,5047,5629,6198,6409,6872",
+                        "endLines": "33,39,46,55,63,68,78,84,92,100,111,122,126,135,139",
+                        "endColumns": "12,12,12,12,12,12,12,12,12,12,12,12,12,12,12",
+                        "endOffsets": "1608,1912,2264,2809,3218,3449,3975,4260,4656,5042,5624,6193,6404,6867,7072"
                     }
                 },
                 {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "1",
                         "startColumns": "4",
-                        "startOffsets": "16",
+                        "startOffsets": "17",
                         "endColumns": "49",
-                        "endOffsets": "61"
+                        "endOffsets": "62"
                     },
                     "to": {
-                        "startLines": "2",
+                        "startLines": "19",
                         "startColumns": "4",
-                        "startOffsets": "55",
+                        "startOffsets": "843",
                         "endColumns": "49",
-                        "endOffsets": "100"
+                        "endOffsets": "888"
                     }
                 }
             ]

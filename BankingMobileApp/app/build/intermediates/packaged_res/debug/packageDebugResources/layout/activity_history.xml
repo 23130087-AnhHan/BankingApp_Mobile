@@ -2,24 +2,36 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg">
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
 
-        <TextView style="@style/MutedText" android:text="Account activity" />
-        <TextView style="@style/PageTitle" android:text="Transactions" />
+        <TextView style="@style/MutedText" android:text="Biến động tài khoản" />
+        <TextView style="@style/PageTitle" android:layout_marginTop="2dp" android:text="Lịch sử giao dịch" />
 
         <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Search history" />
+            <TextView style="@style/SectionTitle" android:text="Tra cứu giao dịch" />
+            <TextView style="@style/MutedText" android:layout_marginBottom="16dp" android:text="Xem các khoản nạp, rút và chuyển tiền gần đây." />
 
-            <EditText android:id="@+id/accountNumberInput" style="@style/Input" android:hint="Account number" />
-            <Button android:id="@+id/loadHistoryButton" style="@style/PrimaryButton" android:text="Load transactions" />
+            <TextView style="@style/FieldLabel" android:text="Số tài khoản" />
+            <EditText android:id="@+id/accountNumberInput" style="@style/Input" android:hint="Nhập số tài khoản" android:inputType="number" />
+            <Button android:id="@+id/loadHistoryButton" style="@style/PrimaryButton" android:text="Xem lịch sử" />
         </LinearLayout>
 
-        <TextView android:id="@+id/historyText" style="@style/ResultBox" android:text="Transactions will appear here." />
+        <TextView
+            android:id="@+id/historyText"
+            style="@style/ResultBox"
+            android:fontFamily="monospace"
+            android:text="Các giao dịch sẽ hiển thị tại đây theo thứ tự mới nhất." />
     </LinearLayout>
 </ScrollView>
