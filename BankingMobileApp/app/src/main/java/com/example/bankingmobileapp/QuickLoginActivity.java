@@ -2,14 +2,17 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bankingmobileapp.api.ApiClient;
+import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.AccountResponse;
+import com.example.bankingmobileapp.model.AuthResponse;
+import com.example.bankingmobileapp.model.LoginRequest;
+import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,7 +20,6 @@ import retrofit2.Response;
 
 public class QuickLoginActivity extends Activity {
     private static final String TAG = "QuickLoginActivity";
-
     private EditText passwordInput;
     private Button loginButton;
     private TextView resultText;
@@ -32,69 +34,87 @@ public class QuickLoginActivity extends Activity {
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
         resultText = findViewById(R.id.resultText);
-
         String displayName = AppSession.getRememberedDisplayName(this);
         greetingText.setText(displayName.isEmpty() ? "Xin chào" : "Xin chào, " + displayName);
 
         loginButton.setOnClickListener(v -> loginRememberedUser());
-        findViewById(R.id.otherAccountButton).setOnClickListener(v -> {
-            AppSession.clearLoginState(this);
+        findViewById(R.id.otherAccountButton).setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
+        findViewById(R.id.forgotPasswordButton).setOnClickListener(v -> requestPasswordReset());
+    }
+
+    private void requestPasswordReset() {
+        String email = AppSession.getUserEmail(this);
+        if (email.isEmpty()) {
             Ui.openAndClear(this, LoginActivity.class);
+            return;
+        }
+        ApiClient.getApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Toast.makeText(QuickLoginActivity.this,
+                        "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable throwable) {
+                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+            }
         });
-        findViewById(R.id.forgotPasswordButton).setOnClickListener(v ->
-                Toast.makeText(this, "Tính năng quên mật khẩu chưa hỗ trợ trong phiên bản demo.", Toast.LENGTH_SHORT).show());
     }
 
     private void loginRememberedUser() {
+        String email = AppSession.getUserEmail(this);
         String password = Ui.text(passwordInput);
+        if (email.isEmpty()) {
+            Ui.openAndClear(this, LoginActivity.class);
+            return;
+        }
         if (password.isEmpty()) {
             passwordInput.setError("Vui lòng nhập mật khẩu");
             return;
         }
-
-        String userIdValue = AppSession.getRememberedUserId(this);
-        if (userIdValue.isEmpty()) {
-            resultText.setText("Không tìm thấy tài khoản đã nhớ. Vui lòng đăng nhập bằng tài khoản khác.");
-            return;
-        }
-
-        long userId;
-        try {
-            userId = Long.parseLong(userIdValue);
-        } catch (NumberFormatException ex) {
-            resultText.setText("User ID đã lưu không hợp lệ. Vui lòng chọn tài khoản khác.");
-            return;
-        }
-
         setLoading(true);
-        resultText.setText("Đang xác thực phiên demo...");
+        resultText.setText("Đang xác thực...");
+        ApiClient.getApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                if (!response.isSuccessful() || response.body() == null || response.body().userId == null) {
+                    setLoading(false);
+                    resultText.setText(response.code() == 401
+                            ? "Mật khẩu không đúng hoặc tài khoản đã bị khóa."
+                            : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập."));
+                    return;
+                }
+                AppSession.saveAuth(QuickLoginActivity.this, response.body());
+                AppSession.saveLoginState(QuickLoginActivity.this, true);
+                loadAccount(response.body().userId);
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable throwable) {
+                setLoading(false);
+                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+            }
+        });
+    }
+
+    private void loadAccount(long userId) {
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 setLoading(false);
-                if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "Quick login failed. HTTP " + response.code());
-                    AppSession.clearLoginState(QuickLoginActivity.this);
-                    resultText.setText(response.code() == 404
-                            ? "Không tìm thấy tài khoản đã lưu."
-                            : Ui.messageForHttpCode(response.code()));
-                    return;
+                if (response.isSuccessful() && response.body() != null) {
+                    AppSession.saveAccount(QuickLoginActivity.this, response.body());
+                } else if (response.code() == 404) {
+                    AppSession.clearAccount(QuickLoginActivity.this);
                 }
-
-                AccountResponse account = response.body();
-                AppSession.saveUserId(QuickLoginActivity.this, userIdValue);
-                AppSession.saveAccount(QuickLoginActivity.this, account);
-                AppSession.saveRememberedUser(QuickLoginActivity.this, userIdValue, "User ID " + userIdValue);
-                AppSession.saveLoginState(QuickLoginActivity.this, true);
                 Ui.openAndClear(QuickLoginActivity.this, MainActivity.class);
             }
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
                 setLoading(false);
-                Log.e(TAG, "Quick login network failure", throwable);
-                AppSession.clearLoginState(QuickLoginActivity.this);
-                resultText.setText("Không kết nối được server.");
+                Ui.openAndClear(QuickLoginActivity.this, MainActivity.class);
             }
         });
     }

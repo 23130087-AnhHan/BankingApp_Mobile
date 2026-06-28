@@ -3,6 +3,7 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,6 +14,8 @@ import com.example.bankingmobileapp.model.AccountRequest;
 import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.CreateUserRequest;
+import com.example.bankingmobileapp.model.AuthResponse;
+import com.example.bankingmobileapp.model.LoginRequest;
 
 import java.math.BigDecimal;
 
@@ -41,6 +44,8 @@ public class RegisterActivity extends Activity {
         registerButton = findViewById(R.id.registerButton);
         openAccountButton = findViewById(R.id.openAccountButton);
         resultText = findViewById(R.id.resultText);
+        userIdInput.setEnabled(false);
+        openAccountButton.setEnabled(false);
 
         registerButton.setOnClickListener(v -> {
             if (!validateRequired(firstNameInput, "Vui lòng nhập tên")
@@ -52,6 +57,16 @@ public class RegisterActivity extends Activity {
             }
 
             String email = Ui.text(emailInput);
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                emailInput.setError("Email không hợp lệ");
+                emailInput.requestFocus();
+                return;
+            }
+            if (Ui.text(passwordInput).length() < 8) {
+                passwordInput.setError("Mật khẩu phải có ít nhất 8 ký tự");
+                passwordInput.requestFocus();
+                return;
+            }
             CreateUserRequest request = new CreateUserRequest(
                     Ui.text(firstNameInput),
                     Ui.text(lastNameInput),
@@ -59,7 +74,7 @@ public class RegisterActivity extends Activity {
                     email,
                     Ui.text(passwordInput)
             );
-            register(request, email);
+            register(request, email.toLowerCase(), Ui.text(passwordInput), userIdInput);
         });
         openAccountButton.setOnClickListener(v -> createAccount(userIdInput));
         findViewById(R.id.loginButton).setOnClickListener(v -> finish());
@@ -74,7 +89,7 @@ public class RegisterActivity extends Activity {
         return true;
     }
 
-    private void register(CreateUserRequest request, String email) {
+    private void register(CreateUserRequest request, String email, String password, EditText userIdInput) {
         setLoading(true);
         resultText.setText("Đang tạo hồ sơ khách hàng...");
         ApiClient.getApi().register(request).enqueue(new Callback<ApiResponse>() {
@@ -90,16 +105,46 @@ public class RegisterActivity extends Activity {
                     return;
                 }
 
+                if (response.body().userId == null) {
+                    resultText.setText("Hồ sơ đã được tạo nhưng server chưa trả User ID. Vui lòng đăng nhập lại.");
+                    return;
+                }
+                long userId = response.body().userId;
+                userIdInput.setText(String.valueOf(userId));
+                AppSession.saveUserId(RegisterActivity.this, String.valueOf(userId));
                 AppSession.saveUserEmail(RegisterActivity.this, email);
-                resultText.setText("Đăng ký thành công\n"
-                        + Ui.formatBody(response.body())
-                        + "\n\nBackend hiện chưa trả User ID trong response đăng ký. Khi đã có User ID do hệ thống cấp, nhập bên dưới để mở tài khoản.");
+                resultText.setText("Đăng ký thành công. Đang tạo phiên đăng nhập...");
+                loginAfterRegistration(email, password, userIdInput);
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
                 setLoading(false);
                 resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+            }
+        });
+    }
+
+    private void loginAfterRegistration(String email, String password, EditText userIdInput) {
+        ApiClient.getApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    setLoading(false);
+                    resultText.setText("Đăng ký thành công nhưng chưa thể đăng nhập tự động. Vui lòng quay lại màn hình đăng nhập.");
+                    return;
+                }
+                AppSession.saveAuth(RegisterActivity.this, response.body());
+                AppSession.saveLoginState(RegisterActivity.this, true);
+                openAccountButton.setEnabled(true);
+                resultText.setText("Đã tạo hồ sơ và đăng nhập. Đang mở tài khoản thanh toán...");
+                createAccount(userIdInput);
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable throwable) {
+                setLoading(false);
+                resultText.setText("Đăng ký thành công nhưng chưa thể đăng nhập tự động. Vui lòng thử đăng nhập lại.");
             }
         });
     }
@@ -128,6 +173,10 @@ public class RegisterActivity extends Activity {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if (!response.isSuccessful()) {
+                    if (response.code() == 409) {
+                        loadCreatedAccount(userId, userIdValue, "Tài khoản đã tồn tại.");
+                        return;
+                    }
                     setAccountLoading(false);
                     resultText.setText(ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản."));
                     return;
@@ -159,13 +208,13 @@ public class RegisterActivity extends Activity {
                 AccountResponse account = response.body();
                 AppSession.saveUserId(RegisterActivity.this, userIdValue);
                 AppSession.saveAccount(RegisterActivity.this, account);
-                AppSession.saveRememberedUser(RegisterActivity.this, userIdValue, "User ID " + userIdValue);
                 resultText.setText(successPrefix
                         + "\n\nUser ID: " + userIdValue
                         + "\nSố tài khoản: " + account.accountNumber
                         + "\nTrạng thái: " + account.accountStatus
                         + "\nSố dư: " + account.availableBalance
-                        + "\n\nTài khoản mới thường ở trạng thái PENDING. Vui lòng nạp tối thiểu 1000 và kích hoạt trước khi chuyển/rút tiền. Sau đó quay lại đăng nhập.");
+                        + "\n\nTài khoản đang ở trạng thái PENDING. Bạn sẽ được chuyển tới Dashboard để nạp tối thiểu 1000 và kích hoạt.");
+                Ui.openAndClear(RegisterActivity.this, MainActivity.class);
             }
 
             @Override
@@ -186,6 +235,6 @@ public class RegisterActivity extends Activity {
     private void setAccountLoading(boolean loading) {
         registerButton.setEnabled(!loading);
         openAccountButton.setEnabled(!loading);
-        openAccountButton.setText(loading ? "Đang mở tài khoản..." : "Mở tài khoản bằng User ID");
+        openAccountButton.setText(loading ? "Đang mở tài khoản..." : "Thử mở tài khoản lại");
     }
 }

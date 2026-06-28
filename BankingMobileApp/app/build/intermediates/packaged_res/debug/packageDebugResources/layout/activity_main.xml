@@ -25,7 +25,6 @@
             android:layout_marginTop="2dp"
             android:text="Ngân hàng của bạn" />
 
-        <!-- Thẻ tổng quan tài khoản luôn giữ thông tin quan trọng ở đầu màn hình. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="208dp"
@@ -47,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Khách hàng #1"
+                    android:text="Chưa có khách hàng"
                     android:textColor="@color/text_on_primary_muted"
                     android:textSize="14sp" />
 
@@ -98,6 +97,12 @@
             android:text="Làm mới số dư" />
 
         <Button
+            android:id="@+id/setupAccountButton"
+            style="@style/PrimaryButton"
+            android:text="Mở hoặc tìm tài khoản"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/logoutButton"
             style="@style/WarningButton"
             android:text="Đăng xuất" />
@@ -107,7 +112,6 @@
             android:layout_marginTop="26dp"
             android:text="Giao dịch nhanh" />
 
-        <!-- Lưới 2 x 2 giúp các tác vụ chính có cùng độ ưu tiên thị giác. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

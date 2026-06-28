@@ -61,6 +61,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response createUser(CreateUser userDto) {
 
+        userDto.setEmailId(userDto.getEmailId().trim().toLowerCase(Locale.ROOT));
+
         List<UserRepresentation> userRepresentations = keycloakService.readUserByEmail(userDto.getEmailId());
         if(userRepresentations.size() > 0) {
             log.error("This emailId is already registered as a user");
@@ -72,7 +74,9 @@ public class UserServiceImpl implements UserService {
         userRepresentation.setFirstName(userDto.getFirstName());
         userRepresentation.setLastName(userDto.getLastName());
         userRepresentation.setEmailVerified(false);
-        userRepresentation.setEnabled(false);
+        // Authentication and banking approval are separate concerns. A newly registered
+        // customer can sign in immediately while the banking profile remains PENDING.
+        userRepresentation.setEnabled(true);
         userRepresentation.setEmail(userDto.getEmailId());
 
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
@@ -96,10 +100,15 @@ public class UserServiceImpl implements UserService {
                     .authId(representations.get(0).getId())
                     .identificationNumber(UUID.randomUUID().toString()).build();
 
-            userRepository.save(user);
+            User savedUser = userRepository.save(user);
             return Response.builder()
                     .responseMessage("User created successfully")
-                    .responseCode(responseCodeSuccess).build();
+                    .responseCode(responseCodeSuccess)
+                    .userId(savedUser.getUserId())
+                    .emailId(savedUser.getEmailId())
+                    .displayName(userProfile.getFirstName() + " " + userProfile.getLastName())
+                    .status(savedUser.getStatus())
+                    .build();
         }
         throw new RuntimeException("User with identification number not found");
     }

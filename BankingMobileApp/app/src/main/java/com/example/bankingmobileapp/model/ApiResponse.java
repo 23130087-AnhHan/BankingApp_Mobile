@@ -9,4 +9,12 @@ public class ApiResponse {
     public String responseMessage;
     @SerializedName("message")
     public String message;
+    @SerializedName("userId")
+    public Long userId;
+    @SerializedName("emailId")
+    public String emailId;
+    @SerializedName("displayName")
+    public String displayName;
+    @SerializedName("status")
+    public String status;
 }

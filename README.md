@@ -44,6 +44,7 @@ To get started, follow these steps to run the application on your local applicat
 - Clone the repository containing the microservices onto your local system using Git. Navigate to the directory where you have cloned the repository.
 - Navigate to each microservice directory within the cloned repository and run the application. You can do this by using your IDE or running specific commands depending on the build tool used (e.g., Maven or Gradle).
 - Set up Keycloak for authentication and authorization. Refer to the detailed configuration guide provided [here](https://devscribbles.hashnode.dev/mastering-microservices-authentication-and-authorization-with-keycloak) for step-by-step instructions on configuring Keycloak for your microservices.
+- `User-Service` requires a real Keycloak server at `http://localhost:8571` and the `KEYCLOAK_CLIENT_SECRET` environment variable; there is no disable flag, bypass, or fallback secret. Create realm `banking-service`, confidential client `banking-service-api-client`, enable its service account, and grant the service account user-management permissions. Without the variable User-Service will not start; if Keycloak/client/roles are unavailable or invalid, registration and authentication fail. See [RUN_LOCAL.md](./RUN_LOCAL.md) or run `./run-user-service.ps1` from PowerShell.
 - Some microservices and APIs may depend on others being up and running. Ensure that all necessary microservices and APIs are up and functioning correctly to avoid any issues in the application workflow.
 
 <h2>📖 Documentation</h2>

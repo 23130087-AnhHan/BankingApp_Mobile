@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.AccountResponse;
+import com.example.bankingmobileapp.model.RefreshTokenRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,7 +28,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!AppSession.isLoggedIn(this)) {
+        if (!AppSession.hasValidSession(this)) {
             openLoginAndFinish();
             return;
         }
@@ -53,7 +54,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshAccount();
+        if (!AppSession.hasValidSession(this)) {
+            openLoginAndFinish();
+        } else {
+            refreshAccount();
+        }
     }
 
     private void refreshAccount() {
@@ -145,6 +150,25 @@ public class MainActivity extends Activity {
     }
 
     private void logout() {
+        String refreshToken = AppSession.getRefreshToken(this);
+        if (refreshToken.isEmpty()) {
+            finishLogout();
+            return;
+        }
+        ApiClient.getApi().logout(new RefreshTokenRequest(refreshToken)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                finishLogout();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable throwable) {
+                finishLogout();
+            }
+        });
+    }
+
+    private void finishLogout() {
         AppSession.clearLoginState(this);
         Ui.openAndClear(this, WelcomeActivity.class);
     }

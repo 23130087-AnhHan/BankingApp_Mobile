@@ -54,4 +54,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<Object> handleAuthenticationFailed(AuthenticationFailedException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.builder()
+                        .errorCode("401")
+                        .errorMessage(exception.getMessage())
+                        .build());
+    }
+
 }

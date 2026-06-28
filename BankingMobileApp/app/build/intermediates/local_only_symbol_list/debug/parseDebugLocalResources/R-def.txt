@@ -67,6 +67,7 @@ id rateShortcut
 id refreshButton
 id registerButton
 id resultText
+id setupAccountButton
 id statusText
 id toAccountInput
 id transactionTypeInput

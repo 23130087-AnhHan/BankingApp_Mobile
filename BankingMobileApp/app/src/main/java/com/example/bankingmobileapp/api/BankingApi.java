@@ -9,6 +9,10 @@ import com.example.bankingmobileapp.model.FundTransferRequest;
 import com.example.bankingmobileapp.model.FundTransferResponse;
 import com.example.bankingmobileapp.model.TransactionRequest;
 import com.example.bankingmobileapp.model.TransactionResponse;
+import com.example.bankingmobileapp.model.AuthResponse;
+import com.example.bankingmobileapp.model.LoginRequest;
+import com.example.bankingmobileapp.model.RefreshTokenRequest;
+import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 
 import java.util.List;
 
@@ -21,6 +25,18 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface BankingApi {
+    @POST("api/users/auth/login")
+    Call<AuthResponse> login(@Body LoginRequest body);
+
+    @POST("api/users/auth/refresh")
+    Call<AuthResponse> refresh(@Body RefreshTokenRequest body);
+
+    @POST("api/users/auth/logout")
+    Call<Void> logout(@Body RefreshTokenRequest body);
+
+    @POST("api/users/auth/forgot-password")
+    Call<Void> forgotPassword(@Body ForgotPasswordRequest body);
+
     @POST("api/users/register")
     Call<ApiResponse> register(@Body CreateUserRequest body);
 

@@ -14,12 +14,12 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .authorizeExchange()
-                // Demo mode for the Android final project: allow mobile app calls without Keycloak.
-                .anyExchange().permitAll()
+                .pathMatchers("/api/users/register", "/api/users/auth/login", "/api/users/auth/refresh",
+                        "/api/users/auth/forgot-password").permitAll()
+                .pathMatchers("/actuator/health").permitAll()
+                .anyExchange().authenticated()
                 .and()
                 .csrf().disable()
-                .oauth2Login()
-                .and()
                 .oauth2ResourceServer()
                 .jwt();
         return http.build();

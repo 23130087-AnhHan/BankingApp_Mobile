@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.bankingmobileapp.model.AccountResponse;
+import com.example.bankingmobileapp.model.AuthResponse;
 
 public final class AppSession {
     private static final String PREFS = "banking_demo_session";
@@ -16,6 +17,8 @@ public final class AppSession {
     private static final String ACCOUNT_NUMBER = "account_number";
     private static final String ACCOUNT_BALANCE = "account_balance";
     private static final String AUTH_TOKEN = "auth_token";
+    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String TOKEN_EXPIRES_AT = "token_expires_at";
 
     private AppSession() {
     }
@@ -133,15 +136,35 @@ public final class AppSession {
     }
 
     public static void saveAuthToken(Context context, String token) {
-        putOrRemove(context, AUTH_TOKEN, token);
+        SecureTokenStore.put(prefs(context), AUTH_TOKEN, token);
     }
 
     public static String getAuthToken(Context context) {
-        return getString(context, AUTH_TOKEN);
+        return SecureTokenStore.get(prefs(context), AUTH_TOKEN);
     }
 
     public static void clearAuthToken(Context context) {
-        prefs(context).edit().remove(AUTH_TOKEN).apply();
+        prefs(context).edit().remove(AUTH_TOKEN).remove(REFRESH_TOKEN).remove(TOKEN_EXPIRES_AT).apply();
+    }
+
+    public static String getRefreshToken(Context context) {
+        return SecureTokenStore.get(prefs(context), REFRESH_TOKEN);
+    }
+
+    public static void saveAuth(Context context, AuthResponse auth) {
+        if (auth == null || auth.accessToken == null || auth.accessToken.trim().isEmpty()) return;
+        saveAuthToken(context, auth.accessToken);
+        SecureTokenStore.put(prefs(context), REFRESH_TOKEN, auth.refreshToken);
+        long expiresIn = auth.expiresIn == null ? 0L : auth.expiresIn;
+        prefs(context).edit().putLong(TOKEN_EXPIRES_AT,
+                System.currentTimeMillis() + Math.max(0L, expiresIn - 30L) * 1000L).apply();
+        if (auth.userId != null) saveUserId(context, String.valueOf(auth.userId));
+        saveUserEmail(context, auth.email);
+        saveRememberedUser(context, auth.userId == null ? "" : String.valueOf(auth.userId), auth.displayName);
+    }
+
+    public static boolean hasValidSession(Context context) {
+        return isLoggedIn(context) && !getAuthToken(context).isEmpty() && !getRefreshToken(context).isEmpty();
     }
 
     public static void saveAccount(Context context, AccountResponse account) {
@@ -164,6 +187,8 @@ public final class AppSession {
         prefs(context).edit()
                 .putBoolean(IS_LOGGED_IN, false)
                 .remove(AUTH_TOKEN)
+                .remove(REFRESH_TOKEN)
+                .remove(TOKEN_EXPIRES_AT)
                 .apply();
     }
 

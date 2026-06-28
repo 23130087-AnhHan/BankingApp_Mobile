@@ -4,14 +4,31 @@
             "outputFile": "com.example.bankingmobileapp-mergeDebugResources-2:/values/values.xml",
             "map": [
                 {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "7,3,4,5,2,6,14,15,16,8,9,12,13,10,11,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "285,99,143,192,55,241,624,665,707,334,376,518,568,422,469,754,796",
+                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
+                        "endOffsets": "329,138,187,236,94,280,660,702,749,371,417,563,619,464,513,791,838"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,104,148,197,246,290,334,375,417,464,506,552,602,658,705,754,796",
+                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
+                        "endOffsets": "99,143,192,241,285,329,370,412,459,501,547,597,653,700,749,791,838"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "114,129,50,1,30,96,39,89,80,11,58,102,70,20,75",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "5303,6039,2400,17,1443,4483,1862,4190,3784,573,2761,4721,3356,969,3573",
+                        "startOffsets": "5189,5910,2350,16,1413,4387,1823,4101,3704,562,2703,4619,3286,949,3498",
                         "endLines": "127,134,56,9,37,100,48,94,87,18,68,112,73,28,78",
                         "endColumns": "12,12,12,12,12,12,12,12,12,12,12,12,12,12,12",
-                        "endOffsets": "6031,6343,2753,565,1854,4713,2392,4475,4182,961,3348,5295,3565,1435,3776"
+                        "endOffsets": "5904,6209,2697,556,1817,4613,2344,4381,4095,943,3280,5183,3492,1407,3698"
                     },
                     "to": {
                         "startLines": "20,34,40,47,56,64,69,79,85,93,101,112,123,127,136",
@@ -23,30 +40,13 @@
                     }
                 },
                 {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\colors.xml",
-                    "from": {
-                        "startLines": "7,3,4,5,2,6,14,15,16,8,9,12,13,10,11,17,18",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "292,102,147,197,57,247,638,680,723,342,385,530,581,432,480,771,814",
-                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
-                        "endOffsets": "336,141,191,241,96,286,674,717,765,379,426,575,632,474,524,808,856"
-                    },
-                    "to": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,104,148,197,246,290,334,375,417,464,506,552,602,658,705,754,796",
-                        "endColumns": "48,43,48,48,43,43,40,41,46,41,45,49,55,46,48,41,46",
-                        "endOffsets": "99,143,192,241,285,329,370,412,459,501,547,597,653,700,749,791,838"
-                    }
-                },
-                {
-                    "source": "D:\\Spring-Boot-Microservices-Banking-Application\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Users\\Asus\\StudioProjects\\BankingApp_Mobile\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "1",
                         "startColumns": "4",
-                        "startOffsets": "16",
+                        "startOffsets": "17",
                         "endColumns": "49",
-                        "endOffsets": "61"
+                        "endOffsets": "62"
                     },
                     "to": {
                         "startLines": "19",

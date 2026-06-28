@@ -81,4 +81,10 @@ public class KeycloakServiceImpl implements KeycloakService {
         keyCloakManager.getKeyCloakInstanceWithRealm().users()
                 .get(userRepresentation.getId()).update(userRepresentation);
     }
+
+    @Override
+    public void sendPasswordReset(String authId) {
+        keyCloakManager.getKeyCloakInstanceWithRealm().users()
+                .get(authId).executeActionsEmail(java.util.Collections.singletonList("UPDATE_PASSWORD"));
+    }
 }

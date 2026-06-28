@@ -27,7 +27,7 @@
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Nhập mật khẩu để tiếp tục phiên demo. Ứng dụng vẫn kiểm tra tài khoản qua backend trước khi vào Dashboard." />
+            android:text="Nhập mật khẩu để xác thực lại tài khoản đã nhớ." />
 
         <LinearLayout
             style="@style/Panel"

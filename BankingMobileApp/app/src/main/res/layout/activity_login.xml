@@ -26,7 +26,7 @@
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Phiên bản demo dùng User ID để tra cứu tài khoản qua backend. Mật khẩu được kiểm tra tối thiểu ở phía ứng dụng vì backend chưa có endpoint login thật." />
+            android:text="Đăng nhập bằng email và mật khẩu đã đăng ký. Phiên truy cập được xác thực an toàn qua hệ thống ngân hàng." />
 
         <LinearLayout
             style="@style/Panel"
@@ -38,13 +38,13 @@
 
             <TextView
                 style="@style/FieldLabel"
-                android:text="User ID" />
+                android:text="Email" />
 
             <EditText
                 android:id="@+id/userIdInput"
                 style="@style/Input"
-                android:hint="Nhập User ID"
-                android:inputType="number" />
+                android:hint="tenban@email.com"
+                android:inputType="textEmailAddress" />
 
             <TextView
                 style="@style/FieldLabel"
@@ -75,6 +75,6 @@
         <TextView
             android:id="@+id/resultText"
             style="@style/ResultBox"
-            android:text="Nhập User ID và mật khẩu để đăng nhập phiên bản demo." />
+            android:text="Nhập email và mật khẩu để tiếp tục." />
     </LinearLayout>
 </ScrollView>

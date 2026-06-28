@@ -9,14 +9,14 @@ Repo có 7 backend Spring Boot độc lập và 1 Android app.
 | Folder | `spring.application.name` | Port | Database | Tài khoản MySQL | `ddl-auto` | Eureka |
 | --- | --- | ---: | --- | --- | --- | --- |
 | `Service-Registry` | `SERVICE-REGISTRY` | 8761 | Không dùng | Không dùng | Không dùng | Server tại `http://localhost:8761/eureka` |
-| `User-Service` | `user-service` | 8082 | `user_service` | `root` / `123456` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
-| `Account-Service` | `account-service` | 8081 | `account_service` | `root` / `123456` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
-| `Sequence-Generator` | `sequence-generator` | 8083 | `sequence_generator` | `root` / `123456` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
-| `Transaction-Service` | `transaction-service` | 8084 | `transaction_service` | `root` / `123456` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
-| `Fund-Transfer` | `fund-transfer-service` | 8085 | `fund_transfer_service` | `root` / `123456` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
+| `User-Service` | `user-service` | 8082 | `user_service` | `root` / `12345678` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
+| `Account-Service` | `account-service` | 8081 | `account_service` | `root` / `12345678` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
+| `Sequence-Generator` | `sequence-generator` | 8083 | `sequence_generator` | `root` / `12345678` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
+| `Transaction-Service` | `transaction-service` | 8084 | `transaction_service` | `root` / `12345678` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
+| `Fund-Transfer` | `fund-transfer-service` | 8085 | `fund_transfer_service` | `root` / `12345678` | `update` | URL mặc định của Eureka client: `http://localhost:8761/eureka/` |
 | `API-Gateway` | `api-gateway` | 8080 | Không dùng | Không dùng | Không dùng | Khai báo rõ `http://localhost:8761/eureka` |
 
-Lưu ý: mật khẩu mặc định thực tế trong tất cả `application.yml` có datasource là `123456`, không phải `12345678`. Riêng `User-Service` cho phép ghi đè bằng các biến `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DB_NAME`, `MYSQL_USER`, `MYSQL_PASSWORD`.
+Mật khẩu mặc định hiện là `12345678`. Riêng `User-Service` cho phép ghi đè bằng các biến `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DB_NAME`, `MYSQL_USER`, `MYSQL_PASSWORD`.
 
 API Gateway đang có các route:
 
@@ -38,7 +38,137 @@ Hai route fund transfer dùng cùng `id` trong YAML. Repo trước đây đã ch
 - MySQL chạy tại `localhost:3306`.
 - Android Studio, Android SDK Platform 35 và một Android Emulator.
 - Android app dùng Gradle Wrapper có sẵn trong `BankingMobileApp`.
-- Keycloak tại `http://localhost:8571` nếu cần đăng ký/duyệt người dùng. `User-Service` gọi trực tiếp Keycloak realm `banking-service`; chỉ có MySQL là chưa đủ cho luồng đăng ký.
+- Keycloak tại `http://localhost:8571` là bắt buộc cho đăng ký, đăng nhập, làm mới token và đăng xuất.
+
+### Cấu hình Keycloak cho xác thực thật
+
+Keycloak là thành phần bắt buộc của bản chính, không phải nhánh demo. `User-Service` luôn tạo và đọc user qua Keycloak; không có cờ tắt hoặc fallback local. Nếu Keycloak chưa chạy tại `http://localhost:8571`, thao tác đăng ký từ Android sẽ lỗi kết nối và không thể hoàn tất.
+
+#### Khởi động Keycloak local tại port 8571
+
+Project đang dùng `keycloak-admin-client` 21.0.1, vì vậy có thể chạy Keycloak 21.0.1 tương ứng bằng Docker. Dữ liệu Keycloak được giữ trong named volume, không mất khi container dừng:
+
+```powershell
+$adminPassword = Read-Host "Nhap mat khau admin Keycloak local"
+
+docker volume create banking-keycloak-data
+docker run --name banking-keycloak `
+  -p 127.0.0.1:8571:8080 `
+  -e KEYCLOAK_ADMIN=admin `
+  -e KEYCLOAK_ADMIN_PASSWORD=$adminPassword `
+  -v banking-keycloak-data:/opt/keycloak/data `
+  quay.io/keycloak/keycloak:21.0.1 `
+  start-dev
+
+$adminPassword = $null
+```
+
+Nếu máy không dùng Docker, tải bản ZIP Keycloak 21.0.1, giải nén và chạy trực tiếp bằng JDK 17:
+
+```powershell
+cd C:\Tools\keycloak-21.0.1
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$env:KEYCLOAK_ADMIN = "admin"
+$env:KEYCLOAK_ADMIN_PASSWORD = Read-Host "Nhap mat khau admin Keycloak local"
+
+.\bin\kc.bat start-dev --http-port=8571
+```
+
+Giữ terminal này chạy trong lúc sử dụng app. Sau khi admin đầu tiên đã được tạo, các biến bootstrap admin không cần dùng để tạo lại tài khoản ở mỗi lần khởi động.
+
+Lệnh `start-dev` chỉ cấu hình server Keycloak cho môi trường local; luồng đăng ký, credential, token và service account vẫn là Keycloak thật. Khi triển khai production, chạy Keycloak bằng `start`, HTTPS, hostname cố định, database bền vững và secret manager; không cần đổi logic auth của Android hoặc User-Service.
+
+Sau lần tạo đầu tiên, có thể khởi động lại container và xem log bằng:
+
+```powershell
+docker start banking-keycloak
+docker logs -f banking-keycloak
+```
+
+Kiểm tra endpoint realm sau khi hoàn tất setup:
+
+```powershell
+Invoke-RestMethod http://localhost:8571/realms/banking-service/.well-known/openid-configuration
+```
+
+#### Tạo realm và confidential client
+
+1. Mở `http://localhost:8571` và chọn `Administration Console`.
+2. Đăng nhập tài khoản admin vừa tạo.
+3. Chọn `Create Realm`, nhập realm name `banking-service`, rồi lưu.
+4. Trong realm `banking-service`, mở `Clients` > `Create client`.
+5. Chọn `OpenID Connect`, nhập Client ID `banking-service-api-client`, rồi tiếp tục.
+6. Cấu hình client:
+   - `Client authentication`: **ON**.
+   - `Service accounts roles`: **ON** vì User-Service dùng client credentials để gọi Admin API.
+   - `Direct access grants`: **ON** vì endpoint login backend đổi email/password lấy token Keycloak.
+   - `Authorization`: **OFF**, trừ khi sau này project thật sự dùng Authorization Services.
+7. Lưu client. Vào tab `Service account roles` > `Assign role` > lọc theo client.
+8. Chọn client roles của `realm-management` và gán `manage-users`. Nếu bản Keycloak không tự kéo các quyền composite cần thiết, gán thêm `view-users` và `query-users`. Không cần gán `realm-admin`.
+9. Vào tab `Credentials`, copy `Client Secret`.
+10. Dán secret khi script `run-user-service.ps1` hỏi. Không ghi secret vào YAML, script, README, commit hoặc lịch sử lệnh.
+
+Client phải có `Client authentication`, service account và quyền quản lý user; chỉ bật `Credentials` mà không gán role thì token client có thể được cấp nhưng lệnh tạo/tìm user vẫn bị Keycloak từ chối `403`.
+
+Không lưu client secret vào Git. Lấy secret ở Keycloak Admin Console, rồi khai báo trong terminal chạy User-Service:
+
+1. Mở Keycloak Admin Console tại `http://localhost:8571`.
+2. Chọn realm `banking-service`.
+3. Vào `Clients` và chọn `banking-service-api-client`.
+4. Mở tab `Credentials`.
+5. Copy `Client Secret`; không dán giá trị này vào file trong repo hoặc commit lên Git.
+
+```powershell
+cd C:\Users\Asus\StudioProjects\BankingApp_Mobile
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+
+$env:KEYCLOAK_URL = 'http://localhost:8571'
+$env:KEYCLOAK_REALM = 'banking-service'
+$env:KEYCLOAK_CLIENT_ID = 'banking-service-api-client'
+$env:KEYCLOAK_CLIENT_SECRET = 'PASTE_REAL_SECRET_HERE'
+
+.\mvnw.cmd -f .\User-Service\pom.xml spring-boot:run
+```
+
+`PASTE_REAL_SECRET_HERE` chỉ là vị trí cần dán secret thật trong terminal, không phải giá trị cấu hình để lưu vào Git. Biến môi trường chỉ có hiệu lực trong phiên PowerShell hiện tại.
+
+Repo cũng có script hỏi secret khi chạy và không lưu secret vào file:
+
+```powershell
+cd C:\Users\Asus\StudioProjects\BankingApp_Mobile
+.\run-user-service.ps1
+```
+
+Script sẽ dừng trước khi chạy Maven nếu secret bị bỏ trống hoặc không kết nối được Keycloak. Khi User-Service kết thúc, script xóa `KEYCLOAK_CLIENT_SECRET` khỏi môi trường của tiến trình script.
+
+Kiểm tra biến đã được set trong terminal chạy thủ công:
+
+```powershell
+echo $env:KEYCLOAK_CLIENT_SECRET
+```
+
+Lệnh trên sẽ in secret ra màn hình; chỉ dùng để kiểm tra cục bộ và không chia sẻ/chụp lại output. Nếu không set `KEYCLOAK_CLIENT_SECRET`, Spring sẽ báo lỗi placeholder và User-Service không start. Nếu Keycloak chưa chạy, realm/client không tồn tại hoặc secret sai, service có thể start nhưng đăng ký/đăng nhập sẽ lỗi khi gọi Keycloak.
+
+Flow public chỉ gồm đăng ký, đăng nhập, làm mới token và yêu cầu đặt lại mật khẩu. Các API tài khoản, giao dịch, chuyển tiền và dữ liệu user khác đều yêu cầu header `Authorization: Bearer <access_token>`.
+
+Để nút Quên mật khẩu gửi được email, cấu hình SMTP trong `Realm settings > Email` của Keycloak và kiểm tra bằng nút test connection.
+
+#### Kiểm tra đăng ký end-to-end
+
+1. Chạy Keycloak và xác nhận URL discovery của realm trả JSON.
+2. Chạy MySQL, Service Registry và các service nghiệp vụ cần thiết.
+3. Từ root repo, chạy `./run-user-service.ps1`, nhập client secret thật và chờ `User-Service` đăng ký `UP` trên Eureka.
+4. Chạy API Gateway mới nhất và Android app, sau đó xóa app data để tránh session cũ.
+5. Trên Android chọn Đăng ký và nhập email chưa tồn tại.
+6. Trong Keycloak Admin Console, mở realm `banking-service` > `Users`; email mới phải xuất hiện.
+7. Kiểm tra database `user_service`; profile tương ứng phải có `authId` trùng ID của user Keycloak.
+8. Android phải nhận response thành công có `userId`; log User-Service không còn `Connect to localhost:8571 failed` hoặc `RESTEASY004655`.
+
+Nếu user có trong Keycloak nhưng không có trong MySQL, kiểm tra lỗi database sau bước gọi Admin API trước khi thử lại. Nếu nhận `401`, kiểm tra client secret; nếu nhận `403`, kiểm tra service-account roles; nếu `Connection refused`, Keycloak chưa lắng nghe ở port 8571.
 
 ### Java, Spring Boot và Maven của từng backend
 
@@ -158,6 +288,7 @@ Mỗi service đang chạy phải giữ một cửa sổ PowerShell riêng. Các
 2. Chạy các service nghiệp vụ. Database phải được tạo trước bước này.
 
    ```powershell
+   $env:KEYCLOAK_CLIENT_SECRET = 'PASTE_REAL_SECRET_HERE'
    mvn -f .\User-Service\pom.xml spring-boot:run
    ```
 
@@ -190,7 +321,7 @@ Mỗi service đang chạy phải giữ một cửa sổ PowerShell riêng. Các
    curl.exe "http://localhost:8080/transactions?accountId=test"
    ```
 
-Lệnh thứ hai dự kiến trả về danh sách rỗng khi database chưa có giao dịch. Nếu Gateway trả `503`, kiểm tra service đích đã đăng ký trên Eureka và tên service có khớp bảng cấu hình ở trên hay chưa.
+Lệnh thứ hai phải trả `401` khi không có token; đây là hành vi đúng. Nếu Gateway trả `503`, kiểm tra service đích đã đăng ký trên Eureka và tên service có khớp bảng cấu hình ở trên hay chưa.
 
 ## 5. Test nhanh bằng Postman
 

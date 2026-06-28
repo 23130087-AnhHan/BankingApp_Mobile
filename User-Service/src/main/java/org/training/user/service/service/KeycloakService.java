@@ -44,4 +44,6 @@ public interface KeycloakService {
      * @param  userRepresentation  the user representation object containing the updated user details
      */
     void updateUser(UserRepresentation userRepresentation);
+
+    void sendPasswordReset(String authId);
 }

@@ -46,23 +46,23 @@
         </LinearLayout>
 
         <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Mở tài khoản bằng User ID" />
+            <TextView style="@style/SectionTitle" android:text="Tài khoản ngân hàng" />
             <TextView
                 style="@style/MutedText"
                 android:layout_marginBottom="16dp"
-                android:text="Backend hiện chưa trả User ID sau đăng ký. Khi đã có User ID do hệ thống cấp, nhập vào đây để mở tài khoản tiết kiệm." />
+                android:text="Sau khi đăng ký, ứng dụng sẽ tự nhận mã khách hàng, đăng nhập và mở tài khoản cho bạn." />
 
             <TextView style="@style/FieldLabel" android:text="User ID" />
             <EditText
                 android:id="@+id/userIdInput"
                 style="@style/Input"
-                android:hint="Nhập User ID"
+                android:hint="Được cấp tự động"
                 android:inputType="number" />
 
             <Button
                 android:id="@+id/openAccountButton"
                 style="@style/PrimaryButton"
-                android:text="Mở tài khoản bằng User ID" />
+                android:text="Thử mở tài khoản lại" />
         </LinearLayout>
 
         <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Kết quả đăng ký sẽ hiển thị tại đây." />

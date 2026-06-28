@@ -13,6 +13,7 @@ import org.training.user.service.model.dto.response.Response;
 import org.training.user.service.service.UserService;
 
 import java.util.List;
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -29,8 +30,8 @@ public class UserController {
      * @return the response entity containing the response
      */
     @PostMapping("/register")
-    public ResponseEntity<Response> createUser(@RequestBody CreateUser userDto) {
-        log.info("creating user with: {}", userDto.toString());
+    public ResponseEntity<Response> createUser(@Valid @RequestBody CreateUser userDto) {
+        log.info("Creating user profile for email: {}", userDto.getEmailId());
         return ResponseEntity.ok(userService.createUser(userDto));
     }
 

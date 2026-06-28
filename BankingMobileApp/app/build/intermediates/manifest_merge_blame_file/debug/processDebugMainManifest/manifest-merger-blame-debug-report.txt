@@ -9,67 +9,69 @@
 9        android:targetSdkVersion="35" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:4:5-67
-11-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:4:22-64
+11-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:4:5-67
+11-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:4:22-64
 12
 13    <application
-13-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:6:5-30:19
-14        android:allowBackup="true"
-14-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:7:9-35
-15        android:debuggable="true"
-16        android:extractNativeLibs="false"
-17        android:icon="@drawable/ic_launcher"
-17-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:8:9-45
-18        android:label="@string/app_name"
-18-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:9:9-41
-19        android:supportsRtl="true"
-19-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:10:9-35
-20        android:testOnly="true"
-21        android:theme="@style/AppTheme"
-21-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:11:9-40
-22        android:usesCleartextTraffic="true" >
-22-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:12:9-44
-23        <activity
-23-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:13:9-21:20
-24            android:name="com.example.bankingmobileapp.WelcomeActivity"
-24-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:14:13-44
-25            android:exported="true" >
-25-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:15:13-36
-26            <intent-filter>
-26-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:16:13-20:29
-27                <action android:name="android.intent.action.MAIN" />
-27-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:17:17-69
-27-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:17:25-66
-28
-29                <category android:name="android.intent.category.LAUNCHER" />
-29-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:19:17-77
-29-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:19:27-74
-30            </intent-filter>
-31        </activity>
-32        <activity android:name="com.example.bankingmobileapp.QuickLoginActivity" />
-32-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:22:9-56
-32-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:22:19-53
-33        <activity android:name="com.example.bankingmobileapp.LoginActivity" />
-33-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:23:9-51
-33-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:23:19-48
-34        <activity android:name="com.example.bankingmobileapp.HistoryActivity" />
-34-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:24:9-53
-34-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:24:19-50
-35        <activity android:name="com.example.bankingmobileapp.TransferActivity" />
-35-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:25:9-54
-35-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:25:19-51
-36        <activity android:name="com.example.bankingmobileapp.TransactionActivity" />
-36-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:26:9-57
-36-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:26:19-54
-37        <activity android:name="com.example.bankingmobileapp.AccountActivity" />
-37-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:27:9-53
-37-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:27:19-50
-38        <activity android:name="com.example.bankingmobileapp.RegisterActivity" />
-38-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:28:9-54
-38-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:28:19-51
-39        <activity android:name="com.example.bankingmobileapp.MainActivity" />
-39-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:29:9-50
-39-->D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\AndroidManifest.xml:29:19-47
-40    </application>
-41
-42</manifest>
+13-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:6:5-31:19
+14        android:name="com.example.bankingmobileapp.BankingApplication"
+14-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:7:9-43
+15        android:allowBackup="false"
+15-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:8:9-36
+16        android:debuggable="true"
+17        android:extractNativeLibs="false"
+18        android:icon="@drawable/ic_launcher"
+18-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:9:9-45
+19        android:label="@string/app_name"
+19-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:10:9-41
+20        android:supportsRtl="true"
+20-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:11:9-35
+21        android:testOnly="true"
+22        android:theme="@style/AppTheme"
+22-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:12:9-40
+23        android:usesCleartextTraffic="true" >
+23-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:13:9-44
+24        <activity
+24-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:14:9-22:20
+25            android:name="com.example.bankingmobileapp.WelcomeActivity"
+25-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:15:13-44
+26            android:exported="true" >
+26-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:16:13-36
+27            <intent-filter>
+27-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:17:13-21:29
+28                <action android:name="android.intent.action.MAIN" />
+28-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:18:17-69
+28-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:18:25-66
+29
+30                <category android:name="android.intent.category.LAUNCHER" />
+30-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:20:17-77
+30-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:20:27-74
+31            </intent-filter>
+32        </activity>
+33        <activity android:name="com.example.bankingmobileapp.QuickLoginActivity" />
+33-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:23:9-56
+33-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:23:19-53
+34        <activity android:name="com.example.bankingmobileapp.LoginActivity" />
+34-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:24:9-51
+34-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:24:19-48
+35        <activity android:name="com.example.bankingmobileapp.HistoryActivity" />
+35-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:25:9-53
+35-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:25:19-50
+36        <activity android:name="com.example.bankingmobileapp.TransferActivity" />
+36-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:26:9-54
+36-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:26:19-51
+37        <activity android:name="com.example.bankingmobileapp.TransactionActivity" />
+37-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:27:9-57
+37-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:27:19-54
+38        <activity android:name="com.example.bankingmobileapp.AccountActivity" />
+38-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:28:9-53
+38-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:28:19-50
+39        <activity android:name="com.example.bankingmobileapp.RegisterActivity" />
+39-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:29:9-54
+39-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:29:19-51
+40        <activity android:name="com.example.bankingmobileapp.MainActivity" />
+40-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:30:9-50
+40-->C:\Users\Asus\StudioProjects\BankingApp_Mobile\BankingMobileApp\app\src\main\AndroidManifest.xml:30:19-47
+41    </application>
+42
+43</manifest>
