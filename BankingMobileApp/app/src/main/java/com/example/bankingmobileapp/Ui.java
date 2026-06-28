@@ -2,10 +2,10 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.FundTransferResponse;
 
@@ -14,8 +14,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public final class Ui {
-    private static final String TAG = "BankingUi";
-
     private Ui() {
     }
 
@@ -40,8 +38,7 @@ public final class Ui {
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, action + " failed. HTTP " + response.code());
-                    resultView.setText(action + " thất bại.\n" + messageForHttpCode(response.code()));
+                    resultView.setText(ApiErrorUtils.httpError("Ui", response, action + " chưa thể hoàn tất."));
                     return;
                 }
                 resultView.setText(action + " hoàn tất\n" + formatBody(response.body()));
@@ -49,24 +46,24 @@ public final class Ui {
 
             @Override
             public void onFailure(Call<T> call, Throwable throwable) {
-                Log.e(TAG, action + " network failure", throwable);
-                resultView.setText(action + " thất bại.\nKhông kết nối được server.");
+                resultView.setText(ApiErrorUtils.networkError("Ui", throwable));
             }
         });
     }
 
     public static String formatBody(Object body) {
         if (body == null) {
-            return "Không có dữ liệu phản hồi";
+            return "Server không trả nội dung chi tiết.";
         }
         if (body instanceof ApiResponse) {
             ApiResponse response = (ApiResponse) body;
-            String message = response.message != null ? response.message : response.responseMessage;
-            return "Mã phản hồi: " + response.responseCode + "\nThông báo: " + message;
+            String message = firstNonEmpty(response.message, response.responseMessage, "Thao tác đã hoàn tất.");
+            return "Mã: " + firstNonEmpty(response.responseCode, "--") + "\nThông báo: " + message;
         }
         if (body instanceof FundTransferResponse) {
             FundTransferResponse response = (FundTransferResponse) body;
-            return "Mã tham chiếu: " + response.transactionId + "\nThông báo: " + response.message;
+            return "Mã tham chiếu: " + firstNonEmpty(response.transactionId, "--")
+                    + "\nThông báo: " + firstNonEmpty(response.message, "Chuyển tiền đã hoàn tất.");
         }
         return String.valueOf(body);
     }
@@ -79,14 +76,25 @@ public final class Ui {
             return "Thông tin đăng nhập không hợp lệ hoặc chưa được cấp quyền.";
         }
         if (code == 404) {
-            return "Không tìm thấy dữ liệu.";
+            return "Không tìm thấy tài khoản.";
         }
         if (code == 409) {
-            return "Dữ liệu đã tồn tại hoặc xung đột.";
+            return "Dữ liệu đã tồn tại.";
         }
         if (code >= 500) {
             return "Lỗi hệ thống, vui lòng thử lại.";
         }
         return "Yêu cầu không thành công. Mã lỗi: " + code;
+    }
+
+    private static String firstNonEmpty(String first, String fallback) {
+        return first == null || first.trim().isEmpty() ? fallback : first;
+    }
+
+    private static String firstNonEmpty(String first, String second, String fallback) {
+        if (first != null && !first.trim().isEmpty()) {
+            return first;
+        }
+        return firstNonEmpty(second, fallback);
     }
 }

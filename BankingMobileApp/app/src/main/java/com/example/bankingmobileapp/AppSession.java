@@ -29,37 +29,47 @@ public final class AppSession {
     }
 
     public static void saveUserId(Context context, String userId) {
-        prefs(context).edit().putString(USER_ID, userId).apply();
+        putOrRemove(context, USER_ID, userId);
     }
 
     public static String getUserId(Context context) {
-        return prefs(context).getString(USER_ID, "");
+        return getString(context, USER_ID);
+    }
+
+    public static boolean hasUser(Context context) {
+        return !getUserId(context).isEmpty();
     }
 
     public static void saveUserEmail(Context context, String email) {
-        prefs(context).edit().putString(USER_EMAIL, email).apply();
+        putOrRemove(context, USER_EMAIL, email);
     }
 
     public static String getUserEmail(Context context) {
-        return prefs(context).getString(USER_EMAIL, "");
+        return getString(context, USER_EMAIL);
     }
 
     public static void saveRememberedUser(Context context, String userId, String displayName) {
+        String normalizedUserId = normalize(userId);
+        String normalizedDisplayName = normalize(displayName);
         prefs(context).edit()
-                .putString(REMEMBERED_USER_ID, userId == null ? "" : userId)
-                .putString(REMEMBERED_DISPLAY_NAME, displayName == null ? "" : displayName)
+                .putString(REMEMBERED_USER_ID, normalizedUserId)
+                .putString(REMEMBERED_DISPLAY_NAME, normalizedDisplayName)
                 .apply();
     }
 
     public static String getRememberedUserId(Context context) {
-        String rememberedUserId = prefs(context).getString(REMEMBERED_USER_ID, "");
-        return rememberedUserId == null || rememberedUserId.isEmpty() ? getUserId(context) : rememberedUserId;
+        String rememberedUserId = getString(context, REMEMBERED_USER_ID);
+        return rememberedUserId.isEmpty() ? getUserId(context) : rememberedUserId;
     }
 
     public static String getRememberedDisplayName(Context context) {
-        String displayName = prefs(context).getString(REMEMBERED_DISPLAY_NAME, "");
-        if (displayName != null && !displayName.isEmpty()) {
+        String displayName = getString(context, REMEMBERED_DISPLAY_NAME);
+        if (!displayName.isEmpty()) {
             return displayName;
+        }
+        String email = getUserEmail(context);
+        if (!email.isEmpty()) {
+            return email;
         }
         String userId = getRememberedUserId(context);
         return userId.isEmpty() ? "" : "User ID " + userId;
@@ -76,36 +86,58 @@ public final class AppSession {
                 .apply();
     }
 
-    public static void saveAccountId(Context context, String accountId) {
-        prefs(context).edit().putString(ACCOUNT_ID, accountId).apply();
-    }
-
-    public static String getAccountId(Context context) {
-        return prefs(context).getString(ACCOUNT_ID, "");
-    }
-
     public static void saveAccountNumber(Context context, String accountNumber) {
-        prefs(context).edit().putString(ACCOUNT_NUMBER, accountNumber).apply();
+        String normalized = normalize(accountNumber);
+        String current = getAccountNumber(context);
+        SharedPreferences.Editor editor = prefs(context).edit();
+        if (normalized.isEmpty()) {
+            editor.remove(ACCOUNT_NUMBER).remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE).apply();
+            return;
+        }
+        if (!normalized.equals(current)) {
+            editor.remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE);
+        }
+        editor.putString(ACCOUNT_NUMBER, normalized).apply();
     }
 
     public static String getAccountNumber(Context context) {
-        return prefs(context).getString(ACCOUNT_NUMBER, "");
+        return getString(context, ACCOUNT_NUMBER);
+    }
+
+    public static void saveAccountId(Context context, String accountId) {
+        putOrRemove(context, ACCOUNT_ID, accountId);
+    }
+
+    public static String getAccountId(Context context) {
+        return getString(context, ACCOUNT_ID);
     }
 
     public static void saveAccountBalance(Context context, String balance) {
-        prefs(context).edit().putString(ACCOUNT_BALANCE, balance).apply();
+        putOrRemove(context, ACCOUNT_BALANCE, balance);
     }
 
     public static String getAccountBalance(Context context) {
-        return prefs(context).getString(ACCOUNT_BALANCE, "");
+        return getString(context, ACCOUNT_BALANCE);
+    }
+
+    public static boolean hasAccount(Context context) {
+        return !getAccountNumber(context).isEmpty();
+    }
+
+    public static void clearAccount(Context context) {
+        prefs(context).edit()
+                .remove(ACCOUNT_ID)
+                .remove(ACCOUNT_NUMBER)
+                .remove(ACCOUNT_BALANCE)
+                .apply();
     }
 
     public static void saveAuthToken(Context context, String token) {
-        prefs(context).edit().putString(AUTH_TOKEN, token).apply();
+        putOrRemove(context, AUTH_TOKEN, token);
     }
 
     public static String getAuthToken(Context context) {
-        return prefs(context).getString(AUTH_TOKEN, "");
+        return getString(context, AUTH_TOKEN);
     }
 
     public static void clearAuthToken(Context context) {
@@ -116,20 +148,16 @@ public final class AppSession {
         if (account == null) {
             return;
         }
-        SharedPreferences.Editor editor = prefs(context).edit();
         if (account.userId != null) {
-            editor.putString(USER_ID, String.valueOf(account.userId));
+            saveUserId(context, String.valueOf(account.userId));
         }
         if (account.accountId != null) {
-            editor.putString(ACCOUNT_ID, String.valueOf(account.accountId));
+            saveAccountId(context, String.valueOf(account.accountId));
         }
-        editor.putString(ACCOUNT_NUMBER, account.accountNumber == null ? "" : account.accountNumber);
-        editor.putString(ACCOUNT_BALANCE, account.availableBalance == null ? "" : account.availableBalance.toPlainString());
-        editor.apply();
-    }
-
-    public static boolean hasAccount(Context context) {
-        return !getAccountNumber(context).isEmpty();
+        saveAccountNumber(context, account.accountNumber);
+        if (account.availableBalance != null) {
+            saveAccountBalance(context, account.availableBalance.toPlainString());
+        }
     }
 
     public static void clearLoginState(Context context) {
@@ -149,5 +177,25 @@ public final class AppSession {
 
     private static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    private static String getString(Context context, String key) {
+        String value = prefs(context).getString(key, "");
+        return value == null ? "" : value.trim();
+    }
+
+    private static void putOrRemove(Context context, String key, String value) {
+        String normalized = normalize(value);
+        SharedPreferences.Editor editor = prefs(context).edit();
+        if (normalized.isEmpty()) {
+            editor.remove(key);
+        } else {
+            editor.putString(key, normalized);
+        }
+        editor.apply();
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim();
     }
 }

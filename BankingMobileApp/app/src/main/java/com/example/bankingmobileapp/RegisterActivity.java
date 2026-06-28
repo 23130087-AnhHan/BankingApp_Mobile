@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
+import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.AccountRequest;
 import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.ApiResponse;
@@ -42,48 +43,38 @@ public class RegisterActivity extends Activity {
         resultText = findViewById(R.id.resultText);
 
         registerButton.setOnClickListener(v -> {
-            if (!validate(firstNameInput, lastNameInput, phoneInput, emailInput, passwordInput)) {
+            if (!validateRequired(firstNameInput, "Vui lòng nhập tên")
+                    || !validateRequired(lastNameInput, "Vui lòng nhập họ và tên đệm")
+                    || !validateRequired(phoneInput, "Vui lòng nhập số điện thoại")
+                    || !validateRequired(emailInput, "Vui lòng nhập email")
+                    || !validateRequired(passwordInput, "Vui lòng nhập mật khẩu")) {
                 return;
             }
+
+            String email = Ui.text(emailInput);
             CreateUserRequest request = new CreateUserRequest(
                     Ui.text(firstNameInput),
                     Ui.text(lastNameInput),
                     Ui.text(phoneInput),
-                    Ui.text(emailInput),
+                    email,
                     Ui.text(passwordInput)
             );
-            register(request);
+            register(request, email);
         });
         openAccountButton.setOnClickListener(v -> createAccount(userIdInput));
         findViewById(R.id.loginButton).setOnClickListener(v -> finish());
     }
 
-    private boolean validate(EditText firstNameInput, EditText lastNameInput, EditText phoneInput,
-                             EditText emailInput, EditText passwordInput) {
-        if (Ui.text(firstNameInput).isEmpty()) {
-            firstNameInput.setError("Vui lòng nhập tên");
-            return false;
-        }
-        if (Ui.text(lastNameInput).isEmpty()) {
-            lastNameInput.setError("Vui lòng nhập họ và tên đệm");
-            return false;
-        }
-        if (Ui.text(phoneInput).isEmpty()) {
-            phoneInput.setError("Vui lòng nhập số điện thoại");
-            return false;
-        }
-        if (Ui.text(emailInput).isEmpty()) {
-            emailInput.setError("Vui lòng nhập email");
-            return false;
-        }
-        if (Ui.text(passwordInput).isEmpty()) {
-            passwordInput.setError("Vui lòng nhập mật khẩu");
+    private boolean validateRequired(EditText input, String message) {
+        if (Ui.text(input).isEmpty()) {
+            input.setError(message);
+            input.requestFocus();
             return false;
         }
         return true;
     }
 
-    private void register(CreateUserRequest request) {
+    private void register(CreateUserRequest request, String email) {
         setLoading(true);
         resultText.setText("Đang tạo hồ sơ khách hàng...");
         ApiClient.getApi().register(request).enqueue(new Callback<ApiResponse>() {
@@ -91,35 +82,33 @@ public class RegisterActivity extends Activity {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 setLoading(false);
                 if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "Register failed. HTTP " + response.code());
-                    resultText.setText("Đăng ký thất bại.\n" + Ui.messageForHttpCode(response.code()));
+                    resultText.setText(ApiErrorUtils.httpError(
+                            TAG,
+                            response,
+                            "User-Service hoặc Keycloak đang gặp lỗi. Vui lòng kiểm tra backend."
+                    ));
                     return;
                 }
 
-                resultText.setText("Đăng ký thành công.\n"
+                AppSession.saveUserEmail(RegisterActivity.this, email);
+                resultText.setText("Đăng ký thành công\n"
                         + Ui.formatBody(response.body())
-                        + "\n\nBackend hiện chưa trả User ID trong response đăng ký. Vui lòng duyệt hồ sơ nếu cần, sau đó dùng User ID để mở tài khoản và đăng nhập.");
+                        + "\n\nBackend hiện chưa trả User ID trong response đăng ký. Khi đã có User ID do hệ thống cấp, nhập bên dưới để mở tài khoản.");
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
                 setLoading(false);
-                Log.e(TAG, "Register network failure", throwable);
-                resultText.setText("Đăng ký thất bại.\nKhông kết nối được server.");
+                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
-    }
-
-    private void setLoading(boolean loading) {
-        registerButton.setEnabled(!loading);
-        openAccountButton.setEnabled(!loading);
-        registerButton.setText(loading ? "Đang tạo hồ sơ..." : "Tạo hồ sơ khách hàng");
     }
 
     private void createAccount(EditText userIdInput) {
         String userIdValue = Ui.text(userIdInput);
         if (userIdValue.isEmpty()) {
             userIdInput.setError("Vui lòng nhập User ID");
+            userIdInput.requestFocus();
             return;
         }
 
@@ -128,6 +117,7 @@ public class RegisterActivity extends Activity {
             userId = Long.parseLong(userIdValue);
         } catch (NumberFormatException ex) {
             userIdInput.setError("User ID không hợp lệ");
+            userIdInput.requestFocus();
             return;
         }
 
@@ -139,31 +129,30 @@ public class RegisterActivity extends Activity {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if (!response.isSuccessful()) {
                     setAccountLoading(false);
-                    Log.e(TAG, "Create account failed. HTTP " + response.code());
-                    resultText.setText("Mở tài khoản thất bại.\n" + Ui.messageForHttpCode(response.code()));
+                    resultText.setText(ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản."));
                     return;
                 }
-                loadCreatedAccount(userId, userIdValue);
+                loadCreatedAccount(userId, userIdValue, "Mở tài khoản thành công.\n" + Ui.formatBody(response.body()));
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
                 setAccountLoading(false);
-                Log.e(TAG, "Create account network failure", throwable);
-                resultText.setText("Mở tài khoản thất bại.\nKhông kết nối được server.");
+                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
     }
 
-    private void loadCreatedAccount(long userId, String userIdValue) {
+    private void loadCreatedAccount(long userId, String userIdValue, String successPrefix) {
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 setAccountLoading(false);
                 if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "Load created account failed. HTTP " + response.code());
-                    resultText.setText("Hồ sơ/tài khoản đã gửi xử lý, nhưng chưa đọc lại được thông tin tài khoản.\n"
-                            + Ui.messageForHttpCode(response.code()));
+                    String message = response.isSuccessful()
+                            ? "Backend chưa trả thông tin tài khoản."
+                            : ApiErrorUtils.httpError(TAG, response, "Chưa đọc lại được thông tin tài khoản.");
+                    resultText.setText(successPrefix + "\n\n" + message);
                     return;
                 }
 
@@ -171,8 +160,8 @@ public class RegisterActivity extends Activity {
                 AppSession.saveUserId(RegisterActivity.this, userIdValue);
                 AppSession.saveAccount(RegisterActivity.this, account);
                 AppSession.saveRememberedUser(RegisterActivity.this, userIdValue, "User ID " + userIdValue);
-                resultText.setText("Mở tài khoản thành công."
-                        + "\nUser ID: " + userIdValue
+                resultText.setText(successPrefix
+                        + "\n\nUser ID: " + userIdValue
                         + "\nSố tài khoản: " + account.accountNumber
                         + "\nTrạng thái: " + account.accountStatus
                         + "\nSố dư: " + account.availableBalance
@@ -182,10 +171,16 @@ public class RegisterActivity extends Activity {
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
                 setAccountLoading(false);
-                Log.e(TAG, "Load created account network failure", throwable);
-                resultText.setText("Mở tài khoản đã gửi xử lý, nhưng không kết nối được server để đọc lại thông tin.");
+                Log.e(TAG, "Cannot load created account", throwable);
+                resultText.setText(successPrefix + "\n\nKhông kết nối được server để đọc lại thông tin tài khoản.");
             }
         });
+    }
+
+    private void setLoading(boolean loading) {
+        registerButton.setEnabled(!loading);
+        openAccountButton.setEnabled(!loading);
+        registerButton.setText(loading ? "Đang tạo hồ sơ..." : "Tạo hồ sơ khách hàng");
     }
 
     private void setAccountLoading(boolean loading) {
