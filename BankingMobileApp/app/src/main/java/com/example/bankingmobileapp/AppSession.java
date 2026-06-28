@@ -3,15 +3,29 @@ package com.example.bankingmobileapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.bankingmobileapp.model.AccountResponse;
+
 public final class AppSession {
     private static final String PREFS = "banking_demo_session";
+    private static final String IS_LOGGED_IN = "is_logged_in";
     private static final String USER_ID = "user_id";
     private static final String USER_EMAIL = "user_email";
+    private static final String REMEMBERED_USER_ID = "remembered_user_id";
+    private static final String REMEMBERED_DISPLAY_NAME = "remembered_display_name";
     private static final String ACCOUNT_ID = "account_id";
     private static final String ACCOUNT_NUMBER = "account_number";
     private static final String ACCOUNT_BALANCE = "account_balance";
+    private static final String AUTH_TOKEN = "auth_token";
 
     private AppSession() {
+    }
+
+    public static void saveLoginState(Context context, boolean isLoggedIn) {
+        prefs(context).edit().putBoolean(IS_LOGGED_IN, isLoggedIn).apply();
+    }
+
+    public static boolean isLoggedIn(Context context) {
+        return prefs(context).getBoolean(IS_LOGGED_IN, false);
     }
 
     public static void saveUserId(Context context, String userId) {
@@ -22,6 +36,10 @@ public final class AppSession {
         return getString(context, USER_ID);
     }
 
+    public static boolean hasUser(Context context) {
+        return !getUserId(context).isEmpty();
+    }
+
     public static void saveUserEmail(Context context, String email) {
         putOrRemove(context, USER_EMAIL, email);
     }
@@ -30,8 +48,42 @@ public final class AppSession {
         return getString(context, USER_EMAIL);
     }
 
-    public static boolean hasUser(Context context) {
-        return !getUserId(context).isEmpty();
+    public static void saveRememberedUser(Context context, String userId, String displayName) {
+        String normalizedUserId = normalize(userId);
+        String normalizedDisplayName = normalize(displayName);
+        prefs(context).edit()
+                .putString(REMEMBERED_USER_ID, normalizedUserId)
+                .putString(REMEMBERED_DISPLAY_NAME, normalizedDisplayName)
+                .apply();
+    }
+
+    public static String getRememberedUserId(Context context) {
+        String rememberedUserId = getString(context, REMEMBERED_USER_ID);
+        return rememberedUserId.isEmpty() ? getUserId(context) : rememberedUserId;
+    }
+
+    public static String getRememberedDisplayName(Context context) {
+        String displayName = getString(context, REMEMBERED_DISPLAY_NAME);
+        if (!displayName.isEmpty()) {
+            return displayName;
+        }
+        String email = getUserEmail(context);
+        if (!email.isEmpty()) {
+            return email;
+        }
+        String userId = getRememberedUserId(context);
+        return userId.isEmpty() ? "" : "User ID " + userId;
+    }
+
+    public static boolean hasRememberedUser(Context context) {
+        return !getRememberedUserId(context).isEmpty();
+    }
+
+    public static void clearRememberedUser(Context context) {
+        prefs(context).edit()
+                .remove(REMEMBERED_USER_ID)
+                .remove(REMEMBERED_DISPLAY_NAME)
+                .apply();
     }
 
     public static void saveAccountNumber(Context context, String accountNumber) {
@@ -80,7 +132,46 @@ public final class AppSession {
                 .apply();
     }
 
+    public static void saveAuthToken(Context context, String token) {
+        putOrRemove(context, AUTH_TOKEN, token);
+    }
+
+    public static String getAuthToken(Context context) {
+        return getString(context, AUTH_TOKEN);
+    }
+
+    public static void clearAuthToken(Context context) {
+        prefs(context).edit().remove(AUTH_TOKEN).apply();
+    }
+
+    public static void saveAccount(Context context, AccountResponse account) {
+        if (account == null) {
+            return;
+        }
+        if (account.userId != null) {
+            saveUserId(context, String.valueOf(account.userId));
+        }
+        if (account.accountId != null) {
+            saveAccountId(context, String.valueOf(account.accountId));
+        }
+        saveAccountNumber(context, account.accountNumber);
+        if (account.availableBalance != null) {
+            saveAccountBalance(context, account.availableBalance.toPlainString());
+        }
+    }
+
+    public static void clearLoginState(Context context) {
+        prefs(context).edit()
+                .putBoolean(IS_LOGGED_IN, false)
+                .remove(AUTH_TOKEN)
+                .apply();
+    }
+
     public static void clearSession(Context context) {
+        clearAll(context);
+    }
+
+    public static void clearAll(Context context) {
         prefs(context).edit().clear().apply();
     }
 

@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Chưa có khách hàng"
+                    android:text="Khách hàng #1"
                     android:textColor="@color/text_on_primary_muted"
                     android:textSize="14sp" />
 
@@ -98,10 +98,9 @@
             android:text="Làm mới số dư" />
 
         <Button
-            android:id="@+id/setupAccountButton"
-            style="@style/PrimaryButton"
-            android:text="Mở hoặc tìm tài khoản"
-            android:visibility="gone" />
+            android:id="@+id/logoutButton"
+            style="@style/WarningButton"
+            android:text="Đăng xuất" />
 
         <TextView
             style="@style/SectionTitle"
@@ -157,17 +156,5 @@
                 android:drawableTop="@drawable/ic_history"
                 android:text="Lịch sử" />
         </LinearLayout>
-
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_marginTop="26dp"
-            android:text="Dành cho khách hàng mới" />
-
-        <TextView
-            android:id="@+id/registerTile"
-            style="@style/ActionTileWide"
-            android:drawableStart="@drawable/ic_user_add"
-            android:drawablePadding="14dp"
-            android:text="Đăng ký hồ sơ khách hàng" />
     </LinearLayout>
 </ScrollView>

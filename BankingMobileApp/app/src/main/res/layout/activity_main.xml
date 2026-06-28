@@ -25,7 +25,6 @@
             android:layout_marginTop="2dp"
             android:text="Ngân hàng của bạn" />
 
-        <!-- Thẻ tổng quan tài khoản luôn giữ thông tin quan trọng ở đầu màn hình. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="208dp"
@@ -103,12 +102,16 @@
             android:text="Mở hoặc tìm tài khoản"
             android:visibility="gone" />
 
+        <Button
+            android:id="@+id/logoutButton"
+            style="@style/WarningButton"
+            android:text="Đăng xuất" />
+
         <TextView
             style="@style/SectionTitle"
             android:layout_marginTop="26dp"
             android:text="Giao dịch nhanh" />
 
-        <!-- Lưới 2 x 2 giúp các tác vụ chính có cùng độ ưu tiên thị giác. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -157,17 +160,5 @@
                 android:drawableTop="@drawable/ic_history"
                 android:text="Lịch sử" />
         </LinearLayout>
-
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_marginTop="26dp"
-            android:text="Dành cho khách hàng mới" />
-
-        <TextView
-            android:id="@+id/registerTile"
-            style="@style/ActionTileWide"
-            android:drawableStart="@drawable/ic_user_add"
-            android:drawablePadding="14dp"
-            android:text="Đăng ký hồ sơ khách hàng" />
     </LinearLayout>
 </ScrollView>

@@ -27,6 +27,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppSession.isLoggedIn(this)) {
+            openLoginAndFinish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         accountNumberText = findViewById(R.id.accountNumberText);
@@ -36,11 +41,11 @@ public class MainActivity extends Activity {
         setupAccountButton = findViewById(R.id.setupAccountButton);
         refreshButton = findViewById(R.id.refreshButton);
 
-        findViewById(R.id.registerTile).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.depositTile).setOnClickListener(v -> Ui.open(this, TransactionActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.historyTile).setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
+        findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
         refreshButton.setOnClickListener(v -> refreshAccount());
         setupAccountButton.setOnClickListener(v -> Ui.open(this, AccountActivity.class));
     }
@@ -130,19 +135,21 @@ public class MainActivity extends Activity {
             return;
         }
 
-        AppSession.saveAccountNumber(this, accountNumber);
-        if (account.accountId != null) {
-            AppSession.saveAccountId(this, String.valueOf(account.accountId));
-        }
-        if (account.userId != null) {
-            AppSession.saveUserId(this, String.valueOf(account.userId));
-        }
+        AppSession.saveAccount(this, account);
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
-        AppSession.saveAccountBalance(this, balance);
 
         accountNumberText.setText("STK  •  " + accountNumber);
         balanceText.setText(balance + " ₫");
         statusText.setText(account.accountStatus == null ? "Không rõ trạng thái" : account.accountStatus);
         setupAccountButton.setVisibility(View.GONE);
+    }
+
+    private void logout() {
+        AppSession.clearLoginState(this);
+        Ui.openAndClear(this, WelcomeActivity.class);
+    }
+
+    private void openLoginAndFinish() {
+        Ui.openAndClear(this, WelcomeActivity.class);
     }
 }

@@ -1,0 +1,20 @@
+# IDE
+.idea/
+*.iml
+
+# Java and Spring Boot build output
+target/
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# Android and Gradle build output
+.gradle/
+build/
+**/.gradle/
+**/build/
+local.properties
+
+# OS
+.DS_Store
+Thumbs.db
