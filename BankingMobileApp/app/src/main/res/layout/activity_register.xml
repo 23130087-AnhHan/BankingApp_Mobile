@@ -45,5 +45,11 @@
         </LinearLayout>
 
         <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Kết quả đăng ký sẽ hiển thị tại đây." />
+
+        <Button
+            android:id="@+id/openAccountButton"
+            style="@style/SecondaryButton"
+            android:text="Tiếp tục đến Tài khoản"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

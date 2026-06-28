@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Khách hàng #1"
+                    android:text="Chưa có khách hàng"
                     android:textColor="@color/text_on_primary_muted"
                     android:textSize="14sp" />
 
@@ -96,6 +96,12 @@
             android:id="@+id/refreshButton"
             style="@style/SecondaryButton"
             android:text="Làm mới số dư" />
+
+        <Button
+            android:id="@+id/setupAccountButton"
+            style="@style/PrimaryButton"
+            android:text="Mở hoặc tìm tài khoản"
+            android:visibility="gone" />
 
         <TextView
             style="@style/SectionTitle"

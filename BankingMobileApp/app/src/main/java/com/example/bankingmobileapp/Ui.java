@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.FundTransferResponse;
 
@@ -30,7 +31,7 @@ public final class Ui {
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
                 if (!response.isSuccessful()) {
-                    resultView.setText(action + " failed. HTTP " + response.code());
+                    resultView.setText(ApiErrorUtils.httpError("Ui", response, action + " chưa thể hoàn tất."));
                     return;
                 }
                 resultView.setText(action + " completed\n" + formatBody(response.body()));
@@ -38,24 +39,36 @@ public final class Ui {
 
             @Override
             public void onFailure(Call<T> call, Throwable throwable) {
-                resultView.setText(action + " failed: " + throwable.getMessage());
+                resultView.setText(ApiErrorUtils.networkError("Ui", throwable));
             }
         });
     }
 
     public static String formatBody(Object body) {
         if (body == null) {
-            return "No response body";
+            return "Server không trả nội dung chi tiết.";
         }
         if (body instanceof ApiResponse) {
             ApiResponse response = (ApiResponse) body;
-            String message = response.message != null ? response.message : response.responseMessage;
-            return "Code: " + response.responseCode + "\nMessage: " + message;
+            String message = firstNonEmpty(response.message, response.responseMessage, "Thao tác đã hoàn tất.");
+            return "Mã: " + firstNonEmpty(response.responseCode, "--") + "\nThông báo: " + message;
         }
         if (body instanceof FundTransferResponse) {
             FundTransferResponse response = (FundTransferResponse) body;
-            return "Reference: " + response.transactionId + "\nMessage: " + response.message;
+            return "Mã tham chiếu: " + firstNonEmpty(response.transactionId, "--")
+                    + "\nThông báo: " + firstNonEmpty(response.message, "Chuyển tiền đã hoàn tất.");
         }
         return String.valueOf(body);
+    }
+
+    private static String firstNonEmpty(String first, String fallback) {
+        return first == null || first.trim().isEmpty() ? fallback : first;
+    }
+
+    private static String firstNonEmpty(String first, String second, String fallback) {
+        if (first != null && !first.trim().isEmpty()) {
+            return first;
+        }
+        return firstNonEmpty(second, fallback);
     }
 }
