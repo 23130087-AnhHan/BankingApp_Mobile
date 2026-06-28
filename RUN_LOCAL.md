@@ -317,9 +317,30 @@ curl.exe -X POST http://localhost:8080/sequence
 ## 6. Chạy Android
 
 1. Mở riêng folder `BankingMobileApp` bằng Android Studio.
-2. Chờ Gradle sync và bảo đảm SDK Platform 35 đã được cài. `local.properties` phải trỏ tới Android SDK của chính máy đang chạy.
+2. Chờ Gradle sync và bảo đảm SDK Platform 35 cùng Build-Tools 35.0.0 đã được cài.
 3. Khởi động Android Emulator.
 4. Chạy cấu hình `app`.
+
+`BankingMobileApp/local.properties` là cấu hình riêng của từng máy và không còn được Git track, vì vậy pull code sẽ không ghi đè đường dẫn SDK bằng username của máy khác. Sau khi clone/pull trên máy mới, tạo lại file tự động từ SDK mặc định `%LOCALAPPDATA%\Android\Sdk`:
+
+```powershell
+cd C:\Users\Asus\StudioProjects\BankingApp_Mobile
+powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-android-sdk.ps1
+```
+
+Nếu SDK nằm ở vị trí khác:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-android-sdk.ps1 -SdkPath "D:\Android\Sdk"
+```
+
+Script kiểm tra SDK Platform 35 và Build-Tools 35.0.0 trước khi tạo `BankingMobileApp/local.properties`. Có thể build lại bằng:
+
+```powershell
+cd .\BankingMobileApp
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+.\gradlew.bat assembleDebug
+```
 
 `ApiClient.java` đang dùng đúng base URL:
 
