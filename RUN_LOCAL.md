@@ -46,46 +46,23 @@ Keycloak là thành phần bắt buộc của bản chính, không phải nhánh
 
 #### Khởi động Keycloak local tại port 8571
 
-Project đang dùng `keycloak-admin-client` 21.0.1, vì vậy có thể chạy Keycloak 21.0.1 tương ứng bằng Docker. Dữ liệu Keycloak được giữ trong named volume, không mất khi container dừng:
+Project này chạy Keycloak bằng ZIP trên Windows, không dùng Docker và không cần `docker-compose-keycloak.yml`. Guide chính nằm ở [`RUN_KEYCLOAK_WINDOWS.md`](./RUN_KEYCLOAK_WINDOWS.md).
 
 ```powershell
-$adminPassword = Read-Host "Nhap mat khau admin Keycloak local"
-
-docker volume create banking-keycloak-data
-docker run --name banking-keycloak `
-  -p 127.0.0.1:8571:8080 `
-  -e KEYCLOAK_ADMIN=admin `
-  -e KEYCLOAK_ADMIN_PASSWORD=$adminPassword `
-  -v banking-keycloak-data:/opt/keycloak/data `
-  quay.io/keycloak/keycloak:21.0.1 `
-  start-dev
-
-$adminPassword = $null
-```
-
-Nếu máy không dùng Docker, tải bản ZIP Keycloak 21.0.1, giải nén và chạy trực tiếp bằng JDK 17:
-
-```powershell
-cd C:\Tools\keycloak-21.0.1
+cd C:\Tools\keycloak
 
 $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+
 $env:KEYCLOAK_ADMIN = "admin"
-$env:KEYCLOAK_ADMIN_PASSWORD = Read-Host "Nhap mat khau admin Keycloak local"
+$env:KEYCLOAK_ADMIN_PASSWORD = "admin"
 
 .\bin\kc.bat start-dev --http-port=8571
 ```
 
-Giữ terminal này chạy trong lúc sử dụng app. Sau khi admin đầu tiên đã được tạo, các biến bootstrap admin không cần dùng để tạo lại tài khoản ở mỗi lần khởi động.
+Tải Keycloak Server ZIP từ trang chính thức [https://www.keycloak.org/downloads](https://www.keycloak.org/downloads), giải nén và đổi tên folder thành `C:\Tools\keycloak` trước khi chạy lệnh trên. Nếu ZIP đang bị lồng một cấp như `C:\Tools\keycloak\keycloak-26.6.4\bin\kc.bat`, hãy `cd C:\Tools\keycloak\keycloak-26.6.4` hoặc di chuyển nội dung folder version ra trực tiếp `C:\Tools\keycloak`. Giữ terminal này chạy trong lúc sử dụng app. Sau khi admin đầu tiên đã được tạo, các biến bootstrap admin không cần dùng để tạo lại tài khoản ở mỗi lần khởi động.
 
 Lệnh `start-dev` chỉ cấu hình server Keycloak cho môi trường local; luồng đăng ký, credential, token và service account vẫn là Keycloak thật. Khi triển khai production, chạy Keycloak bằng `start`, HTTPS, hostname cố định, database bền vững và secret manager; không cần đổi logic auth của Android hoặc User-Service.
-
-Sau lần tạo đầu tiên, có thể khởi động lại container và xem log bằng:
-
-```powershell
-docker start banking-keycloak
-docker logs -f banking-keycloak
-```
 
 Kiểm tra endpoint realm sau khi hoàn tất setup:
 

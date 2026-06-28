@@ -6,11 +6,12 @@ $ErrorActionPreference = "Stop"
 $repoRoot = $PSScriptRoot
 $javaExecutable = Join-Path $JavaHome "bin\java.exe"
 
+# Keycloak runs from the Windows ZIP on localhost:8571; this script does not use Docker.
 if (-not (Test-Path -LiteralPath $javaExecutable)) {
     throw "Khong tim thay JDK 17 tai '$JavaHome'. Chay lai voi -JavaHome <duong-dan-jdk-17>."
 }
 
-$secret = Read-Host "Nhap KEYCLOAK_CLIENT_SECRET that tu Keycloak Admin Console"
+$secret = Read-Host "Nhap KEYCLOAK_CLIENT_SECRET that tu Keycloak Admin Console (khong luu vao file)"
 if ([string]::IsNullOrWhiteSpace($secret)) {
     throw "KEYCLOAK_CLIENT_SECRET khong duoc de trong. Script da dung va khong khoi dong User-Service."
 }
