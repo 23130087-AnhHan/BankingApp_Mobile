@@ -43,18 +43,46 @@ public class AccountActivity extends Activity {
     }
 
     private void createAccount() {
-        AppSession.saveUserId(this, Ui.text(userIdInput));
+        String userId = Ui.text(userIdInput);
+        if (userId.isEmpty()) {
+            userIdInput.setError("Vui lòng nhập mã khách hàng");
+            resultText.setText("Cần mã khách hàng để mở tài khoản.");
+            return;
+        }
+
+        long parsedUserId;
+        try {
+            parsedUserId = Long.parseLong(userId);
+        } catch (NumberFormatException ex) {
+            userIdInput.setError("Mã khách hàng không hợp lệ");
+            return;
+        }
+
+        AppSession.saveUserId(this, userId);
         AccountRequest request = new AccountRequest(
                 Ui.text(accountTypeInput),
                 BigDecimal.ZERO,
-                Long.parseLong(Ui.text(userIdInput))
+                parsedUserId
         );
         Ui.runCall("Open account", resultText, ApiClient.getApi().createAccount(request));
     }
 
     private void findAccount() {
-        AppSession.saveUserId(this, Ui.text(userIdInput));
-        long userId = Long.parseLong(Ui.text(userIdInput));
+        String userIdValue = Ui.text(userIdInput);
+        if (userIdValue.isEmpty()) {
+            userIdInput.setError("Vui lòng nhập mã khách hàng");
+            return;
+        }
+
+        long userId;
+        try {
+            userId = Long.parseLong(userIdValue);
+        } catch (NumberFormatException ex) {
+            userIdInput.setError("Mã khách hàng không hợp lệ");
+            return;
+        }
+
+        AppSession.saveUserId(this, userIdValue);
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
@@ -79,16 +107,26 @@ public class AccountActivity extends Activity {
     }
 
     private void activateAccount() {
-        AppSession.saveAccountNumber(this, Ui.text(accountNumberInput));
+        String accountNumber = Ui.text(accountNumberInput);
+        if (accountNumber.isEmpty()) {
+            accountNumberInput.setError("Vui lòng nhập số tài khoản");
+            return;
+        }
+        AppSession.saveAccountNumber(this, accountNumber);
         Ui.runCall(
                 "Activate account",
                 resultText,
-                ApiClient.getApi().activateAccount(Ui.text(accountNumberInput), new AccountStatusRequest("ACTIVE"))
+                ApiClient.getApi().activateAccount(accountNumber, new AccountStatusRequest("ACTIVE"))
         );
     }
 
     private void checkBalance() {
-        AppSession.saveAccountNumber(this, Ui.text(accountNumberInput));
-        Ui.runCall("Check balance", resultText, ApiClient.getApi().getBalance(Ui.text(accountNumberInput)));
+        String accountNumber = Ui.text(accountNumberInput);
+        if (accountNumber.isEmpty()) {
+            accountNumberInput.setError("Vui lòng nhập số tài khoản");
+            return;
+        }
+        AppSession.saveAccountNumber(this, accountNumber);
+        Ui.runCall("Check balance", resultText, ApiClient.getApi().getBalance(accountNumber));
     }
 }

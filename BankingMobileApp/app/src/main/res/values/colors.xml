@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bank_navy">#0B214A</color>
+    <color name="bank_blue">#1769E0</color>
+    <color name="bank_blue_dark">#0D4FB8</color>
+    <color name="bank_blue_soft">#EAF2FF</color>
+    <color name="bank_teal">#19A7A0</color>
+    <color name="app_background">#F4F7FC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_alt">#F8FAFD</color>
+    <color name="text_primary">#12223B</color>
+    <color name="text_secondary">#66758C</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_primary_muted">#D8E6FF</color>
+    <color name="border">#DDE5F0</color>
+    <color name="success">#11845B</color>
+    <color name="success_soft">#E5F7EF</color>
+    <color name="warning">#B35C00</color>
+    <color name="warning_soft">#FFF3E3</color>
+</resources>

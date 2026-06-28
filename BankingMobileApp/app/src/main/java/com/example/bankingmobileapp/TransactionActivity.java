@@ -38,12 +38,35 @@ public class TransactionActivity extends Activity {
     }
 
     private void submit(String type) {
+        String accountNumber = Ui.text(accountNumberInput);
+        String amountValue = Ui.text(amountInput);
+        if (accountNumber.isEmpty()) {
+            accountNumberInput.setError("Vui lòng nhập số tài khoản");
+            return;
+        }
+        if (amountValue.isEmpty()) {
+            amountInput.setError("Vui lòng nhập số tiền");
+            return;
+        }
+
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(amountValue);
+        } catch (NumberFormatException ex) {
+            amountInput.setError("Số tiền không hợp lệ");
+            return;
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            amountInput.setError("Số tiền phải lớn hơn 0");
+            return;
+        }
+
         transactionTypeInput.setText(type);
-        AppSession.saveAccountNumber(this, Ui.text(accountNumberInput));
+        AppSession.saveAccountNumber(this, accountNumber);
         TransactionRequest request = new TransactionRequest(
-                Ui.text(accountNumberInput),
+                accountNumber,
                 type,
-                new BigDecimal(Ui.text(amountInput)),
+                amount,
                 Ui.text(descriptionInput)
         );
         Ui.runCall(type, resultText, ApiClient.getApi().createTransaction(request));

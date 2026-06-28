@@ -2,27 +2,52 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg">
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
 
-        <TextView style="@style/MutedText" android:text="Payments" />
-        <TextView style="@style/PageTitle" android:text="Send money" />
+        <TextView style="@style/MutedText" android:text="Chuyển tiền nội bộ" />
+        <TextView style="@style/PageTitle" android:layout_marginTop="2dp" android:text="Chuyển tiền" />
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Kiểm tra kỹ thông tin người nhận trước khi xác nhận." />
 
         <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Transfer details" />
+            <TextView style="@style/SectionTitle" android:text="Thông tin chuyển tiền" />
 
-            <EditText android:id="@+id/fromAccountInput" style="@style/Input" android:hint="From account" />
-            <EditText android:id="@+id/toAccountInput" style="@style/Input" android:hint="To account" />
-            <EditText android:id="@+id/amountInput" style="@style/Input" android:hint="Amount" android:inputType="numberDecimal" />
+            <TextView style="@style/FieldLabel" android:text="Từ tài khoản" />
+            <EditText android:id="@+id/fromAccountInput" style="@style/Input" android:hint="Số tài khoản nguồn" android:inputType="number" />
 
-            <Button android:id="@+id/transferButton" style="@style/PrimaryButton" android:text="Confirm transfer" />
+            <TextView style="@style/FieldLabel" android:text="Đến tài khoản" />
+            <EditText android:id="@+id/toAccountInput" style="@style/Input" android:hint="Số tài khoản người nhận" android:inputType="number" />
+
+            <TextView style="@style/FieldLabel" android:text="Số tiền" />
+            <EditText android:id="@+id/amountInput" style="@style/AmountInput" android:hint="0 ₫" android:inputType="numberDecimal" />
+
+            <TextView style="@style/FieldLabel" android:text="Nội dung chuyển tiền" />
+            <EditText
+                android:id="@+id/transferNoteInput"
+                style="@style/Input"
+                android:hint="Nhập lời nhắn (tùy chọn)"
+                android:inputType="textCapSentences" />
+            <TextView
+                style="@style/HelperText"
+                android:text="Lời nhắn dùng để kiểm tra trước khi gửi; API hiện tại chưa lưu trường này." />
+
+            <Button android:id="@+id/transferButton" style="@style/PrimaryButton" android:text="Xác nhận chuyển tiền" />
         </LinearLayout>
 
-        <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Transfer receipt will appear here." />
+        <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Biên nhận chuyển tiền sẽ hiển thị tại đây." />
     </LinearLayout>
 </ScrollView>

@@ -12,7 +12,7 @@ spring:
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB_NAME:user_service}
     username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:123456}
+    password: 12345678
   jpa:
     hibernate:
       ddl-auto: update

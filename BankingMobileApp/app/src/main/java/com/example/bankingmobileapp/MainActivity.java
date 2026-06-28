@@ -44,10 +44,10 @@ public class MainActivity extends Activity {
     private void refreshAccount() {
         String userId = AppSession.getUserId(this);
         String accountNumber = AppSession.getAccountNumber(this);
-        userIdText.setText("User ID " + userId);
-        accountNumberText.setText(accountNumber.isEmpty() ? "No account selected" : accountNumber);
-        balanceText.setText("Loading...");
-        statusText.setText("Syncing");
+        userIdText.setText("Khách hàng #" + userId);
+        accountNumberText.setText(accountNumber.isEmpty() ? "Chưa chọn tài khoản" : "STK  •  " + accountNumber);
+        balanceText.setText("Đang tải...");
+        statusText.setText("Đang đồng bộ");
 
         try {
             long id = Long.parseLong(userId);
@@ -55,26 +55,31 @@ public class MainActivity extends Activity {
                 @Override
                 public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                     if (!response.isSuccessful() || response.body() == null) {
-                        balanceText.setText("Open Account page");
-                        statusText.setText("No account");
+                        balanceText.setText("0 ₫");
+                        statusText.setText("Chưa có tài khoản");
                         return;
                     }
                     AccountResponse account = response.body();
-                    AppSession.saveAccountNumber(MainActivity.this, account.accountNumber);
-                    accountNumberText.setText(account.accountNumber);
-                    balanceText.setText(account.availableBalance == null ? "0" : account.availableBalance.toPlainString());
-                    statusText.setText(account.accountStatus);
+                    String resolvedAccountNumber = account.accountNumber == null ? "" : account.accountNumber;
+                    AppSession.saveAccountNumber(MainActivity.this, resolvedAccountNumber);
+                    accountNumberText.setText(resolvedAccountNumber.isEmpty()
+                            ? "Chưa có số tài khoản"
+                            : "STK  •  " + resolvedAccountNumber);
+                    balanceText.setText((account.availableBalance == null
+                            ? "0"
+                            : account.availableBalance.toPlainString()) + " ₫");
+                    statusText.setText(account.accountStatus == null ? "Không rõ" : account.accountStatus);
                 }
 
                 @Override
                 public void onFailure(Call<AccountResponse> call, Throwable throwable) {
-                    balanceText.setText("Backend offline");
-                    statusText.setText("Local demo");
+                    balanceText.setText("-- ₫");
+                    statusText.setText("Mất kết nối");
                 }
             });
         } catch (NumberFormatException ex) {
-            balanceText.setText("Invalid user");
-            statusText.setText("Check User ID");
+            balanceText.setText("-- ₫");
+            statusText.setText("User ID không hợp lệ");
         }
     }
 }

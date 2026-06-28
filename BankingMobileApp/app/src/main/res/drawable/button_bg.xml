@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#1F7A53" />
-    <corners android:radius="10dp" />
+    <solid android:color="@color/bank_blue" />
+    <corners android:radius="14dp" />
     <padding
         android:bottom="10dp"
         android:left="12dp"

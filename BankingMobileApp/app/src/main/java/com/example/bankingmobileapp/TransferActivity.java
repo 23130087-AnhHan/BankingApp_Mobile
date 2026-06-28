@@ -25,11 +25,39 @@ public class TransferActivity extends Activity {
         amountInput.setText("100");
 
         findViewById(R.id.transferButton).setOnClickListener(v -> {
-            AppSession.saveAccountNumber(this, Ui.text(fromAccountInput));
+            String fromAccount = Ui.text(fromAccountInput);
+            String toAccount = Ui.text(toAccountInput);
+            String amountValue = Ui.text(amountInput);
+            if (fromAccount.isEmpty()) {
+                fromAccountInput.setError("Vui lòng nhập tài khoản nguồn");
+                return;
+            }
+            if (toAccount.isEmpty()) {
+                toAccountInput.setError("Vui lòng nhập tài khoản nhận");
+                return;
+            }
+            if (amountValue.isEmpty()) {
+                amountInput.setError("Vui lòng nhập số tiền");
+                return;
+            }
+
+            BigDecimal amount;
+            try {
+                amount = new BigDecimal(amountValue);
+            } catch (NumberFormatException ex) {
+                amountInput.setError("Số tiền không hợp lệ");
+                return;
+            }
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                amountInput.setError("Số tiền phải lớn hơn 0");
+                return;
+            }
+
+            AppSession.saveAccountNumber(this, fromAccount);
             FundTransferRequest request = new FundTransferRequest(
-                    Ui.text(fromAccountInput),
-                    Ui.text(toAccountInput),
-                    new BigDecimal(Ui.text(amountInput))
+                    fromAccount,
+                    toAccount,
+                    amount
             );
             Ui.runCall("Transfer", resultText, ApiClient.getApi().transfer(request));
         });

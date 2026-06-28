@@ -25,7 +25,13 @@ public class HistoryActivity extends Activity {
         accountNumberInput.setText(AppSession.getAccountNumber(this));
 
         findViewById(R.id.loadHistoryButton).setOnClickListener(v -> {
-            AppSession.saveAccountNumber(this, Ui.text(accountNumberInput));
+            String accountNumber = Ui.text(accountNumberInput);
+            if (accountNumber.isEmpty()) {
+                accountNumberInput.setError("Vui lòng nhập số tài khoản");
+                historyText.setText("Nhập số tài khoản để xem lịch sử giao dịch.");
+                return;
+            }
+            AppSession.saveAccountNumber(this, accountNumber);
             loadHistory(accountNumberInput, historyText);
         });
     }
@@ -47,16 +53,17 @@ public class HistoryActivity extends Activity {
 
                 StringBuilder builder = new StringBuilder();
                 for (TransactionResponse item : transactions) {
-                    builder.append(item.transactionType)
-                            .append("  ")
-                            .append(item.amount)
+                    builder.append(item.transactionType == null ? "GIAO DỊCH" : item.transactionType)
+                            .append("    ")
+                            .append(item.amount == null ? "0" : item.amount.toPlainString())
+                            .append(" ₫")
                             .append("\n")
-                            .append(item.transactionStatus)
-                            .append(" | ")
-                            .append(item.localDateTime)
-                            .append("\nRef: ")
-                            .append(item.referenceId)
-                            .append("\n\n");
+                            .append(item.transactionStatus == null ? "Không rõ trạng thái" : item.transactionStatus)
+                            .append("  •  ")
+                            .append(item.localDateTime == null ? "Chưa có thời gian" : item.localDateTime)
+                            .append("\nMã tham chiếu: ")
+                            .append(item.referenceId == null ? "—" : item.referenceId)
+                            .append("\n────────────────────\n\n");
                 }
                 historyText.setText(builder.toString().trim());
             }
