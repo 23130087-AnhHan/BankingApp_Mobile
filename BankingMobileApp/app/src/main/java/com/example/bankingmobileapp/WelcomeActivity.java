@@ -18,10 +18,10 @@ public class WelcomeActivity extends Activity {
         setContentView(R.layout.activity_welcome);
 
         findViewById(R.id.loginButton).setOnClickListener(v -> Ui.open(this, LoginActivity.class));
-        findViewById(R.id.openAccountButton).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
-        findViewById(R.id.helpShortcut).setOnClickListener(v -> showDemoToast());
-        findViewById(R.id.rateShortcut).setOnClickListener(v -> showDemoToast());
-        findViewById(R.id.branchShortcut).setOnClickListener(v -> showDemoToast());
+        findViewById(R.id.txtRegister).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
+        findViewById(R.id.txtForgot).setOnClickListener(v -> showDemoToast());
+        findViewById(R.id.btnLanguage).setOnClickListener(v -> showDemoToast());
+        findViewById(R.id.btnSupport).setOnClickListener(v -> showDemoToast());
     }
 
     private void showDemoToast() {

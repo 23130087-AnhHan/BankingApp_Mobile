@@ -8,6 +8,7 @@ import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Authenticator;
 import okhttp3.Interceptor;
@@ -18,8 +19,6 @@ import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import java.util.concurrent.TimeUnit;
 
 public final class ApiClient {
     private static final String TAG = "BankingApi";

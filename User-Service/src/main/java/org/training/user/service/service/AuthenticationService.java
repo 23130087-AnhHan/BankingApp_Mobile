@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.training.user.service.exception.AuthenticationFailedException;
 import org.training.user.service.model.dto.auth.AuthResponse;
 import org.training.user.service.model.dto.auth.LoginRequest;
+import org.training.user.service.model.dto.auth.ResetPasswordRequest;
 import org.training.user.service.model.entity.User;
 import org.training.user.service.repository.UserRepository;
 
@@ -22,6 +23,8 @@ import java.util.Map;
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;
+    private final OtpService otpService;
+    private final EmailService emailService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${app.config.keycloak.server-url}")
@@ -68,10 +71,38 @@ public class AuthenticationService {
     }
 
     public void requestPasswordReset(String email) {
-        // Always return the same public response so this endpoint cannot be used
-        // to discover whether an email is registered.
         userRepository.findByEmailIdIgnoreCase(email.trim())
-                .ifPresent(user -> keycloakService.sendPasswordReset(user.getAuthId()));
+                .ifPresent(user -> {
+                    String otp = otpService.generateOtp();
+                    user.setEmailOtp(otp);
+                    user.setEmailOtpExpiredAt(otpService.generateExpiredTime());
+                    userRepository.save(user);
+                    emailService.sendOtp(user.getEmailId(), otp);
+                });
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmailIdIgnoreCase(request.getEmail().trim())
+                .orElseThrow(() -> new AuthenticationFailedException("Email not found"));
+
+        if (otpService.isExpired(user.getEmailOtpExpiredAt())) {
+            throw new AuthenticationFailedException("OTP has expired");
+        }
+        if (!request.getOtp().equals(user.getEmailOtp())) {
+            throw new AuthenticationFailedException("Invalid OTP");
+        }
+
+        org.keycloak.representations.idm.UserRepresentation keycloakUser = keycloakService.readUser(user.getAuthId());
+        org.keycloak.representations.idm.CredentialRepresentation cred = new org.keycloak.representations.idm.CredentialRepresentation();
+        cred.setType(org.keycloak.representations.idm.CredentialRepresentation.PASSWORD);
+        cred.setValue(request.getNewPassword());
+        cred.setTemporary(false);
+        keycloakUser.setCredentials(java.util.Collections.singletonList(cred));
+        keycloakService.updateUser(keycloakUser);
+
+        user.setEmailOtp(null);
+        user.setEmailOtpExpiredAt(null);
+        userRepository.save(user);
     }
 
     private MultiValueMap<String, String> form(String grantType, String username, String password) {
