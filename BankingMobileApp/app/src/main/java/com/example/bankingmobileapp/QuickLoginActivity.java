@@ -1,6 +1,5 @@
 package com.example.bankingmobileapp;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,33 +14,108 @@ import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 import com.example.bankingmobileapp.model.LoginRequest;
 
+import java.util.concurrent.Executor;
+
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class QuickLoginActivity extends Activity {
+public class QuickLoginActivity extends FragmentActivity {
     private static final String TAG = "QuickLoginActivity";
     private EditText passwordInput;
     private Button loginButton;
+    private Button biometricLoginButton;
     private TextView resultText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppSession.clearLoginState(this);
+        AppSession.lockSession(this);
         setContentView(R.layout.activity_quick_login);
 
         TextView greetingText = findViewById(R.id.greetingText);
         passwordInput = findViewById(R.id.passwordInput);
         Ui.configurePasswordVisibility(passwordInput);
         loginButton = findViewById(R.id.loginButton);
+        biometricLoginButton = findViewById(R.id.biometricLoginButton);
         resultText = findViewById(R.id.resultText);
         String displayName = AppSession.getRememberedDisplayName(this);
         greetingText.setText(displayName.isEmpty() ? "Xin chào" : "Xin chào, " + displayName);
 
         loginButton.setOnClickListener(v -> loginRememberedUser());
+        biometricLoginButton.setOnClickListener(v -> authenticateWithBiometric());
         findViewById(R.id.otherAccountButton).setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
         findViewById(R.id.forgotPasswordButton).setOnClickListener(v -> requestPasswordReset());
+        renderBiometricState();
+    }
+
+    private void renderBiometricState() {
+        boolean hasStoredSession = !AppSession.getAuthToken(this).isEmpty()
+                && !AppSession.getRefreshToken(this).isEmpty();
+        int status = BiometricManager.from(this)
+                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG);
+
+        biometricLoginButton.setVisibility(
+                hasStoredSession && status == BiometricManager.BIOMETRIC_SUCCESS
+                        ? View.VISIBLE
+                        : View.GONE);
+
+        if (!hasStoredSession) {
+            return;
+        }
+        if (status == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED) {
+            showMessage("Thiết bị chưa thiết lập vân tay. Vui lòng đăng nhập bằng mật khẩu.");
+        } else if (status == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
+            showMessage("Thiết bị không hỗ trợ đăng nhập bằng vân tay.");
+        }
+    }
+
+    private void authenticateWithBiometric() {
+        if (AppSession.getAuthToken(this).isEmpty() || AppSession.getRefreshToken(this).isEmpty()) {
+            showMessage("Phiên đã hết hạn. Vui lòng đăng nhập bằng mật khẩu.");
+            biometricLoginButton.setVisibility(View.GONE);
+            return;
+        }
+
+        Executor executor = ContextCompat.getMainExecutor(this);
+        BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor,
+                new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                        super.onAuthenticationSucceeded(result);
+                        AppSession.saveLoginState(QuickLoginActivity.this, true);
+                        Ui.openAndClear(QuickLoginActivity.this, MainActivity.class);
+                    }
+
+                    @Override
+                    public void onAuthenticationError(int errorCode, CharSequence errString) {
+                        super.onAuthenticationError(errorCode, errString);
+                        if (errorCode != BiometricPrompt.ERROR_USER_CANCELED
+                                && errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                            showMessage(errString == null
+                                    ? "Không thể xác thực vân tay."
+                                    : errString.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onAuthenticationFailed() {
+                        super.onAuthenticationFailed();
+                        showMessage("Vân tay không khớp. Vui lòng thử lại.");
+                    }
+                });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Đăng nhập bằng vân tay")
+                .setSubtitle("Xác thực để vào NLU Banking")
+                .setNegativeButtonText("Dùng mật khẩu")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .build();
+        biometricPrompt.authenticate(promptInfo);
     }
 
     private void requestPasswordReset() {

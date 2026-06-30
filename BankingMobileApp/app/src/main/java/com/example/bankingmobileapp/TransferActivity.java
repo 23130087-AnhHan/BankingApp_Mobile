@@ -29,6 +29,8 @@ import com.example.bankingmobileapp.model.FundTransferRequest;
 import com.example.bankingmobileapp.model.FundTransferResponse;
 import com.example.bankingmobileapp.model.SendPaymentOtpRequest;
 import com.example.bankingmobileapp.model.VerifyPaymentOtpRequest;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -45,6 +47,10 @@ public class TransferActivity extends Activity {
     private static final String TAG = "TransferActivity";
     private static final String INTERNAL_BANK = "NLU Banking";
     private static final int REQUEST_SELECT_BENEFICIARY = 301;
+    public static final String EXTRA_QR_ACCOUNT_NUMBER = "qr_account_number";
+    public static final String EXTRA_QR_ACCOUNT_HOLDER_NAME = "qr_account_holder_name";
+    public static final String EXTRA_QR_AMOUNT = "qr_amount";
+    public static final String EXTRA_QR_NOTE = "qr_note";
 
     private final DecimalFormat moneyFormat = new DecimalFormat("#,##0",
             DecimalFormatSymbols.getInstance(Locale.US));
@@ -71,6 +77,7 @@ public class TransferActivity extends Activity {
     private Button submitButton;
     private Button editButton;
     private Button managePinButton;
+    private Button scanQrButton;
 
     private String pendingFromAccount;
     private String pendingToBank;
@@ -108,6 +115,7 @@ public class TransferActivity extends Activity {
         submitButton = findViewById(R.id.submitButton);
         editButton = findViewById(R.id.editButton);
         managePinButton = findViewById(R.id.managePinButton);
+        scanQrButton = findViewById(R.id.scanQrButton);
 
         setupBankSpinner();
         setupRecipientLookup();
@@ -117,6 +125,7 @@ public class TransferActivity extends Activity {
 
         transferButton.setOnClickListener(v -> validateAndShowConfirmation());
         selectBeneficiaryButton.setOnClickListener(v -> openBeneficiaryPicker());
+        scanQrButton.setOnClickListener(v -> scanTransferQr());
         saveBeneficiaryButton.setOnClickListener(v -> saveCurrentBeneficiary());
         sendOtpButton.setOnClickListener(v -> sendPaymentOtp());
         submitButton.setOnClickListener(v -> verifyAndSubmit());
@@ -126,10 +135,18 @@ public class TransferActivity extends Activity {
         renderSourceAccount();
         hideConfirmation();
         renderAuthState();
+        applyTransferQrIntent(getIntent());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (scanResult != null) {
+            if (scanResult.getContents() != null) {
+                applyTransferQr(scanResult.getContents());
+            }
+            return;
+        }
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != REQUEST_SELECT_BENEFICIARY || resultCode != RESULT_OK || data == null) {
             return;
@@ -185,6 +202,88 @@ public class TransferActivity extends Activity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+    }
+
+    private void scanTransferQr() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("Quét QR nhận tiền NLU Banking");
+        integrator.setBeepEnabled(false);
+        integrator.setOrientationLocked(false);
+        integrator.initiateScan();
+    }
+
+    private void applyTransferQr(String rawQrValue) {
+        try {
+            TransferQrPayload payload = TransferQrPayload.parse(rawQrValue);
+            if (payload.accountNumber.equals(AppSession.getAccountNumber(this))) {
+                resultText.setText("QR này là tài khoản nguồn hiện tại. Vui lòng quét tài khoản nhận khác.");
+                return;
+            }
+
+            setSelectedBank(TransferQrPayload.BANK_NAME);
+            toAccountInput.setText(payload.accountNumber);
+            if (payload.amount != null) {
+                amountInput.setText(payload.amount.stripTrailingZeros().toPlainString());
+            }
+            if (!payload.note.isEmpty()) {
+                transferNoteInput.setText(payload.note);
+            }
+
+            recipientVerified = false;
+            pendingRecipientName = payload.accountHolderName;
+            recipientNameText.setText(payload.accountHolderName.isEmpty()
+                    ? "Đã quét QR. Hệ thống đang kiểm tra tên chủ tài khoản."
+                    : "Đã quét QR: " + payload.accountHolderName + ". Hệ thống đang kiểm tra lại.");
+            hideConfirmation();
+            scheduleRecipientLookup();
+            resultText.setText(payload.amount == null
+                    ? "Đã quét QR người nhận. Vui lòng nhập số tiền và tiếp tục."
+                    : "Đã quét QR thanh toán. Vui lòng kiểm tra thông tin rồi tiếp tục.");
+        } catch (Exception exception) {
+            resultText.setText("QR không hợp lệ hoặc không thuộc NLU Banking.");
+        }
+    }
+
+    private void applyTransferQrIntent(Intent intent) {
+        if (intent == null || !intent.hasExtra(EXTRA_QR_ACCOUNT_NUMBER)) {
+            return;
+        }
+
+        String accountNumber = firstNonEmpty(intent.getStringExtra(EXTRA_QR_ACCOUNT_NUMBER), "");
+        if (accountNumber.isEmpty()) {
+            resultText.setText("QR thiếu số tài khoản nhận.");
+            return;
+        }
+        if (accountNumber.equals(AppSession.getAccountNumber(this))) {
+            resultText.setText("QR này là tài khoản nguồn hiện tại. Vui lòng quét tài khoản nhận khác.");
+            return;
+        }
+
+        setSelectedBank(TransferQrPayload.BANK_NAME);
+        toAccountInput.setText(accountNumber);
+
+        String rawAmount = firstNonEmpty(intent.getStringExtra(EXTRA_QR_AMOUNT), "");
+        if (!rawAmount.isEmpty()) {
+            amountInput.setText(rawAmount);
+        }
+
+        String note = firstNonEmpty(intent.getStringExtra(EXTRA_QR_NOTE), "");
+        if (!note.isEmpty()) {
+            transferNoteInput.setText(note);
+        }
+
+        String holderName = firstNonEmpty(intent.getStringExtra(EXTRA_QR_ACCOUNT_HOLDER_NAME), "");
+        recipientVerified = false;
+        pendingRecipientName = holderName;
+        recipientNameText.setText(holderName.isEmpty()
+                ? "Đã quét QR. Hệ thống đang kiểm tra tên chủ tài khoản."
+                : "Đã quét QR: " + holderName + ". Hệ thống đang kiểm tra lại.");
+        hideConfirmation();
+        scheduleRecipientLookup();
+        resultText.setText(rawAmount.isEmpty()
+                ? "Đã quét QR người nhận. Vui lòng nhập số tiền và tiếp tục."
+                : "Đã quét QR thanh toán. Vui lòng kiểm tra thông tin rồi tiếp tục.");
     }
 
     private void setupRecipientLookup() {
@@ -623,6 +722,7 @@ public class TransferActivity extends Activity {
         toAccountInput.setEnabled(enabled);
         amountInput.setEnabled(enabled);
         transferNoteInput.setEnabled(enabled);
+        scanQrButton.setEnabled(enabled);
     }
 
     private String selectedBank() {

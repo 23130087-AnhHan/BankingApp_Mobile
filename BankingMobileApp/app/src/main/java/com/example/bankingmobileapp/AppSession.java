@@ -140,7 +140,7 @@ public final class AppSession {
     public static boolean isPaymentAccount(String type) {
         if (type == null) return false;
         String normalized = type.trim().toUpperCase();
-        return "PAYMENT_ACCOUNT".equals(normalized) || "SAVINGS_ACCOUNT".equals(normalized) || "SAVINGS".equals(normalized);
+        return "PAYMENT_ACCOUNT".equals(normalized);
     }
 
     public static void clearAccount(Context context) {
@@ -230,6 +230,12 @@ public final class AppSession {
                 .remove(AUTH_TOKEN)
                 .remove(REFRESH_TOKEN)
                 .remove(TOKEN_EXPIRES_AT)
+                .apply();
+    }
+
+    public static void lockSession(Context context) {
+        prefs(context).edit()
+                .putBoolean(IS_LOGGED_IN, false)
                 .apply();
     }
 

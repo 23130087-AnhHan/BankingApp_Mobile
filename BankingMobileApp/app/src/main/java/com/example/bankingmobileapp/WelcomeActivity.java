@@ -8,7 +8,7 @@ public class WelcomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppSession.clearLoginState(this);
+        AppSession.lockSession(this);
 
         if (AppSession.hasRememberedUser(this)) {
             Ui.openAndClear(this, QuickLoginActivity.class);

@@ -60,6 +60,11 @@
                 style="@style/SecondaryButton"
                 android:text="Chọn người thụ hưởng" />
 
+            <Button
+                android:id="@+id/scanQrButton"
+                style="@style/SecondaryButton"
+                android:text="Quét QR chuyển tiền" />
+
             <TextView
                 style="@style/FieldLabel"
                 android:text="Số tài khoản nhận" />

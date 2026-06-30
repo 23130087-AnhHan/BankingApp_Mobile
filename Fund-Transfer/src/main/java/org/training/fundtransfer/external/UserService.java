@@ -11,5 +11,5 @@ import org.training.fundtransfer.model.dto.NotificationRequest;
 public interface UserService {
 
     @PostMapping("/api/users/notifications")
-    ResponseEntity<Void> createNotification(@RequestBody NotificationRequest request);
+    ResponseEntity<Object> createNotification(@RequestBody NotificationRequest request);
 }

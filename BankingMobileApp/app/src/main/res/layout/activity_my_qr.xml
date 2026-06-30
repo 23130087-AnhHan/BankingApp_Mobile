@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout style="@style/ScreenRoot">
+
+        <TextView
+            style="@style/MutedText"
+            android:text="QR chuyển tiền" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="QR của tôi" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Tạo QR để người khác quét và chuyển tiền nội bộ NLU Banking." />
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Thông tin nhận tiền" />
+
+            <TextView
+                android:id="@+id/accountInfoText"
+                style="@style/ResultBox"
+                android:layout_marginTop="0dp"
+                android:text="Đang kiểm tra tài khoản..." />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Tùy chọn QR" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Số tiền yêu cầu" />
+
+            <EditText
+                android:id="@+id/amountInput"
+                style="@style/AmountInput"
+                android:hint="Bỏ trống nếu chỉ tạo QR người nhận"
+                android:inputType="number" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Nội dung" />
+
+            <EditText
+                android:id="@+id/noteInput"
+                style="@style/Input"
+                android:hint="Ví dụ: Thanh toan tien an"
+                android:inputType="textCapSentences" />
+
+            <Button
+                android:id="@+id/generateQrButton"
+                style="@style/PrimaryButton"
+                android:text="Tạo QR" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Panel"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Mã QR" />
+
+            <ImageView
+                android:id="@+id/qrImage"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:adjustViewBounds="true"
+                android:background="@color/surface"
+                android:contentDescription="Mã QR nhận tiền"
+                android:padding="12dp"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/resultText"
+                style="@style/ResultBox"
+                android:text="QR không chứa thông tin bảo mật. Người gửi vẫn phải xác thực PIN hoặc OTP khi chuyển tiền." />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/backButton"
+            style="@style/TextButton"
+            android:text="Quay lại" />
+    </LinearLayout>
+</ScrollView>

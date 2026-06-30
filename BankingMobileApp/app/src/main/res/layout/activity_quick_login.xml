@@ -46,6 +46,12 @@
                 android:id="@+id/loginButton"
                 style="@style/PrimaryButton"
                 android:text="Đăng nhập" />
+
+            <Button
+                android:id="@+id/biometricLoginButton"
+                style="@style/SecondaryButton"
+                android:text="Đăng nhập bằng vân tay"
+                android:visibility="gone" />
         </LinearLayout>
 
         <Button

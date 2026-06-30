@@ -204,7 +204,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDto readAccountByUserId(Long userId) {
         // Look for any account for the user, prioritizing PAYMENT_ACCOUNT if multiple exist
-        return accountRepository.findAccountByUserId(userId)
+        return accountRepository.findFirstByUserIdAndAccountTypeOrderByAccountIdDesc(userId, AccountType.PAYMENT_ACCOUNT)
+                .or(() -> accountRepository.findAccountByUserId(userId))
                 .map(account ->{
                     AccountDto accountDto = accountMapper.convertToDto(account);
                     accountDto.setAccountStatus(account.getAccountStatus().toString());

@@ -73,8 +73,13 @@ public class AccountActivity extends Activity {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    AccountResponse account = response.body();
+                    if (!AppSession.isPaymentAccount(account.accountType)) {
+                        provisionPaymentAccount(userId);
+                        return;
+                    }
                     setBusy(false);
-                    saveAndRenderAccount(response.body());
+                    saveAndRenderAccount(account);
                 } else if (response.code() == 404 || response.code() == 400) {
                     provisionPaymentAccount(userId);
                 } else {
@@ -99,7 +104,7 @@ public class AccountActivity extends Activity {
         resultText.setText("Đang mở tài khoản mới...");
         setBusy(true);
 
-        AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
+        AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {

@@ -1,6 +1,7 @@
 package com.example.bankingmobileapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -11,6 +12,8 @@ import com.example.bankingmobileapp.model.AccountRequest;
 import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.math.BigDecimal;
 
@@ -46,11 +49,25 @@ public class MainActivity extends Activity {
 
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
+        findViewById(R.id.scanQrTile).setOnClickListener(v -> scanTransferQr());
         findViewById(R.id.historyTile).setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
         findViewById(R.id.beneficiaryTile).setOnClickListener(v -> Ui.open(this, BeneficiaryActivity.class));
+        findViewById(R.id.myQrTile).setOnClickListener(v -> Ui.open(this, MyQrActivity.class));
         findViewById(R.id.notificationTile).setOnClickListener(v -> Ui.open(this, NotificationActivity.class));
         findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
         refreshButton.setOnClickListener(v -> refreshPaymentAccount());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (scanResult != null) {
+            if (scanResult.getContents() != null) {
+                openTransferFromQr(scanResult.getContents());
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -91,7 +108,12 @@ public class MainActivity extends Activity {
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 refreshButton.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
-                    saveAndRenderAccount(response.body());
+                    AccountResponse account = response.body();
+                    if (!AppSession.isPaymentAccount(account.accountType)) {
+                        provisionDefaultPaymentAccount(userId);
+                        return;
+                    }
+                    saveAndRenderAccount(account);
                 } else if (response.code() == 404 || response.code() == 400) {
                     // Try to create if not found
                     provisionDefaultPaymentAccount(userId);
@@ -110,13 +132,48 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void scanTransferQr() {
+        if (!AppSession.hasAccount(this) || !AppSession.isPaymentAccount(AppSession.getAccountType(this))) {
+            statusText.setText("Cần tài khoản thanh toán trước khi quét QR");
+            refreshPaymentAccount();
+            return;
+        }
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("Quét QR nhận tiền NLU Banking");
+        integrator.setBeepEnabled(false);
+        integrator.setOrientationLocked(false);
+        integrator.initiateScan();
+    }
+
+    private void openTransferFromQr(String rawQrValue) {
+        try {
+            TransferQrPayload payload = TransferQrPayload.parse(rawQrValue);
+            if (payload.accountNumber.equals(AppSession.getAccountNumber(this))) {
+                statusText.setText("Không thể chuyển cho chính tài khoản của bạn");
+                return;
+            }
+
+            Intent intent = new Intent(this, TransferActivity.class);
+            intent.putExtra(TransferActivity.EXTRA_QR_ACCOUNT_NUMBER, payload.accountNumber);
+            intent.putExtra(TransferActivity.EXTRA_QR_ACCOUNT_HOLDER_NAME, payload.accountHolderName);
+            if (payload.amount != null) {
+                intent.putExtra(TransferActivity.EXTRA_QR_AMOUNT, payload.amount.stripTrailingZeros().toPlainString());
+            }
+            intent.putExtra(TransferActivity.EXTRA_QR_NOTE, payload.note);
+            startActivity(intent);
+        } catch (Exception exception) {
+            statusText.setText("QR không hợp lệ");
+        }
+    }
+
     private void provisionDefaultPaymentAccount(long userId) {
         if (provisioningAccount) return;
         provisioningAccount = true;
         refreshButton.setEnabled(false);
         statusText.setText("Đang mở tài khoản...");
 
-        AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
+        AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {

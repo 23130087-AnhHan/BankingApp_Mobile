@@ -11,11 +11,13 @@ import org.training.fundtransfer.exception.InsufficientBalance;
 import org.training.fundtransfer.exception.ResourceNotFound;
 import org.training.fundtransfer.external.AccountService;
 import org.training.fundtransfer.external.TransactionService;
+import org.training.fundtransfer.external.UserService;
 import org.training.fundtransfer.model.mapper.FundTransferMapper;
 import org.training.fundtransfer.model.TransactionStatus;
 import org.training.fundtransfer.model.TransferType;
 import org.training.fundtransfer.model.dto.Account;
 import org.training.fundtransfer.model.dto.FundTransferDto;
+import org.training.fundtransfer.model.dto.NotificationRequest;
 import org.training.fundtransfer.model.dto.Transaction;
 import org.training.fundtransfer.model.dto.request.FundTransferRequest;
 import org.training.fundtransfer.model.dto.response.FundTransferResponse;
@@ -36,6 +38,7 @@ public class FundTransferServiceImpl implements FundTransferService {
     private final AccountService accountService;
     private final FundTransferRepository fundTransferRepository;
     private final TransactionService transactionService;
+    private final UserService userService;
 
     @Value("${spring.application.ok}")
     private String ok;
@@ -89,6 +92,7 @@ public class FundTransferServiceImpl implements FundTransferService {
                 .toAccount(toAccount.getAccountNumber()).build();
 
         fundTransferRepository.save(fundTransfer);
+        createTransferNotifications(fromAccount, toAccount, fundTransferRequest.getAmount(), transactionId);
         return FundTransferResponse.builder()
                 .transactionId(transactionId)
                 .message("Fund transfer was successful").build();
@@ -145,6 +149,47 @@ public class FundTransferServiceImpl implements FundTransferService {
         }
         String accountType = account.getAccountType().trim();
         return "PAYMENT_ACCOUNT".equalsIgnoreCase(accountType);
+    }
+
+    private void createTransferNotifications(
+            Account fromAccount,
+            Account toAccount,
+            BigDecimal amount,
+            String transactionId) {
+        createNotification(NotificationRequest.builder()
+                .userId(fromAccount.getUserId())
+                .title("Chuyển tiền thành công")
+                .message("Bạn đã chuyển " + formatAmount(amount)
+                        + " đ đến tài khoản " + toAccount.getAccountNumber() + ".")
+                .type("TRANSFER_OUT")
+                .referenceId(transactionId)
+                .build());
+
+        createNotification(NotificationRequest.builder()
+                .userId(toAccount.getUserId())
+                .title("Nhận tiền thành công")
+                .message("Bạn đã nhận " + formatAmount(amount)
+                        + " đ từ tài khoản " + fromAccount.getAccountNumber() + ".")
+                .type("TRANSFER_IN")
+                .referenceId(transactionId)
+                .build());
+    }
+
+    private void createNotification(NotificationRequest request) {
+        if (Objects.isNull(request.getUserId())) {
+            log.warn("Skipping notification because userId is missing for reference {}", request.getReferenceId());
+            return;
+        }
+        try {
+            userService.createNotification(request);
+        } catch (Exception exception) {
+            log.warn("Transfer {} completed but notification for user {} could not be created",
+                    request.getReferenceId(), request.getUserId(), exception);
+        }
+    }
+
+    private String formatAmount(BigDecimal amount) {
+        return Objects.isNull(amount) ? "0" : amount.stripTrailingZeros().toPlainString();
     }
 
     private boolean isBlank(String value) {
