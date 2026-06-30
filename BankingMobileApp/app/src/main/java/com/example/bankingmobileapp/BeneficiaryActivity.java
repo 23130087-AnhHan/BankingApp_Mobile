@@ -291,6 +291,9 @@ public class BeneficiaryActivity extends Activity {
         recipientVerified = false;
         accountHolderNameInput.setText("");
         accountHolderNameInput.setEnabled(true);
+        if (recipientLookupText != null) {
+            recipientLookupText.setVisibility(View.GONE);
+        }
     }
 
     private void scheduleRecipientLookup() {
@@ -298,11 +301,13 @@ public class BeneficiaryActivity extends Activity {
         String bankName = Ui.text(bankNameInput);
         String accountNumber = Ui.text(accountNumberInput);
         if (!INTERNAL_BANK.equalsIgnoreCase(bankName)) {
+            recipientLookupText.setVisibility(View.VISIBLE);
+            recipientLookupText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             recipientLookupText.setText("Hiện chỉ hỗ trợ kiểm tra người nhận nội bộ NLU Banking.");
             return;
         }
         if (accountNumber.length() < 6) {
-            recipientLookupText.setText("Nhập số tài khoản để kiểm tra tên chủ tài khoản.");
+            recipientLookupText.setVisibility(View.GONE);
             return;
         }
         lookupHandler.postDelayed(() -> lookupRecipient(accountNumber), 600);
@@ -312,6 +317,8 @@ public class BeneficiaryActivity extends Activity {
         if (!accountNumber.equals(Ui.text(accountNumberInput))) {
             return;
         }
+        recipientLookupText.setVisibility(View.VISIBLE);
+        recipientLookupText.setTextColor(getResources().getColor(R.color.text_secondary));
         recipientLookupText.setText("Đang kiểm tra người nhận...");
         ApiClient.getApi().getRecipient(accountNumber).enqueue(new Callback<AccountRecipientResponse>() {
             @Override
@@ -323,8 +330,9 @@ public class BeneficiaryActivity extends Activity {
                     recipientVerified = false;
                     accountHolderNameInput.setText("");
                     accountHolderNameInput.setEnabled(true);
-                    recipientLookupText.setText(ApiErrorUtils.httpError(TAG, response,
-                            "Không tìm thấy tài khoản nhận hợp lệ."));
+                    recipientLookupText.setVisibility(View.VISIBLE);
+                    recipientLookupText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    recipientLookupText.setText("Không tìm thấy tài khoản nhận hợp lệ.");
                     return;
                 }
                 AccountRecipientResponse recipient = response.body();
@@ -332,6 +340,8 @@ public class BeneficiaryActivity extends Activity {
                         ? "Khach hang NLU Banking"
                         : recipient.accountHolderName.trim();
                 recipientVerified = true;
+                recipientLookupText.setVisibility(View.VISIBLE);
+                recipientLookupText.setTextColor(getResources().getColor(R.color.text_primary));
                 recipientLookupText.setText("Chủ tài khoản: " + holderName);
                 accountHolderNameInput.setText(holderName);
                 accountHolderNameInput.setEnabled(false);
@@ -342,7 +352,9 @@ public class BeneficiaryActivity extends Activity {
                 recipientVerified = false;
                 accountHolderNameInput.setText("");
                 accountHolderNameInput.setEnabled(true);
-                recipientLookupText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                recipientLookupText.setVisibility(View.VISIBLE);
+                recipientLookupText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                recipientLookupText.setText("Lỗi kết nối mạng.");
             }
         });
     }

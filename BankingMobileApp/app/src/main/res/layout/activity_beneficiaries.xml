@@ -76,9 +76,9 @@
                 style="@style/ResultBox"
                 android:layout_marginTop="0dp"
                 android:minHeight="42dp"
-                android:text="Nhập số tài khoản để kiểm tra tên chủ tài khoản." />
+                android:visibility="gone" />
             <TextView style="@style/FieldLabel" android:text="Tên chủ tài khoản" />
-            <EditText android:id="@+id/accountHolderNameInput" style="@style/Input" android:hint="Tự động hiển thị khi kiểm tra tài khoản" android:inputType="textCapWords" />
+            <EditText android:id="@+id/accountHolderNameInput" style="@style/Input" android:hint="" android:inputType="textCapWords" />
             <TextView style="@style/FieldLabel" android:text="Tên gợi nhớ" />
             <EditText android:id="@+id/nicknameInput" style="@style/Input" android:hint="Ví dụ: Anh Nam, Tiền nhà" android:inputType="textCapWords" />
             <Button android:id="@+id/saveBeneficiaryButton" style="@style/NluPrimaryButton" android:text="Lưu người thụ hưởng" />

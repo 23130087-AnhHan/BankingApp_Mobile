@@ -94,7 +94,27 @@ public class TransactionDetailActivity extends Activity {
         addRow("Nội dung", firstNonEmpty(receipt.description, firstNonEmpty(receipt.comments, "Không có")));
         addRow("Mã giao dịch", firstNonEmpty(receipt.referenceId, "-"));
         addRow("Thời gian", firstNonEmpty(receipt.time, firstNonEmpty(receipt.localDateTime, "-")));
-        addRow("Loại giao dịch", firstNonEmpty(receipt.type, firstNonEmpty(receipt.transactionType, "-")));
+        addRow("Loại giao dịch", displayTransactionType(firstNonEmpty(receipt.type, firstNonEmpty(receipt.transactionType, "-"))));
+    }
+
+    private String displayTransactionType(String type) {
+        if (type == null || type.trim().isEmpty()) return "-";
+        String upper = type.toUpperCase().trim();
+        switch (upper) {
+            case "INTERNAL_TRANSFER":
+            case "TRANSFER":
+                return "Chuyển tiền";
+            case "CASH_DEPOSIT":
+            case "DEPOSIT":
+                return "Nạp tiền";
+            case "WITHDRAWAL":
+                return "Rút tiền";
+            case "UTILITY_BILL":
+            case "BILL_PAYMENT":
+                return "Thanh toán hóa đơn";
+            default:
+                return type;
+        }
     }
 
     private void addRow(String label, String value) {

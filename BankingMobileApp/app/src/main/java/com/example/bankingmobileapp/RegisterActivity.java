@@ -365,11 +365,6 @@ public class RegisterActivity extends Activity {
             input.requestFocus();
             return false;
         }
-        if (cccd.length() != 12) {
-            input.setError("Số CCCD phải có đúng 12 chữ số");
-            input.requestFocus();
-            return false;
-        }
         return true;
     }
 

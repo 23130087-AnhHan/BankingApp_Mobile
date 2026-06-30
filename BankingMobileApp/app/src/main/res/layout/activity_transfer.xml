@@ -156,7 +156,8 @@
                 android:padding="13dp"
                 android:text="Nhập số tài khoản để kiểm tra tên chủ tài khoản."
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/saveBeneficiaryButton"

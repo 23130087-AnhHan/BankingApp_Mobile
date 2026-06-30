@@ -246,11 +246,13 @@ public class TransferActivity extends Activity {
         lookupHandler.removeCallbacksAndMessages(null);
         String accountNumber = Ui.text(toAccountInput);
         if (!INTERNAL_BANK.equals(selectedBank())) {
-            recipientNameText.setText("Hiện chỉ hỗ trợ kiểm tra người nhận nội bộ NLU Banking.");
+            recipientNameText.setVisibility(View.VISIBLE);
+            recipientNameText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            recipientNameText.setText("Hiện chỉ hỗ trợ chuyển tiền nội bộ NLU Banking.");
             return;
         }
         if (accountNumber.length() < 6) {
-            recipientNameText.setText("Nhập số tài khoản để kiểm tra tên chủ tài khoản.");
+            recipientNameText.setVisibility(View.GONE);
             return;
         }
         lookupHandler.postDelayed(() -> lookupRecipient(accountNumber), 600);
@@ -259,9 +261,13 @@ public class TransferActivity extends Activity {
     private void lookupRecipient(String accountNumber) {
         if (!accountNumber.equals(Ui.text(toAccountInput))) return;
         if (accountNumber.equals(AppSession.getAccountNumber(this))) {
+            recipientNameText.setVisibility(View.VISIBLE);
+            recipientNameText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             recipientNameText.setText("Tài khoản nhận phải khác tài khoản nguồn.");
             return;
         }
+        recipientNameText.setVisibility(View.VISIBLE);
+        recipientNameText.setTextColor(getResources().getColor(R.color.text_secondary));
         recipientNameText.setText("Đang kiểm tra người nhận...");
         ApiClient.getApi().getRecipient(accountNumber).enqueue(new Callback<AccountRecipientResponse>() {
             @Override
@@ -270,12 +276,15 @@ public class TransferActivity extends Activity {
                 if (!response.isSuccessful() || response.body() == null) {
                     recipientVerified = false;
                     pendingRecipientName = "";
-                    recipientNameText.setText(ApiErrorUtils.httpError(TAG, response,
-                            "Không tìm thấy tài khoản nhận hợp lệ."));
+                    recipientNameText.setVisibility(View.VISIBLE);
+                    recipientNameText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    recipientNameText.setText("Không tìm thấy tài khoản nhận hợp lệ.");
                     return;
                 }
                 recipientVerified = true;
                 pendingRecipientName = safe(response.body().accountHolderName);
+                recipientNameText.setVisibility(View.VISIBLE);
+                recipientNameText.setTextColor(getResources().getColor(R.color.text_primary));
                 recipientNameText.setText("Chủ tài khoản: " + pendingRecipientName);
             }
 
@@ -283,7 +292,9 @@ public class TransferActivity extends Activity {
             public void onFailure(Call<AccountRecipientResponse> call, Throwable throwable) {
                 recipientVerified = false;
                 pendingRecipientName = "";
-                recipientNameText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                recipientNameText.setVisibility(View.VISIBLE);
+                recipientNameText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                recipientNameText.setText("Lỗi kết nối mạng.");
             }
         });
     }
@@ -357,6 +368,9 @@ public class TransferActivity extends Activity {
     private void resetRecipientLookup() {
         recipientVerified = false;
         pendingRecipientName = "";
+        if (recipientNameText != null) {
+            recipientNameText.setVisibility(View.GONE);
+        }
     }
 
     private String selectedBank() {
