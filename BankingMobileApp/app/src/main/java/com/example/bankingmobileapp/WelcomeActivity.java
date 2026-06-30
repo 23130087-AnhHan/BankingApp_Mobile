@@ -41,7 +41,7 @@ public class WelcomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         AppSession.lockSession(this);
 
-        if (AppSession.hasRememberedUser(this)) {
+        if (AppSession.hasRememberedUser(this) && !AppSession.getAuthToken(this).isEmpty()) {
             Ui.openAndClear(this, QuickLoginActivity.class);
             return;
         }
@@ -141,13 +141,16 @@ public class WelcomeActivity extends Activity {
                                 : "Tài khoản hoặc mật khẩu không chính xác";
                     }
                     showMessage(errorMessage);
+                    Toast.makeText(WelcomeActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                     showVerificationAction(isVerificationRequired(errorMessage));
                     return;
                 }
                 AuthResponse auth = response.body();
                 if (auth.userId == null || auth.accessToken == null || auth.accessToken.isEmpty()) {
                     setLoading(false);
-                    showMessage("Phiên đăng nhập từ server không hợp lệ.");
+                    String errMsg = "Phiên đăng nhập từ server không hợp lệ.";
+                    showMessage(errMsg);
+                    Toast.makeText(WelcomeActivity.this, errMsg, Toast.LENGTH_LONG).show();
                     return;
                 }
                 AppSession.saveAuth(WelcomeActivity.this, auth);
@@ -159,7 +162,9 @@ public class WelcomeActivity extends Activity {
             public void onFailure(Call<AuthResponse> call, Throwable throwable) {
                 setLoading(false);
                 AppSession.clearLoginState(WelcomeActivity.this);
-                showMessage(ApiErrorUtils.networkError(TAG, throwable));
+                String errMsg = ApiErrorUtils.networkError(TAG, throwable);
+                showMessage(errMsg);
+                Toast.makeText(WelcomeActivity.this, errMsg, Toast.LENGTH_LONG).show();
             }
         });
     }

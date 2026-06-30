@@ -2,57 +2,102 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@color/app_background"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
 
-        <TextView
-            style="@style/MutedText"
-            android:text="Sao kê tài khoản" />
-
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Lịch sử giao dịch" />
-
-        <TextView
-            style="@style/MutedText"
-            android:layout_marginTop="8dp"
-            android:text="Theo dõi tiền vào, tiền ra và trạng thái xử lý của từng giao dịch." />
-
-        <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Tài khoản hiện tại" />
-
-            <TextView
-                android:id="@+id/currentAccountText"
-                style="@style/ResultBox"
-                android:layout_marginTop="0dp"
-                android:text="Đang kiểm tra tài khoản..." />
-
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@drawable/account_header_bg"
+            android:padding="20dp">
+            <Button android:id="@+id/backHistoryButton" style="@style/NluHeaderButton" android:text="‹" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Lịch sử giao dịch"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Sao kê tài khoản"
+                    android:textColor="@color/nlu_mint"
+                    android:textSize="13sp" />
+            </LinearLayout>
             <Button
                 android:id="@+id/loadHistoryButton"
-                style="@style/PrimaryButton"
-                android:text="Làm mới lịch sử" />
-        </LinearLayout>
+                style="@style/NluHeaderButton"
+                android:layout_alignParentEnd="true"
+                android:text="↻"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/currentAccountText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="-38dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/account_info_card_bg"
+            android:elevation="7dp"
+            android:lineSpacingExtra="4dp"
+            android:padding="18dp"
+            android:text="Đang kiểm tra tài khoản..."
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Tổng quan giao dịch"
+            android:textColor="@color/text_primary"
+            android:textSize="19sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/summaryText"
-            style="@style/ResultBox"
-            android:text="Các giao dịch sẽ hiển thị theo thứ tự mới nhất." />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/history_summary_bg"
+            android:lineSpacingExtra="4dp"
+            android:padding="16dp"
+            android:text="Các giao dịch sẽ hiển thị theo thứ tự mới nhất."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:id="@+id/historyList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
             android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

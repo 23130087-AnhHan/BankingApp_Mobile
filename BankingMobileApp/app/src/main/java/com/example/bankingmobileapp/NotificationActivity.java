@@ -30,12 +30,18 @@ public class NotificationActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppSession.hasValidSession(this)) {
+            Ui.openAndClear(this, WelcomeActivity.class);
+            return;
+        }
+
         setContentView(R.layout.activity_notifications);
 
         summaryText = findViewById(R.id.notificationSummaryText);
         notificationList = findViewById(R.id.notificationList);
         refreshButton = findViewById(R.id.refreshNotificationButton);
         refreshButton.setOnClickListener(v -> loadNotifications());
+        findViewById(R.id.backNotificationButton).setOnClickListener(v -> finish());
     }
 
     @Override
@@ -96,8 +102,10 @@ public class NotificationActivity extends Activity {
         boolean unread = !isRead(notification);
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.panel_bg);
-        card.setPadding(dp(16), dp(14), dp(16), dp(14));
+        card.setBackgroundResource(unread
+                ? R.drawable.notification_unread_card_bg
+                : R.drawable.notification_read_card_bg);
+        card.setPadding(dp(16), dp(15), dp(16), dp(15));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -108,9 +116,17 @@ public class NotificationActivity extends Activity {
 
         TextView status = new TextView(this);
         status.setText(unread ? "Chưa đọc" : "Đã đọc");
-        status.setTextColor(Color.parseColor(unread ? "#0F6BFF" : "#667085"));
+        status.setTextColor(Color.parseColor(unread ? "#075B35" : "#667085"));
         status.setTextSize(12);
         status.setTypeface(Typeface.DEFAULT_BOLD);
+        status.setBackgroundResource(unread
+                ? R.drawable.notification_status_unread_bg
+                : R.drawable.notification_status_read_bg);
+        status.setPadding(dp(10), dp(5), dp(10), dp(5));
+        LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        status.setLayoutParams(statusParams);
         card.addView(status);
 
         TextView title = new TextView(this);
@@ -118,7 +134,7 @@ public class NotificationActivity extends Activity {
         title.setTextColor(Color.parseColor("#101828"));
         title.setTextSize(17);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setPadding(0, dp(6), 0, 0);
+        title.setPadding(0, dp(10), 0, 0);
         card.addView(title);
 
         TextView message = new TextView(this);
@@ -141,7 +157,7 @@ public class NotificationActivity extends Activity {
         if (hasReference(notification)) {
             TextView action = new TextView(this);
             action.setText("Xem biên lai");
-            action.setTextColor(Color.parseColor("#0F6BFF"));
+            action.setTextColor(Color.parseColor("#087D42"));
             action.setTextSize(14);
             action.setTypeface(Typeface.DEFAULT_BOLD);
             action.setPadding(0, dp(10), 0, 0);

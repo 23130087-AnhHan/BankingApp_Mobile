@@ -80,8 +80,14 @@ public class VerifyOtpActivity extends Activity {
         destinationText.setText("Mã OTP đã được gửi đến email: " + email);
         verifyButton.setOnClickListener(v -> verifyOtp());
         resendButton.setOnClickListener(v -> resendOtp());
-        findViewById(R.id.backToLoginButton)
-                .setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
+        Button backButton = findViewById(R.id.backToLoginButton);
+        if (flow == FLOW_TRANSFER) {
+            backButton.setText("Hủy giao dịch");
+            backButton.setOnClickListener(v -> finish());
+        } else {
+            backButton.setText("Quay về đăng nhập");
+            backButton.setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
+        }
     }
 
     @Override

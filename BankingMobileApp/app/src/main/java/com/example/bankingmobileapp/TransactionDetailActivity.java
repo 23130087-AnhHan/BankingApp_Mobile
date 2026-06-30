@@ -36,6 +36,11 @@ public class TransactionDetailActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppSession.hasValidSession(this)) {
+            Ui.openAndClear(this, WelcomeActivity.class);
+            return;
+        }
+
         setContentView(R.layout.activity_transaction_detail);
 
         statusText = findViewById(R.id.receiptStatusText);

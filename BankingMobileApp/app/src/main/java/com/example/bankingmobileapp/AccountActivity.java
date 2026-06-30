@@ -21,6 +21,10 @@ public class AccountActivity extends Activity {
     private static final String TAG = "AccountActivity";
 
     private TextView resultText;
+    private TextView accountHolderValue;
+    private TextView accountNumberValue;
+    private TextView accountBalanceValue;
+    private TextView accountStatusValue;
     private Button refreshButton;
     private Button transferButton;
     private Button historyButton;
@@ -39,6 +43,10 @@ public class AccountActivity extends Activity {
         setContentView(R.layout.activity_account);
 
         resultText = findViewById(R.id.resultText);
+        accountHolderValue = findViewById(R.id.accountHolderValue);
+        accountNumberValue = findViewById(R.id.accountNumberValue);
+        accountBalanceValue = findViewById(R.id.accountBalanceValue);
+        accountStatusValue = findViewById(R.id.accountStatusValue);
         refreshButton = findViewById(R.id.refreshAccountButton);
         transferButton = findViewById(R.id.transferButton);
         historyButton = findViewById(R.id.historyButton);
@@ -68,6 +76,8 @@ public class AccountActivity extends Activity {
         }
 
         resultText.setText("Đang tải tài khoản...");
+        accountHolderValue.setText(displayName());
+        accountStatusValue.setText("Đang đồng bộ");
         setBusy(true);
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
@@ -146,12 +156,11 @@ public class AccountActivity extends Activity {
         AppSession.saveAccount(this, account);
         setAccountActionsEnabled(true);
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
-
-        resultText.setText("Tài khoản thanh toán"
-                + "\nSố tài khoản: " + accountNumber
-                + "\nTrạng thái: " + displayAccountStatus(account.accountStatus)
-                + "\nSố dư khả dụng: " + balance + " đ"
-                + "\n\nTài khoản này dùng để nhận tiền, chuyển tiền và xem lịch sử giao dịch.");
+        accountHolderValue.setText(displayName());
+        accountNumberValue.setText(accountNumber);
+        accountBalanceValue.setText(CurrencyUtils.formatVnd(balance));
+        accountStatusValue.setText(displayAccountStatus(account.accountStatus));
+        resultText.setText("Dùng tài khoản này để nhận tiền, chuyển tiền và quản lý giao dịch.");
     }
 
     private void setBusy(boolean busy) {
@@ -178,6 +187,11 @@ public class AccountActivity extends Activity {
         } catch (NumberFormatException ex) {
             return null;
         }
+    }
+
+    private String displayName() {
+        String name = AppSession.getRememberedDisplayName(this);
+        return name.isEmpty() ? "Khách hàng NLU" : name;
     }
 
     private String displayAccountStatus(String status) {

@@ -81,7 +81,7 @@ public final class AppSession {
     }
 
     public static boolean hasRememberedUser(Context context) {
-        return !getRememberedUserId(context).isEmpty();
+        return !getString(context, REMEMBERED_USER_ID).isEmpty();
     }
 
     public static void clearRememberedUser(Context context) {

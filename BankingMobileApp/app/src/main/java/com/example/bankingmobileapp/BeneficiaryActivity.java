@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
+import com.example.bankingmobileapp.model.AccountRecipientResponse;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.BeneficiaryRequest;
 import com.example.bankingmobileapp.model.BeneficiaryResponse;
@@ -30,16 +35,21 @@ public class BeneficiaryActivity extends Activity {
     public static final String EXTRA_ACCOUNT_HOLDER_NAME = "accountHolderName";
 
     private static final String TAG = "BeneficiaryActivity";
+    private static final String INTERNAL_BANK = "NLU Banking";
+
+    private final Handler lookupHandler = new Handler(Looper.getMainLooper());
 
     private EditText bankNameInput;
     private EditText accountNumberInput;
     private EditText accountHolderNameInput;
     private EditText nicknameInput;
     private TextView resultText;
+    private TextView recipientLookupText;
     private LinearLayout beneficiaryList;
     private Button saveButton;
     private Button refreshButton;
     private boolean selectMode;
+    private boolean recipientVerified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +62,24 @@ public class BeneficiaryActivity extends Activity {
         accountHolderNameInput = findViewById(R.id.accountHolderNameInput);
         nicknameInput = findViewById(R.id.nicknameInput);
         resultText = findViewById(R.id.beneficiaryResultText);
+        recipientLookupText = findViewById(R.id.recipientLookupText);
         beneficiaryList = findViewById(R.id.beneficiaryList);
         saveButton = findViewById(R.id.saveBeneficiaryButton);
         refreshButton = findViewById(R.id.refreshBeneficiaryButton);
 
-        bankNameInput.setText("NLU Banking");
+        bankNameInput.setText(INTERNAL_BANK);
+        findViewById(R.id.backBeneficiaryButton).setOnClickListener(v -> finish());
         saveButton.setOnClickListener(v -> saveBeneficiary());
         refreshButton.setOnClickListener(v -> loadBeneficiaries());
+
+        setupAccountLookup();
         loadBeneficiaries();
+    }
+
+    @Override
+    protected void onDestroy() {
+        lookupHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 
     private void loadBeneficiaries() {
@@ -105,7 +125,7 @@ public class BeneficiaryActivity extends Activity {
     private View createBeneficiaryView(BeneficiaryResponse beneficiary) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.panel_bg);
+        card.setBackgroundResource(R.drawable.nlu_list_card_bg);
         card.setPadding(dp(16), dp(14), dp(16), dp(14));
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -133,7 +153,7 @@ public class BeneficiaryActivity extends Activity {
         if (selectMode) {
             TextView action = new TextView(this);
             action.setText("Chọn người thụ hưởng");
-            action.setTextColor(Color.parseColor("#0F6BFF"));
+            action.setTextColor(Color.parseColor("#075B35"));
             action.setTextSize(14);
             action.setTypeface(Typeface.DEFAULT_BOLD);
             action.setPadding(0, dp(10), 0, 0);
@@ -169,6 +189,10 @@ public class BeneficiaryActivity extends Activity {
         }
         if (accountNumber.isEmpty()) {
             accountNumberInput.setError("Vui lòng nhập số tài khoản");
+            return;
+        }
+        if (INTERNAL_BANK.equalsIgnoreCase(bankName) && !recipientVerified) {
+            resultText.setText("Vui lòng nhập số tài khoản hợp lệ và chờ hệ thống kiểm tra tên chủ tài khoản trước khi lưu.");
             return;
         }
         if (holderName.isEmpty()) {
@@ -236,10 +260,91 @@ public class BeneficiaryActivity extends Activity {
     }
 
     private void clearForm() {
-        bankNameInput.setText("NLU Banking");
+        bankNameInput.setText(INTERNAL_BANK);
         accountNumberInput.setText("");
         accountHolderNameInput.setText("");
+        accountHolderNameInput.setEnabled(true);
         nicknameInput.setText("");
+        recipientVerified = false;
+        recipientLookupText.setText("Nhập số tài khoản để kiểm tra tên chủ tài khoản.");
+    }
+
+    private void setupAccountLookup() {
+        accountNumberInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                resetRecipientLookup();
+                scheduleRecipientLookup();
+            }
+        });
+    }
+
+    private void resetRecipientLookup() {
+        recipientVerified = false;
+        accountHolderNameInput.setText("");
+        accountHolderNameInput.setEnabled(true);
+    }
+
+    private void scheduleRecipientLookup() {
+        lookupHandler.removeCallbacksAndMessages(null);
+        String bankName = Ui.text(bankNameInput);
+        String accountNumber = Ui.text(accountNumberInput);
+        if (!INTERNAL_BANK.equalsIgnoreCase(bankName)) {
+            recipientLookupText.setText("Hiện chỉ hỗ trợ kiểm tra người nhận nội bộ NLU Banking.");
+            return;
+        }
+        if (accountNumber.length() < 6) {
+            recipientLookupText.setText("Nhập số tài khoản để kiểm tra tên chủ tài khoản.");
+            return;
+        }
+        lookupHandler.postDelayed(() -> lookupRecipient(accountNumber), 600);
+    }
+
+    private void lookupRecipient(String accountNumber) {
+        if (!accountNumber.equals(Ui.text(accountNumberInput))) {
+            return;
+        }
+        recipientLookupText.setText("Đang kiểm tra người nhận...");
+        ApiClient.getApi().getRecipient(accountNumber).enqueue(new Callback<AccountRecipientResponse>() {
+            @Override
+            public void onResponse(Call<AccountRecipientResponse> call, Response<AccountRecipientResponse> response) {
+                if (!accountNumber.equals(Ui.text(accountNumberInput))) {
+                    return;
+                }
+                if (!response.isSuccessful() || response.body() == null) {
+                    recipientVerified = false;
+                    accountHolderNameInput.setText("");
+                    accountHolderNameInput.setEnabled(true);
+                    recipientLookupText.setText(ApiErrorUtils.httpError(TAG, response,
+                            "Không tìm thấy tài khoản nhận hợp lệ."));
+                    return;
+                }
+                AccountRecipientResponse recipient = response.body();
+                String holderName = recipient.accountHolderName == null || recipient.accountHolderName.trim().isEmpty()
+                        ? "Khach hang NLU Banking"
+                        : recipient.accountHolderName.trim();
+                recipientVerified = true;
+                recipientLookupText.setText("Chủ tài khoản: " + holderName);
+                accountHolderNameInput.setText(holderName);
+                accountHolderNameInput.setEnabled(false);
+            }
+
+            @Override
+            public void onFailure(Call<AccountRecipientResponse> call, Throwable throwable) {
+                recipientVerified = false;
+                accountHolderNameInput.setText("");
+                accountHolderNameInput.setEnabled(true);
+                recipientLookupText.setText(ApiErrorUtils.networkError(TAG, throwable));
+            }
+        });
     }
 
     private void showMessage(String message) {

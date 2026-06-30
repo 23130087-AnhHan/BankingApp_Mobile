@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -24,21 +25,45 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QuickLoginActivity" />
+        <activity
+            android:name=".QuickLoginActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <activity android:name=".HistoryActivity" />
         <activity android:name=".BeneficiaryActivity" />
         <activity android:name=".NotificationActivity" />
         <activity android:name=".MyQrActivity" />
         <activity android:name=".TransactionDetailActivity" />
-        <activity android:name=".TransferActivity" />
-        <activity android:name=".PinActivity" />
+        <activity
+            android:name=".TransferActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity android:name=".TransferConfirmActivity" />
+        <activity android:name=".TransferAuthActivity" />
+        <activity android:name=".TransferSuccessActivity" />
+        <activity
+            android:name=".PinActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".AccountActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".VerifyOtpActivity" />
+        <activity
+            android:name=".RegisterActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".VerifyOtpActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".MainActivity" />
         <activity android:name=".TransactionActivity" />
-        <activity android:name=".ResetPasswordActivity" />
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -2,91 +2,118 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@color/app_background"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
 
-        <TextView
-            style="@style/MutedText"
-            android:text="Danh bạ chuyển tiền" />
-
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Người thụ hưởng" />
-
-        <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Thêm người thụ hưởng" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Ngân hàng" />
-
-            <EditText
-                android:id="@+id/bankNameInput"
-                style="@style/Input"
-                android:hint="Ví dụ: NLU Banking"
-                android:inputType="textCapWords" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Số tài khoản" />
-
-            <EditText
-                android:id="@+id/beneficiaryAccountInput"
-                style="@style/Input"
-                android:hint="Nhập số tài khoản"
-                android:inputType="number" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Tên chủ tài khoản" />
-
-            <EditText
-                android:id="@+id/accountHolderNameInput"
-                style="@style/Input"
-                android:hint="Nhập tên chủ tài khoản"
-                android:inputType="textCapWords" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Tên gợi nhớ" />
-
-            <EditText
-                android:id="@+id/nicknameInput"
-                style="@style/Input"
-                android:hint="Ví dụ: Anh Nam, Tiền nhà"
-                android:inputType="textCapWords" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="138dp"
+            android:background="@drawable/account_header_bg"
+            android:padding="20dp">
 
             <Button
-                android:id="@+id/saveBeneficiaryButton"
-                style="@style/PrimaryButton"
-                android:text="Lưu người thụ hưởng" />
+                android:id="@+id/backBeneficiaryButton"
+                style="@style/NluHeaderButton"
+                android:text="‹" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Người thụ hưởng"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Danh bạ chuyển tiền"
+                    android:textColor="@color/nlu_mint"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/refreshBeneficiaryButton"
+                style="@style/NluHeaderButton"
+                android:layout_alignParentEnd="true"
+                android:text="↻"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="-30dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/account_info_card_bg"
+            android:elevation="7dp"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView style="@style/SectionTitle" android:text="Thêm người thụ hưởng" />
+            <TextView style="@style/FieldLabel" android:text="Ngân hàng" />
+            <EditText android:id="@+id/bankNameInput" style="@style/Input" android:hint="Ví dụ: NLU Banking" android:inputType="textCapWords" />
+            <TextView style="@style/FieldLabel" android:text="Số tài khoản" />
+            <EditText android:id="@+id/beneficiaryAccountInput" style="@style/Input" android:hint="Nhập số tài khoản" android:inputType="number" />
+            <TextView
+                android:id="@+id/recipientLookupText"
+                style="@style/ResultBox"
+                android:layout_marginTop="0dp"
+                android:minHeight="42dp"
+                android:text="Nhập số tài khoản để kiểm tra tên chủ tài khoản." />
+            <TextView style="@style/FieldLabel" android:text="Tên chủ tài khoản" />
+            <EditText android:id="@+id/accountHolderNameInput" style="@style/Input" android:hint="Tự động hiển thị khi kiểm tra tài khoản" android:inputType="textCapWords" />
+            <TextView style="@style/FieldLabel" android:text="Tên gợi nhớ" />
+            <EditText android:id="@+id/nicknameInput" style="@style/Input" android:hint="Ví dụ: Anh Nam, Tiền nhà" android:inputType="textCapWords" />
+            <Button android:id="@+id/saveBeneficiaryButton" style="@style/NluPrimaryButton" android:text="Lưu người thụ hưởng" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/beneficiaryResultText"
-            style="@style/ResultBox"
-            android:text="Danh sách người thụ hưởng sẽ hiển thị tại đây." />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Danh sách đã lưu"
+            android:textColor="@color/text_primary"
+            android:textSize="19sp"
+            android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/refreshBeneficiaryButton"
-            style="@style/SecondaryButton"
-            android:text="Làm mới danh sách" />
+        <TextView
+            android:id="@+id/beneficiaryResultText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            android:text="Danh sách người thụ hưởng sẽ hiển thị tại đây."
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
 
         <LinearLayout
             android:id="@+id/beneficiaryList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="20dp"
             android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

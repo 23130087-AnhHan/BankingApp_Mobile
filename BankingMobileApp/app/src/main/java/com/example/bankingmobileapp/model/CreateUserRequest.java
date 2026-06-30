@@ -13,12 +13,15 @@ public class CreateUserRequest {
     public String emailId;
     @SerializedName("password")
     public String password;
+    @SerializedName("identificationNumber")
+    public String identificationNumber;
 
-    public CreateUserRequest(String firstName, String lastName, String contactNumber, String emailId, String password) {
+    public CreateUserRequest(String firstName, String lastName, String contactNumber, String emailId, String password, String identificationNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.contactNumber = contactNumber;
         this.emailId = emailId;
         this.password = password;
+        this.identificationNumber = identificationNumber;
     }
 }

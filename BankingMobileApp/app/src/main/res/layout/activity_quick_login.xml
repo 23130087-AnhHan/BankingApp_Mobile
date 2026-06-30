@@ -164,7 +164,7 @@
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_nlu_fingerprint"
+                        android:src="@drawable/ic_fingerprint"
                         android:tint="@android:color/white"
                         android:contentDescription="Vân tay" />
 

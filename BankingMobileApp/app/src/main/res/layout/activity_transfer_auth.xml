@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="154dp"
+            android:background="@drawable/account_header_bg"
+            android:padding="20dp">
+
+            <Button
+                android:id="@+id/backButton"
+                style="@style/NluHeaderButton"
+                android:text="‹" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="Xác thực giao dịch"
+                android:textColor="@android:color/white"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="-34dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/logout_dialog_bg"
+            android:elevation="7dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="22dp">
+
+            <TextView
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:background="@drawable/transfer_auth_icon_bg"
+                android:gravity="center"
+                android:text="i"
+                android:textColor="#183816"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/authTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/authHintText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:textColor="#EAF8EF"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/codeInput"
+                style="@style/TransferCodeInput"
+                android:hint="••••••"
+                android:inputType="numberPassword" />
+
+            <Button
+                android:id="@+id/sendOtpButton"
+                style="@style/TransferSecondaryButton"
+                android:text="Gửi OTP thanh toán" />
+
+            <Button
+                android:id="@+id/managePinButton"
+                style="@style/TransferSecondaryButton"
+                android:text="Thiết lập PIN" />
+
+            <Button
+                android:id="@+id/submitButton"
+                style="@style/NluPrimaryButton"
+                android:text="Tiếp tục" />
+
+            <TextView
+                android:id="@+id/resultText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/transfer_auth_note_bg"
+                android:lineSpacingExtra="3dp"
+                android:padding="13dp"
+                android:text="Vui lòng không chia sẻ mã xác thực cho bất kỳ ai."
+                android:textColor="#EAF8EF"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

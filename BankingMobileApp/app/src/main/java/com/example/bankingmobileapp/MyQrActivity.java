@@ -3,6 +3,9 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,6 +17,9 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import org.json.JSONException;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class MyQrActivity extends Activity {
     private ImageView qrImage;
@@ -22,6 +28,9 @@ public class MyQrActivity extends Activity {
     private EditText amountInput;
     private EditText noteInput;
     private Button generateQrButton;
+    private final DecimalFormat moneyFormat = new DecimalFormat("#,##0",
+            DecimalFormatSymbols.getInstance(Locale.US));
+    private boolean formattingAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,25 @@ public class MyQrActivity extends Activity {
 
         generateQrButton.setOnClickListener(v -> generateQr());
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
+
+        amountInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        amountInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable value) {
+                if (formattingAmount) return;
+                String digits = digitsOnly(value.toString());
+                formattingAmount = true;
+                if (digits.isEmpty()) {
+                    amountInput.setText("");
+                } else {
+                    String formatted = moneyFormat.format(new BigDecimal(digits));
+                    amountInput.setText(formatted);
+                    amountInput.setSelection(formatted.length());
+                }
+                formattingAmount = false;
+            }
+        });
 
         renderAccountInfo();
         generateQr();

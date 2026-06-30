@@ -45,6 +45,7 @@ public class HistoryActivity extends Activity {
         historyList = findViewById(R.id.historyList);
         loadHistoryButton = findViewById(R.id.loadHistoryButton);
 
+        findViewById(R.id.backHistoryButton).setOnClickListener(v -> finish());
         loadHistoryButton.setOnClickListener(v -> loadHistoryForCurrentAccount());
     }
 
@@ -134,7 +135,7 @@ public class HistoryActivity extends Activity {
     private View createTransactionView(TransactionResponse item, boolean moneyIn, BigDecimal amount) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.panel_bg);
+        card.setBackgroundResource(R.drawable.nlu_list_card_bg);
         card.setPadding(dp(16), dp(14), dp(16), dp(14));
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -178,7 +179,7 @@ public class HistoryActivity extends Activity {
 
         TextView action = new TextView(this);
         action.setText("Xem biên lai");
-        action.setTextColor(Color.parseColor("#0F6BFF"));
+        action.setTextColor(Color.parseColor("#075B35"));
         action.setTextSize(14);
         action.setTypeface(Typeface.DEFAULT_BOLD);
         action.setPadding(0, dp(10), 0, 0);
@@ -203,7 +204,7 @@ public class HistoryActivity extends Activity {
         String counterparty = firstNonEmpty(item.counterpartyAccount, "");
         String base = firstNonEmpty(item.displayMessage, moneyIn ? "Tiền vào tài khoản" : "Tiền ra khỏi tài khoản");
         String bank = firstNonEmpty(item.bankName, "NLU Banking");
-        String note = firstNonEmpty(item.comments, "");
+        String note = firstNonEmpty(item.description, firstNonEmpty(item.comments, ""));
 
         StringBuilder builder = new StringBuilder(base);
         if (!counterparty.isEmpty()) {

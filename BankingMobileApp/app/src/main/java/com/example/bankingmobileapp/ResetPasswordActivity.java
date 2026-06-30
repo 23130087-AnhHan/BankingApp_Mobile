@@ -29,22 +29,14 @@ public class ResetPasswordActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register); // Reusing register layout for password inputs
+        setContentView(R.layout.activity_reset_password);
 
         email = getIntent().getStringExtra("email");
         otp = getIntent().getStringExtra("otp");
 
-        // UI setup - hide unnecessary fields from register layout
-        findViewById(R.id.firstNameInput).setVisibility(android.view.View.GONE);
-        findViewById(R.id.lastNameInput).setVisibility(android.view.View.GONE);
-        findViewById(R.id.phoneInput).setVisibility(android.view.View.GONE);
-        findViewById(R.id.emailInput).setVisibility(android.view.View.GONE);
-        findViewById(R.id.loginButton).setVisibility(android.view.View.GONE);
-        ((TextView)findViewById(R.id.registerButton)).setText("Cập nhật mật khẩu");
-
         passwordInput = findViewById(R.id.passwordInput);
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
-        submitButton = findViewById(R.id.registerButton);
+        submitButton = findViewById(R.id.submitButton);
         resultText = findViewById(R.id.resultText);
 
         Ui.configurePasswordVisibility(passwordInput);

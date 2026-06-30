@@ -48,7 +48,11 @@ public class QuickLoginActivity extends FragmentActivity {
 
         loginButton.setOnClickListener(v -> loginRememberedUser());
         biometricLoginButton.setOnClickListener(v -> authenticateWithBiometric());
-        findViewById(R.id.otherAccountButton).setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
+        findViewById(R.id.otherAccountButton).setOnClickListener(v -> {
+            AppSession.clearRememberedUser(this);
+            AppSession.clearLoginState(this);
+            Ui.openAndClear(this, WelcomeActivity.class);
+        });
         findViewById(R.id.forgotPasswordButton).setOnClickListener(v -> requestPasswordReset());
         renderBiometricState();
     }
@@ -57,7 +61,7 @@ public class QuickLoginActivity extends FragmentActivity {
         boolean hasStoredSession = !AppSession.getAuthToken(this).isEmpty()
                 && !AppSession.getRefreshToken(this).isEmpty();
         int status = BiometricManager.from(this)
-                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG);
+                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
 
         biometricLoginButton.setVisibility(
                 hasStoredSession && status == BiometricManager.BIOMETRIC_SUCCESS
@@ -95,6 +99,7 @@ public class QuickLoginActivity extends FragmentActivity {
                     public void onAuthenticationError(int errorCode, CharSequence errString) {
                         super.onAuthenticationError(errorCode, errString);
                         if (errorCode != BiometricPrompt.ERROR_USER_CANCELED
+                                && errorCode != BiometricPrompt.ERROR_USER_CANCELED
                                 && errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
                             showMessage(errString == null
                                     ? "Không thể xác thực vân tay."
@@ -113,7 +118,7 @@ public class QuickLoginActivity extends FragmentActivity {
                 .setTitle("Đăng nhập bằng vân tay")
                 .setSubtitle("Xác thực để vào NLU Banking")
                 .setNegativeButtonText("Dùng mật khẩu")
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK)
                 .build();
         biometricPrompt.authenticate(promptInfo);
     }
@@ -161,9 +166,11 @@ public class QuickLoginActivity extends FragmentActivity {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (!response.isSuccessful() || response.body() == null || response.body().userId == null) {
                     setLoading(false);
-                    showMessage(response.code() == 401
+                    String errMsg = response.code() == 401
                             ? "Mật khẩu không đúng."
-                            : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập."));
+                            : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập.");
+                    showMessage(errMsg);
+                    Toast.makeText(QuickLoginActivity.this, errMsg, Toast.LENGTH_LONG).show();
                     return;
                 }
                 AppSession.saveAuth(QuickLoginActivity.this, response.body());
@@ -174,7 +181,9 @@ public class QuickLoginActivity extends FragmentActivity {
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable throwable) {
                 setLoading(false);
-                showMessage(ApiErrorUtils.networkError(TAG, throwable));
+                String errMsg = ApiErrorUtils.networkError(TAG, throwable);
+                showMessage(errMsg);
+                Toast.makeText(QuickLoginActivity.this, errMsg, Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -1,72 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
-    android:clipToPadding="false"
-    android:fillViewport="true"
-    android:overScrollMode="never">
+    android:background="@color/app_background">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:paddingBottom="104dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="229dp"
+                android:background="@drawable/main_header_bg"
+                android:clipToOutline="true">
 
-                <TextView
-                    style="@style/MutedText"
-                    android:text="Xin chào," />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Banner NLU Bank"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/main_banner" />
 
-                <TextView
-                    style="@style/PageTitle"
-                    android:layout_marginTop="2dp"
-                    android:text="NLU Banking" />
-            </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#38002516" />
 
-            <TextView
-                style="@style/BrandMark"
-                android:text="NLU" />
-        </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="22dp"
+                    android:paddingTop="24dp"
+                    android:paddingEnd="22dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="196dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/balance_card_bg"
-            android:elevation="6dp"
-            android:orientation="vertical"
-            android:padding="20dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:contentDescription="Logo NLU Bank"
+                        android:src="@drawable/nlu_logo" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="NLU Bank"
+                            android:textColor="@android:color/white"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ngân hàng số sinh viên"
+                            android:textColor="@color/nlu_mint"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/logoutButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/main_round_icon_bg"
+                    android:contentDescription="Đăng xuất"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_logout" />
+                </RelativeLayout>
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/main_account_card_bg"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/userNameText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/main_user_badge_bg"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:paddingStart="14dp"
+                            android:paddingTop="9dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="9dp"
+                            android:text="Khách hàng NLU"
+                            android:textColor="@color/nlu_green_deep"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp">
+
+                        <ImageButton
+                            android:id="@+id/notificationTile"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/main_notification_bg"
+                            android:contentDescription="Thông báo"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_notification" />
+
+                        <TextView
+                            android:id="@+id/notificationBadge"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="end|top"
+                            android:layout_marginTop="-2dp"
+                            android:layout_marginEnd="-2dp"
+                            android:background="@drawable/badge_circle_red"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:text=""
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/userIdText"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Chưa có khách hàng"
-                    android:textColor="@color/text_on_primary_muted"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Số tài khoản"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/accountNumberText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="Đang kiểm tra tài khoản"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/copyAccountButton"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="Sao chép số tài khoản"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_copy" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Số dư khả dụng"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/balanceText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="********"
+                        android:textColor="@color/nlu_green_deep"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/toggleBalanceButton"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="Hiện số dư"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_visibility_off" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/statusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:background="@drawable/status_pill_bg"
-                    android:fontFamily="sans-serif-medium"
                     android:paddingStart="10dp"
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
@@ -80,116 +264,95 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Số dư khả dụng"
-                android:textColor="@color/text_on_primary_muted"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/balanceText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="20dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="0 đ"
-                android:textColor="@color/text_on_primary"
-                android:textSize="34sp"
+                android:text="Dịch vụ chính"
+                android:textColor="@color/text_primary"
+                android:textSize="19sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/accountNumberText"
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Bạn chưa có tài khoản"
-                android:textColor="@color/text_on_primary_muted"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="12dp"
+                android:columnCount="3"
+                android:rowCount="2">
 
-        <Button
-            android:id="@+id/refreshButton"
-            style="@style/SecondaryButton"
-            android:layout_marginTop="14dp"
-            android:text="Làm mới số dư" />
+                <TextView
+                    android:id="@+id/transferTile"
+                    style="@style/MainServiceItem"
+                    android:layout_columnWeight="1"
+                    android:drawableTint="@color/nlu_green_deep"
+                    android:drawableTop="@drawable/ic_transfer"
+                    android:text="Chuyển\ntiền" />
+
+                <TextView
+                    android:id="@+id/beneficiaryTile"
+                    style="@style/MainServiceItem"
+                    android:layout_columnWeight="1"
+                    android:drawableTint="@color/nlu_green_deep"
+                    android:drawableTop="@drawable/ic_user_add"
+                    android:text="Người thụ\nhưởng" />
+
+                <TextView
+                    android:id="@+id/historyTile"
+                    style="@style/MainServiceItem"
+                    android:layout_columnWeight="1"
+                    android:drawableTint="@color/nlu_green_deep"
+                    android:drawableTop="@drawable/ic_history"
+                    android:text="Lịch sử\ngiao dịch" />
+
+                <TextView
+                    android:id="@+id/myQrTile"
+                    style="@style/MainServiceItem"
+                    android:layout_columnWeight="1"
+                    android:drawableTint="@color/nlu_green_deep"
+                    android:drawableTop="@drawable/ic_wallet"
+                    android:text="QR nhận\ntiền" />
+            </GridLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/main_bottom_nav_bg"
+        android:elevation="12dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
         <TextView
-            style="@style/SectionTitle"
-            android:layout_marginTop="24dp"
-            android:text="Dịch vụ chính" />
+            android:id="@+id/productTile"
+            style="@style/MainNavItem"
+            android:drawableTop="@drawable/ic_products"
+            android:text="Sản phẩm" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/transferTile"
-                style="@style/ActionTile"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_transfer"
-                android:text="Chuyển tiền" />
-
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="1dp" />
-
-            <TextView
-                android:id="@+id/accountTile"
-                style="@style/ActionTile"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_account"
-                android:text="Tài khoản" />
-        </LinearLayout>
-
-        <TextView
+        <ImageButton
             android:id="@+id/scanQrTile"
-            style="@style/ActionTileWide"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@drawable/ic_transfer"
-            android:drawablePadding="12dp"
-            android:text="Quét QR chuyển tiền" />
+            android:layout_width="66dp"
+            android:layout_height="66dp"
+            android:layout_marginStart="22dp"
+            android:layout_marginEnd="22dp"
+            android:background="@drawable/main_scan_bg"
+            android:contentDescription="Quét QR"
+            android:elevation="8dp"
+            android:padding="18dp"
+            android:src="@drawable/ic_qr_scan" />
 
         <TextView
-            android:id="@+id/historyTile"
-            style="@style/ActionTileWide"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@drawable/ic_history"
-            android:drawablePadding="12dp"
-            android:text="Lịch sử giao dịch" />
-
-        <TextView
-            android:id="@+id/beneficiaryTile"
-            style="@style/ActionTileWide"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@drawable/ic_user_add"
-            android:drawablePadding="12dp"
-            android:text="Người thụ hưởng" />
-
-        <TextView
-            android:id="@+id/myQrTile"
-            style="@style/ActionTileWide"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@drawable/ic_wallet"
-            android:drawablePadding="12dp"
-            android:text="QR nhận tiền" />
-
-        <TextView
-            android:id="@+id/notificationTile"
-            style="@style/ActionTileWide"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@drawable/ic_wallet"
-            android:drawablePadding="12dp"
-            android:text="Thông báo" />
-
-        <Button
-            android:id="@+id/logoutButton"
-            style="@style/TextButton"
-            android:layout_marginTop="16dp"
-            android:text="Đăng xuất" />
+            android:id="@+id/accountTile"
+            style="@style/MainNavItem"
+            android:drawableTop="@drawable/ic_settings"
+            android:text="Cài đặt" />
     </LinearLayout>
-</ScrollView>
+</FrameLayout>

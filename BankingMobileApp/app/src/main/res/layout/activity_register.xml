@@ -17,12 +17,12 @@
         <TextView
             style="@style/PageTitle"
             android:layout_marginTop="2dp"
-            android:text="Tạo hồ sơ khách hàng" />
+            android:text="Tạo tài khoản khách hàng" />
 
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Sau khi tạo hồ sơ, bạn cần nhập mã OTP được gửi qua email để hoàn tất đăng ký." />
+            android:text="Sau khi tạo tài khoản, bạn cần nhập mã OTP được gửi qua email để hoàn tất đăng ký." />
 
         <LinearLayout
             style="@style/Panel"
@@ -31,16 +31,6 @@
             <TextView
                 style="@style/SectionTitle"
                 android:text="Thông tin cá nhân" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Tên" />
-
-            <EditText
-                android:id="@+id/firstNameInput"
-                style="@style/Input"
-                android:hint="Ví dụ: An"
-                android:inputType="textCapWords" />
 
             <TextView
                 style="@style/FieldLabel"
@@ -54,12 +44,22 @@
 
             <TextView
                 style="@style/FieldLabel"
+                android:text="Tên" />
+
+            <EditText
+                android:id="@+id/firstNameInput"
+                style="@style/Input"
+                android:hint="Ví dụ: An"
+                android:inputType="textCapWords" />
+
+            <TextView
+                style="@style/FieldLabel"
                 android:text="Số điện thoại" />
 
             <EditText
                 android:id="@+id/phoneInput"
                 style="@style/Input"
-                android:hint="09xx xxx xxx"
+                android:hint="0xxx xxx xxx"
                 android:inputType="phone" />
 
             <TextView
@@ -67,6 +67,16 @@
                 style="@style/HelperText"
                 android:textColor="@color/danger"
                 android:visibility="gone" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Số CCCD" />
+
+            <EditText
+                android:id="@+id/cccdInput"
+                style="@style/Input"
+                android:hint="Nhập 12 chữ số CCCD"
+                android:inputType="number" />
 
             <TextView
                 style="@style/FieldLabel"
@@ -109,12 +119,12 @@
             <Button
                 android:id="@+id/registerButton"
                 style="@style/PrimaryButton"
-                android:text="Tạo hồ sơ" />
+                android:text="Tạo tài khoản" />
 
             <Button
                 android:id="@+id/loginButton"
                 style="@style/TextButton"
-                android:text="Đã có hồ sơ? Đăng nhập" />
+                android:text="Đã có tài khoản? Đăng nhập" />
         </LinearLayout>
 
         <TextView

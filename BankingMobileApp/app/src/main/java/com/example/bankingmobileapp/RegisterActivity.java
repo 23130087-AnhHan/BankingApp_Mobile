@@ -55,6 +55,7 @@ public class RegisterActivity extends Activity {
         EditText firstNameInput = findViewById(R.id.firstNameInput);
         EditText lastNameInput = findViewById(R.id.lastNameInput);
         phoneInput = findViewById(R.id.phoneInput);
+        EditText cccdInput = findViewById(R.id.cccdInput);
         emailInput = findViewById(R.id.emailInput);
         EditText passwordInput = findViewById(R.id.passwordInput);
         EditText confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
@@ -72,6 +73,7 @@ public class RegisterActivity extends Activity {
             String firstName = Ui.text(firstNameInput);
             String lastName = Ui.text(lastNameInput);
             String phone = Ui.text(phoneInput);
+            String cccd = Ui.text(cccdInput);
             String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
             String password = passwordInput.getText().toString();
             String confirmPassword = confirmPasswordInput.getText().toString();
@@ -79,6 +81,7 @@ public class RegisterActivity extends Activity {
             if (!validateName(firstNameInput, firstName, "Tên")
                     || !validateName(lastNameInput, lastName, "Họ")
                     || !validatePhone(phoneInput, phone)
+                    || !validateCccd(cccdInput, cccd)
                     || !validateEmail(emailInput, email)
                     || !validatePassword(passwordInput, password)
                     || !validateConfirmPassword(confirmPasswordInput, password, confirmPassword)) {
@@ -104,7 +107,8 @@ public class RegisterActivity extends Activity {
                     lastName,
                     phone,
                     email,
-                    password
+                    password,
+                    cccd
             );
             register(request, email);
         });
@@ -350,6 +354,25 @@ public class RegisterActivity extends Activity {
         return true;
     }
 
+    private boolean validateCccd(EditText input, String cccd) {
+        if (cccd.isEmpty()) {
+            input.setError("Số CCCD không được để trống");
+            input.requestFocus();
+            return false;
+        }
+        if (!cccd.matches("[0-9]+")) {
+            input.setError("Số CCCD chỉ được chứa chữ số");
+            input.requestFocus();
+            return false;
+        }
+        if (cccd.length() != 12) {
+            input.setError("Số CCCD phải có đúng 12 chữ số");
+            input.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
     private boolean validateEmail(EditText input, String email) {
         if (email.isEmpty()) {
             input.setError("Email không được để trống");
@@ -408,10 +431,11 @@ public class RegisterActivity extends Activity {
 
     private void register(CreateUserRequest request, String email) {
         setLoading(true);
-        showMessage("Đang tạo hồ sơ khách hàng...");
+        showMessage("Đang tạo tài khoản khách hàng...");
         Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl() + "api/users/register"
                 + " body={emailId=" + email
                 + ", contactNumber=" + request.contactNumber
+                + ", identificationNumber=" + request.identificationNumber
                 + ", firstName=<provided>, lastName=<provided>, password=<redacted>}");
         ApiClient.getAuthApi().register(request).enqueue(new Callback<ApiResponse>() {
             @Override
@@ -423,7 +447,7 @@ public class RegisterActivity extends Activity {
                     showMessage(ApiErrorUtils.httpError(
                             TAG,
                             response,
-                            "Không thể tạo hồ sơ lúc này. Vui lòng thử lại."
+                            "Không thể tạo tài khoản lúc này. Vui lòng thử lại."
                     ));
                     return;
                 }
@@ -450,7 +474,7 @@ public class RegisterActivity extends Activity {
     private void setLoading(boolean loading) {
         registerLoading = loading;
         updateRegisterButtonState();
-        registerButton.setText(loading ? "Đang tạo hồ sơ..." : "Tạo hồ sơ");
+        registerButton.setText(loading ? "Đang tạo tài khoản..." : "Tạo tài khoản");
     }
 
     private void updateRegisterButtonState() {
