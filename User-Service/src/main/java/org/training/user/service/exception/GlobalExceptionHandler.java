@@ -63,4 +63,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Object> handleEmailSendingFailed(EmailSendingException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.builder()
+                        .errorCode("502")
+                        .errorMessage(exception.getMessage())
+                        .build());
+    }
+
 }

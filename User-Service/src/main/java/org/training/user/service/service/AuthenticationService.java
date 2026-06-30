@@ -37,6 +37,9 @@ public class AuthenticationService {
         User user = userRepository.findByEmailIdIgnoreCase(request.getEmail().trim())
                 .orElseThrow(() -> new AuthenticationFailedException("Email or password is incorrect"));
         Map<String, Object> token = requestToken(form("password", request.getEmail().trim(), request.getPassword()));
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new AuthenticationFailedException("Vui lòng xác thực email trước khi đăng nhập");
+        }
         return toResponse(token, user);
     }
 

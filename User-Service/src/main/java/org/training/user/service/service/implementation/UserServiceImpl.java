@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.training.user.service.exception.EmptyFields;
+import org.training.user.service.exception.EmailSendingException;
 import org.training.user.service.exception.ResourceConflictException;
 import org.training.user.service.exception.ResourceNotFound;
 import org.training.user.service.external.AccountService;
@@ -24,6 +25,8 @@ import org.training.user.service.model.external.Account;
 import org.training.user.service.model.mapper.UserMapper;
 import org.training.user.service.repository.UserRepository;
 import org.training.user.service.service.KeycloakService;
+import org.training.user.service.service.EmailService;
+import org.training.user.service.service.OtpService;
 import org.training.user.service.service.UserService;
 import org.training.user.service.utils.FieldChecker;
 
@@ -41,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;
     private final AccountService accountService;
+    private final OtpService otpService;
+    private final EmailService emailService;
 
     private UserMapper userMapper = new UserMapper();
 
@@ -74,8 +79,8 @@ public class UserServiceImpl implements UserService {
         userRepresentation.setFirstName(userDto.getFirstName());
         userRepresentation.setLastName(userDto.getLastName());
         userRepresentation.setEmailVerified(false);
-        // Authentication and banking approval are separate concerns. A newly registered
-        // customer can sign in immediately while the banking profile remains PENDING.
+        // Keep the Keycloak account enabled so credentials can be checked at login;
+        // the local emailVerified flag blocks token delivery until OTP verification.
         userRepresentation.setEnabled(true);
         userRepresentation.setEmail(userDto.getEmailId());
 
@@ -96,14 +101,25 @@ public class UserServiceImpl implements UserService {
             User user = User.builder()
                     .emailId(userDto.getEmailId())
                     .contactNo(userDto.getContactNumber())
+                    .emailVerified(false)
+                    .emailOtp(otpService.generateOtp())
+                    .emailOtpExpiredAt(otpService.generateExpiredTime())
                     .status(Status.PENDING).userProfile(userProfile)
                     .authId(representations.get(0).getId())
                     .identificationNumber(UUID.randomUUID().toString()).build();
 
             User savedUser = userRepository.save(user);
+            String responseMessage = "Đăng ký thành công. Vui lòng kiểm tra email để xác thực OTP.";
+            String responseCode = responseCodeSuccess;
+            try {
+                emailService.sendOtp(savedUser.getEmailId(), savedUser.getEmailOtp());
+            } catch (EmailSendingException exception) {
+                responseMessage = "Đăng ký thành công nhưng không thể gửi email OTP. Vui lòng thử gửi lại OTP.";
+                responseCode = "502";
+            }
             return Response.builder()
-                    .responseMessage("User created successfully")
-                    .responseCode(responseCodeSuccess)
+                    .responseMessage(responseMessage)
+                    .responseCode(responseCode)
                     .userId(savedUser.getUserId())
                     .emailId(savedUser.getEmailId())
                     .displayName(userProfile.getFirstName() + " " + userProfile.getLastName())

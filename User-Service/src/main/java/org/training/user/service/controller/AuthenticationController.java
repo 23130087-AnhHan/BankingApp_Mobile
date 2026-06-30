@@ -7,7 +7,11 @@ import org.training.user.service.model.dto.auth.AuthResponse;
 import org.training.user.service.model.dto.auth.LoginRequest;
 import org.training.user.service.model.dto.auth.RefreshTokenRequest;
 import org.training.user.service.model.dto.auth.ForgotPasswordRequest;
+import org.training.user.service.model.dto.auth.ResendEmailOtpRequest;
+import org.training.user.service.model.dto.auth.VerifyEmailOtpRequest;
+import org.training.user.service.model.dto.response.Response;
 import org.training.user.service.service.AuthenticationService;
+import org.training.user.service.service.OtpService;
 
 import javax.validation.Valid;
 
@@ -16,6 +20,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final OtpService otpService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -37,5 +42,21 @@ public class AuthenticationController {
     public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authenticationService.requestPasswordReset(request.getEmail());
         return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/verify-email-otp")
+    public ResponseEntity<Response> verifyEmailOtp(@RequestBody VerifyEmailOtpRequest request) {
+        return ResponseEntity.ok(Response.builder()
+                .responseCode("200")
+                .responseMessage(otpService.verifyEmailOtp(request.getEmail(), request.getOtp()))
+                .build());
+    }
+
+    @PostMapping("/resend-email-otp")
+    public ResponseEntity<Response> resendEmailOtp(@RequestBody ResendEmailOtpRequest request) {
+        return ResponseEntity.ok(Response.builder()
+                .responseCode("200")
+                .responseMessage(otpService.resendEmailOtp(request.getEmail()))
+                .build());
     }
 }
