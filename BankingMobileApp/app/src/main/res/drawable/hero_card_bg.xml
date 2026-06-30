@@ -2,7 +2,7 @@
     <gradient
         android:angle="135"
         android:centerColor="@color/bank_blue_dark"
-        android:endColor="@color/bank_teal"
+        android:endColor="@color/bank_green"
         android:startColor="@color/bank_navy" />
     <corners android:radius="8dp" />
 </shape>

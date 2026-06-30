@@ -8,33 +8,27 @@
     android:overScrollMode="never">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="32dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="32dp">
+        style="@style/ScreenRoot"
+        android:paddingTop="28dp">
 
-        <TextView style="@style/MutedText" android:text="Truy cập tài khoản" />
+        <TextView
+            style="@style/BrandMark"
+            android:text="NLU" />
 
         <TextView
             style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Đăng nhập" />
+            android:layout_marginTop="22dp"
+            android:text="Chào mừng trở lại" />
 
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Đăng nhập bằng email và mật khẩu đã đăng ký. Phiên truy cập được xác thực an toàn qua hệ thống ngân hàng." />
+            android:text="Đăng nhập NLU Banking để xem số dư và tiếp tục giao dịch." />
 
         <LinearLayout
             style="@style/Panel"
+            android:layout_marginTop="22dp"
             android:orientation="vertical">
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Thông tin truy cập" />
 
             <TextView
                 style="@style/FieldLabel"
@@ -65,16 +59,17 @@
         <Button
             android:id="@+id/registerButton"
             style="@style/SecondaryButton"
-            android:text="Chưa có hồ sơ? Đăng ký" />
+            android:text="Tạo hồ sơ khách hàng" />
 
         <Button
             android:id="@+id/forgotPasswordButton"
-            style="@style/SecondaryButton"
+            style="@style/TextButton"
             android:text="Quên mật khẩu?" />
 
         <TextView
             android:id="@+id/resultText"
             style="@style/ResultBox"
-            android:text="Nhập email và mật khẩu để tiếp tục." />
+            android:text=""
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

@@ -8,37 +8,68 @@
     android:overScrollMode="never">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="32dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="32dp">
+        style="@style/ScreenRoot"
+        android:paddingTop="28dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:background="@drawable/balance_card_bg"
-            android:elevation="8dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/BrandMark"
+                android:text="NLU" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="NLU Banking"
+                    android:textColor="@color/bank_navy"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ngân hàng số cho sinh viên NLU"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/hero_card_bg"
+            android:elevation="6dp"
             android:gravity="bottom"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="22dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Banking Demo"
+                android:text="Quản lý tài chính hằng ngày"
                 android:textColor="@color/text_on_primary"
-                android:textSize="30sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Quản lý tài khoản, giao dịch và chuyển tiền trong một trải nghiệm mobile banking đơn giản."
+                android:text="Mở tài khoản, theo dõi số dư, chuyển tiền và xem lịch sử giao dịch trong một trải nghiệm rõ ràng."
                 android:textColor="@color/text_on_primary_muted"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -46,17 +77,17 @@
         <Button
             android:id="@+id/loginButton"
             style="@style/PrimaryButton"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="20dp"
             android:text="Đăng nhập" />
 
         <Button
             android:id="@+id/openAccountButton"
             style="@style/SecondaryButton"
-            android:text="Chưa có tài khoản? Mở tài khoản" />
+            android:text="Tạo hồ sơ khách hàng" />
 
         <TextView
             style="@style/SectionTitle"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="24dp"
             android:text="Dịch vụ nhanh" />
 
         <LinearLayout
@@ -68,7 +99,7 @@
                 android:id="@+id/helpShortcut"
                 style="@style/ActionTile"
                 android:layout_weight="1"
-                android:text="Trợ giúp" />
+                android:text="Hỗ trợ" />
 
             <Space
                 android:layout_width="10dp"

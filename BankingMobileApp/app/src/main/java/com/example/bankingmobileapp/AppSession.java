@@ -158,7 +158,13 @@ public final class AppSession {
         long expiresIn = auth.expiresIn == null ? 0L : auth.expiresIn;
         prefs(context).edit().putLong(TOKEN_EXPIRES_AT,
                 System.currentTimeMillis() + Math.max(0L, expiresIn - 30L) * 1000L).apply();
-        if (auth.userId != null) saveUserId(context, String.valueOf(auth.userId));
+        if (auth.userId != null) {
+            String nextUserId = String.valueOf(auth.userId);
+            if (!nextUserId.equals(getUserId(context))) {
+                clearAccount(context);
+            }
+            saveUserId(context, nextUserId);
+        }
         saveUserEmail(context, auth.email);
         saveRememberedUser(context, auth.userId == null ? "" : String.valueOf(auth.userId), auth.displayName);
     }

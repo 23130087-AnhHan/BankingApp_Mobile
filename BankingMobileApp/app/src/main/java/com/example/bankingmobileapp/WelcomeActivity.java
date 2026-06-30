@@ -10,7 +10,7 @@ public class WelcomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         AppSession.clearLoginState(this);
 
-        if (AppSession.hasRememberedUser(this) && AppSession.hasAccount(this)) {
+        if (AppSession.hasRememberedUser(this)) {
             Ui.openAndClear(this, QuickLoginActivity.class);
             return;
         }
@@ -25,6 +25,6 @@ public class WelcomeActivity extends Activity {
     }
 
     private void showDemoToast() {
-        Toast.makeText(this, "Tính năng demo", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show();
     }
 }

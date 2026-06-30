@@ -8,20 +8,14 @@
     android:overScrollMode="never">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="24dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="32dp">
+        style="@style/ScreenRoot">
 
         <TextView style="@style/MutedText" android:text="Chuyển tiền nội bộ" />
         <TextView style="@style/PageTitle" android:layout_marginTop="2dp" android:text="Chuyển tiền" />
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Kiểm tra kỹ thông tin người nhận trước khi xác nhận." />
+            android:text="Kiểm tra số tài khoản người nhận và số tiền trước khi xác nhận." />
 
         <LinearLayout style="@style/Panel" android:orientation="vertical">
             <TextView style="@style/SectionTitle" android:text="Thông tin chuyển tiền" />
@@ -33,17 +27,14 @@
             <EditText android:id="@+id/toAccountInput" style="@style/Input" android:hint="Số tài khoản người nhận" android:inputType="number" />
 
             <TextView style="@style/FieldLabel" android:text="Số tiền" />
-            <EditText android:id="@+id/amountInput" style="@style/AmountInput" android:hint="0 ₫" android:inputType="numberDecimal" />
+            <EditText android:id="@+id/amountInput" style="@style/AmountInput" android:hint="0 đ" android:inputType="numberDecimal" />
 
-            <TextView style="@style/FieldLabel" android:text="Nội dung chuyển tiền" />
+            <TextView style="@style/FieldLabel" android:text="Nội dung" />
             <EditText
                 android:id="@+id/transferNoteInput"
                 style="@style/Input"
-                android:hint="Nhập lời nhắn (tùy chọn)"
+                android:hint="Ví dụ: Chuyen tien an trua"
                 android:inputType="textCapSentences" />
-            <TextView
-                style="@style/HelperText"
-                android:text="Lời nhắn dùng để kiểm tra trước khi gửi; API hiện tại chưa lưu trường này." />
 
             <Button android:id="@+id/transferButton" style="@style/PrimaryButton" android:text="Xác nhận chuyển tiền" />
         </LinearLayout>
