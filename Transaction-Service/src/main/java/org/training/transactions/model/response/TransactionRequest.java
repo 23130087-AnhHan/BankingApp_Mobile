@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class TransactionRequest {
 
+    private Long transactionId;
+
     private String referenceId;
 
     private String accountId;
@@ -27,4 +29,18 @@ public class TransactionRequest {
     private String transactionStatus;
 
     private String comments;
+
+    private String direction;
+
+    private BigDecimal signedAmount;
+
+    private String displayTitle;
+
+    private String displayMessage;
+
+    private String counterpartyAccount;
+
+    private String counterpartyName;
+
+    private String bankName;
 }

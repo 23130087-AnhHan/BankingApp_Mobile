@@ -32,4 +32,23 @@ public class EmailService {
                     "Không thể gửi email OTP. Vui lòng thử gửi lại sau.", exception);
         }
     }
+
+    public void sendPaymentOtp(String email, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("OTP thanh toan Banking App");
+        message.setText("Xin chao,\n\n"
+                + "Ma OTP thanh toan cua ban la: " + otp + "\n\n"
+                + "Ma nay co hieu luc trong 5 phut.\n"
+                + "Neu ban khong thuc hien giao dich, vui long bo qua email nay.\n\n"
+                + "Banking App");
+
+        try {
+            mailSender.send(message);
+        } catch (MailException exception) {
+            log.error("Khong the gui OTP thanh toan toi {}: {}", email, exception.getMessage());
+            throw new EmailSendingException(
+                    "Khong the gui OTP thanh toan. Vui long thu lai sau.", exception);
+        }
+    }
 }

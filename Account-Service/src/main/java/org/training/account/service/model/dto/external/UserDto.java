@@ -24,5 +24,7 @@ public class UserDto {
     private String identificationNumber;
 
     private String authId;
+
+    private UserProfileDto userProfileDto;
 }
 

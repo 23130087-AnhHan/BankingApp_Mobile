@@ -16,15 +16,20 @@ import org.training.transactions.model.TransactionType;
 import org.training.transactions.model.dto.TransactionDto;
 import org.training.transactions.model.entity.Transaction;
 import org.training.transactions.model.external.Account;
+import org.training.transactions.model.external.AccountRecipient;
 import org.training.transactions.model.mapper.TransactionMapper;
 import org.training.transactions.model.response.Response;
+import org.training.transactions.model.response.TransactionReceiptResponse;
 import org.training.transactions.model.response.TransactionRequest;
 import org.training.transactions.repository.TransactionRepository;
 import org.training.transactions.service.TransactionService;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -124,15 +129,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionRequest> getTransaction(String accountId) {
 
-        return transactionRepository.findTransactionByAccountId(accountId)
-                .stream().map(transaction -> {
-                    TransactionRequest transactionRequest = new TransactionRequest();
-                    BeanUtils.copyProperties(transaction, transactionRequest);
-                    transactionRequest.setTransactionStatus(transaction.getStatus().toString());
-                    transactionRequest.setLocalDateTime(transaction.getTransactionDate());
-                    transactionRequest.setTransactionType(transaction.getTransactionType().toString());
-                    return transactionRequest;
-                }).collect(Collectors.toList());
+        return transactionRepository.findTransactionByAccountIdOrderByTransactionDateDesc(accountId)
+                .stream()
+                .map(transaction -> toTransactionResponse(transaction, accountId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -145,13 +145,187 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionRequest> getTransactionByTransactionReference(String transactionReference) {
 
         return transactionRepository.findTransactionByReferenceId(transactionReference)
-                .stream().map(transaction -> {
-                    TransactionRequest transactionRequest = new TransactionRequest();
-                    BeanUtils.copyProperties(transaction, transactionRequest);
-                    transactionRequest.setTransactionStatus(transaction.getStatus().toString());
-                    transactionRequest.setLocalDateTime(transaction.getTransactionDate());
-                    transactionRequest.setTransactionType(transaction.getTransactionType().toString());
-                    return transactionRequest;
-                }).collect(Collectors.toList());
+                .stream()
+                .map(transaction -> toTransactionResponse(transaction, transaction.getAccountId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TransactionReceiptResponse getTransactionReceiptByReference(String transactionReference) {
+        List<Transaction> transactions = transactionRepository.findTransactionByReferenceId(transactionReference);
+        if (transactions.isEmpty()) {
+            throw new ResourceNotFound("Transaction receipt not found", GlobalErrorCode.NOT_FOUND);
+        }
+        return buildReceipt(transactions, null);
+    }
+
+    @Override
+    public TransactionReceiptResponse getTransactionReceiptById(Long transactionId) {
+        Transaction selectedTransaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFound("Transaction receipt not found", GlobalErrorCode.NOT_FOUND));
+        List<Transaction> transactions = transactionRepository.findTransactionByReferenceId(selectedTransaction.getReferenceId());
+        if (transactions.isEmpty()) {
+            transactions = List.of(selectedTransaction);
+        }
+        return buildReceipt(transactions, null);
+    }
+
+    private TransactionRequest toTransactionResponse(Transaction transaction, String currentAccountId) {
+        TransactionRequest transactionRequest = new TransactionRequest();
+        BeanUtils.copyProperties(transaction, transactionRequest);
+        transactionRequest.setTransactionStatus(transaction.getStatus().toString());
+        transactionRequest.setLocalDateTime(transaction.getTransactionDate());
+        transactionRequest.setTransactionType(transaction.getTransactionType().toString());
+        transactionRequest.setSignedAmount(transaction.getAmount());
+        transactionRequest.setBankName("NLU Banking");
+
+        BigDecimal amount = transaction.getAmount() == null ? BigDecimal.ZERO : transaction.getAmount();
+        boolean moneyIn = amount.compareTo(BigDecimal.ZERO) > 0;
+        String counterpartyAccount = resolveCounterpartyAccount(transaction, currentAccountId, moneyIn);
+
+        transactionRequest.setDirection(moneyIn ? "IN" : "OUT");
+        transactionRequest.setAmount(amount.abs());
+        transactionRequest.setCounterpartyAccount(counterpartyAccount);
+        transactionRequest.setCounterpartyName(counterpartyAccount == null || counterpartyAccount.isEmpty()
+                ? ""
+                : "Tai khoan " + counterpartyAccount);
+        transactionRequest.setDisplayTitle(moneyIn ? "Nhan tien" : "Chuyen tien");
+        transactionRequest.setDisplayMessage(buildDisplayMessage(moneyIn, counterpartyAccount));
+        return transactionRequest;
+    }
+
+    private TransactionReceiptResponse buildReceipt(List<Transaction> transactions, Transaction selectedTransaction) {
+        Transaction primary = selectedTransaction == null ? transactions.get(0) : selectedTransaction;
+        Transaction debit = transactions.stream()
+                .filter(transaction -> transaction.getAmount() != null
+                        && transaction.getAmount().compareTo(BigDecimal.ZERO) < 0)
+                .findFirst()
+                .orElse(null);
+        Transaction credit = transactions.stream()
+                .filter(transaction -> transaction.getAmount() != null
+                        && transaction.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .findFirst()
+                .orElse(null);
+
+        String fromAccount = debit == null ? "" : debit.getAccountId();
+        String toAccount = credit == null ? "" : credit.getAccountId();
+        BigDecimal amount = resolveReceiptAmount(primary, debit, credit);
+        boolean currentMoneyIn = primary.getAmount() != null && primary.getAmount().compareTo(BigDecimal.ZERO) > 0;
+        String counterpartyAccount = currentMoneyIn ? fromAccount : toAccount;
+        AccountRecipient recipient = findRecipient(toAccount);
+        String recipientName = recipient == null ? fallbackAccountName(toAccount) : safe(recipient.getAccountHolderName());
+        String recipientBank = recipient == null ? "NLU Banking" : safe(recipient.getBankName());
+
+        return TransactionReceiptResponse.builder()
+                .transactionId(primary.getTransactionId())
+                .referenceId(primary.getReferenceId())
+                .type(primary.getTransactionType() == null ? "" : primary.getTransactionType().toString())
+                .amount(amount)
+                .direction(currentMoneyIn ? "IN" : "OUT")
+                .status(resolveStatus(transactions))
+                .time(resolveTime(transactions))
+                .description(resolveDescription(primary))
+                .fromAccount(fromAccount)
+                .toAccount(toAccount)
+                .recipientName(recipientName)
+                .recipientBank(recipientBank)
+                .counterpartyAccount(counterpartyAccount)
+                .counterpartyName(fallbackAccountName(counterpartyAccount))
+                .build();
+    }
+
+    private BigDecimal resolveReceiptAmount(Transaction primary, Transaction debit, Transaction credit) {
+        if (debit != null && debit.getAmount() != null) {
+            return debit.getAmount().abs();
+        }
+        if (credit != null && credit.getAmount() != null) {
+            return credit.getAmount().abs();
+        }
+        return primary.getAmount() == null ? BigDecimal.ZERO : primary.getAmount().abs();
+    }
+
+    private String resolveStatus(List<Transaction> transactions) {
+        boolean hasPending = transactions.stream()
+                .anyMatch(transaction -> TransactionStatus.PENDING.equals(transaction.getStatus()));
+        return hasPending ? TransactionStatus.PENDING.toString() : TransactionStatus.COMPLETED.toString();
+    }
+
+    private LocalDateTime resolveTime(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(Transaction::getTransactionDate)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    private String resolveDescription(Transaction transaction) {
+        String comments = transaction.getComments();
+        if (comments == null || comments.trim().isEmpty()) {
+            return "";
+        }
+        String marker = " | note: ";
+        int noteIndex = comments.indexOf(marker);
+        if (noteIndex >= 0) {
+            return comments.substring(noteIndex + marker.length()).trim();
+        }
+        return comments.trim();
+    }
+
+    private AccountRecipient findRecipient(String accountNumber) {
+        if (accountNumber == null || accountNumber.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            ResponseEntity<AccountRecipient> response = accountService.readRecipient(accountNumber);
+            return response.getBody();
+        } catch (Exception exception) {
+            log.warn("Unable to resolve recipient metadata for account {}: {}", accountNumber, exception.getMessage());
+            return null;
+        }
+    }
+
+    private String safe(String value) {
+        return value == null || value.trim().isEmpty() ? "" : value.trim();
+    }
+
+    private String fallbackAccountName(String accountNumber) {
+        return accountNumber == null || accountNumber.trim().isEmpty()
+                ? ""
+                : "Tai khoan " + accountNumber.trim();
+    }
+
+    private String buildDisplayMessage(boolean moneyIn, String counterpartyAccount) {
+        if (counterpartyAccount == null || counterpartyAccount.isEmpty()) {
+            return moneyIn ? "Tien vao tai khoan" : "Tien ra khoi tai khoan";
+        }
+        return moneyIn
+                ? "Nhan tien tu " + counterpartyAccount
+                : "Chuyen tien den " + counterpartyAccount;
+    }
+
+    private String resolveCounterpartyAccount(Transaction transaction, String currentAccountId, boolean moneyIn) {
+        String comments = transaction.getComments() == null ? "" : transaction.getComments();
+        if (comments.contains(" to ")) {
+            String value = comments.substring(comments.lastIndexOf(" to ") + 4).trim();
+            return stripNonAccountSuffix(value);
+        }
+        if (comments.contains("from:")) {
+            String value = comments.substring(comments.lastIndexOf("from:") + 5).trim();
+            return stripNonAccountSuffix(value);
+        }
+        if (comments.contains(" from ")) {
+            String value = comments.substring(comments.lastIndexOf(" from ") + 6).trim();
+            return stripNonAccountSuffix(value);
+        }
+        return "";
+    }
+
+    private String stripNonAccountSuffix(String value) {
+        if (value == null) {
+            return "";
+        }
+        String trimmed = value.trim();
+        int firstSpace = trimmed.indexOf(' ');
+        return firstSpace < 0 ? trimmed : trimmed.substring(0, firstSpace);
     }
 }

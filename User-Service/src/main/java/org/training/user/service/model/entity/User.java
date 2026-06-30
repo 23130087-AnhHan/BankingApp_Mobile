@@ -40,6 +40,12 @@ public class User {
     @Column(name = "email_otp_expired_at")
     private LocalDateTime emailOtpExpiredAt;
 
+    @Column(name = "payment_otp", length = 10)
+    private String paymentOtp;
+
+    @Column(name = "payment_otp_expired_at")
+    private LocalDateTime paymentOtpExpiredAt;
+
     @CreationTimestamp
     private LocalDate creationOn;
 

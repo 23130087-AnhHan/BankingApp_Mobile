@@ -7,14 +7,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.training.account.service.exception.*;
 import org.training.account.service.external.TransactionService;
+import org.training.account.service.external.UserService;
 import org.training.account.service.model.AccountStatus;
 import org.training.account.service.model.AccountType;
 import org.training.account.service.model.dto.AccountDto;
+import org.training.account.service.model.dto.AccountRecipientDto;
 import org.training.account.service.model.dto.AccountStatusUpdate;
 import org.training.account.service.model.dto.response.Response;
 import org.training.account.service.model.entity.Account;
 import org.training.account.service.model.mapper.AccountMapper;
 import org.training.account.service.model.dto.external.TransactionResponse;
+import org.training.account.service.model.dto.external.UserDto;
+import org.training.account.service.model.dto.external.UserProfileDto;
 import org.training.account.service.repository.AccountRepository;
 import org.training.account.service.service.AccountService;
 
@@ -30,6 +34,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionService transactionService;
+    private final UserService userService;
 
     private final AccountMapper accountMapper = new AccountMapper();
 
@@ -208,6 +213,28 @@ public class AccountServiceImpl implements AccountService {
                 }).orElseThrow(ResourceNotFound::new);
     }
 
+    @Override
+    public AccountRecipientDto readRecipientByAccountNumber(String accountNumber) {
+        Account account = accountRepository.findAccountByAccountNumber(accountNumber)
+                .orElseThrow(ResourceNotFound::new);
+
+        if (!AccountType.PAYMENT_ACCOUNT.equals(account.getAccountType())) {
+            throw new AccountStatusException("Recipient account must be a payment account");
+        }
+        if (!AccountStatus.ACTIVE.equals(account.getAccountStatus())) {
+            throw new AccountStatusException("Recipient account is not active");
+        }
+
+        UserDto user = userService.readUserById(account.getUserId()).getBody();
+        return AccountRecipientDto.builder()
+                .bankName("NLU Banking")
+                .accountNumber(account.getAccountNumber())
+                .accountHolderName(resolveAccountHolderName(user))
+                .accountType(account.getAccountType().toString())
+                .accountStatus(account.getAccountStatus().toString())
+                .build();
+    }
+
     private AccountType parseAccountType(String rawType) {
         if (rawType == null || rawType.trim().isEmpty()) {
             throw new AccountStatusException("Account type is required");
@@ -221,5 +248,22 @@ public class AccountServiceImpl implements AccountService {
 
     private boolean isPaymentAccount(AccountType accountType) {
         return AccountType.PAYMENT_ACCOUNT.equals(accountType) || AccountType.SAVINGS_ACCOUNT.equals(accountType);
+    }
+
+    private String resolveAccountHolderName(UserDto user) {
+        if (user == null) {
+            return "Khach hang NLU Banking";
+        }
+        UserProfileDto profile = user.getUserProfileDto();
+        if (profile != null) {
+            String fullName = ((profile.getFirstName() == null ? "" : profile.getFirstName()) + " "
+                    + (profile.getLastName() == null ? "" : profile.getLastName())).trim();
+            if (!fullName.isEmpty()) {
+                return fullName;
+            }
+        }
+        return user.getEmailId() == null || user.getEmailId().trim().isEmpty()
+                ? "Khach hang NLU Banking"
+                : user.getEmailId().trim();
     }
 }

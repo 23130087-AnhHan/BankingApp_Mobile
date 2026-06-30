@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.training.transactions.model.dto.TransactionDto;
 import org.training.transactions.model.response.Response;
+import org.training.transactions.model.response.TransactionReceiptResponse;
 import org.training.transactions.model.response.TransactionRequest;
 import org.training.transactions.service.TransactionService;
 
@@ -52,6 +53,16 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<List<TransactionRequest>> getTransactions(@RequestParam String accountId) {
         return new ResponseEntity<>(transactionService.getTransaction(accountId), HttpStatus.OK);
+    }
+
+    @GetMapping("/reference/{referenceId}")
+    public ResponseEntity<TransactionReceiptResponse> getReceiptByReference(@PathVariable String referenceId) {
+        return ResponseEntity.ok(transactionService.getTransactionReceiptByReference(referenceId));
+    }
+
+    @GetMapping("/{transactionId:\\d+}")
+    public ResponseEntity<TransactionReceiptResponse> getReceiptByTransactionId(@PathVariable Long transactionId) {
+        return ResponseEntity.ok(transactionService.getTransactionReceiptById(transactionId));
     }
 
     /**
