@@ -61,31 +61,27 @@ public class AccountActivity extends Activity {
     private void loadPaymentAccount() {
         Long userId = currentUserId();
         if (userId == null) {
-            resultText.setText("Phiên đăng nhập chưa có mã khách hàng. Vui lòng đăng nhập lại.");
+            resultText.setText("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
             setBusy(false);
             setAccountActionsEnabled(false);
             return;
         }
 
-        resultText.setText("Đang tải tài khoản thanh toán...");
+        resultText.setText("Đang tải tài khoản...");
         setBusy(true);
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    if (response.code() == 404 || response.code() == 400) {
-                        AppSession.clearAccount(AccountActivity.this);
-                        provisionPaymentAccount(userId);
-                        return;
-                    }
+                if (response.isSuccessful() && response.body() != null) {
+                    setBusy(false);
+                    saveAndRenderAccount(response.body());
+                } else if (response.code() == 404 || response.code() == 400) {
+                    provisionPaymentAccount(userId);
+                } else {
                     setBusy(false);
                     setAccountActionsEnabled(false);
-                    resultText.setText(ApiErrorUtils.httpError(TAG, response,
-                            "Không thể tải tài khoản thanh toán."));
-                    return;
+                    resultText.setText(ApiErrorUtils.httpError(TAG, response, "Lỗi tải tài khoản."));
                 }
-                setBusy(false);
-                saveAndRenderAccount(response.body());
             }
 
             @Override
@@ -98,27 +94,23 @@ public class AccountActivity extends Activity {
     }
 
     private void provisionPaymentAccount(long userId) {
-        if (provisioningAccount) {
-            return;
-        }
-
+        if (provisioningAccount) return;
         provisioningAccount = true;
-        resultText.setText("Đang cấp tài khoản thanh toán...");
+        resultText.setText("Đang mở tài khoản mới...");
         setBusy(true);
-        // Try SAVINGS_ACCOUNT as fallback if PAYMENT_ACCOUNT is not defined in backend enum
+
         AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 provisioningAccount = false;
-                if (!response.isSuccessful() && response.code() != 409) {
+                if (response.isSuccessful() || response.code() == 409) {
+                    loadPaymentAccount();
+                } else {
                     setBusy(false);
                     setAccountActionsEnabled(false);
-                    resultText.setText(ApiErrorUtils.httpError(TAG, response,
-                            "Không thể cấp tài khoản thanh toán."));
-                    return;
+                    resultText.setText(ApiErrorUtils.httpError(TAG, response, "Lỗi mở tài khoản."));
                 }
-                loadPaymentAccount();
             }
 
             @Override

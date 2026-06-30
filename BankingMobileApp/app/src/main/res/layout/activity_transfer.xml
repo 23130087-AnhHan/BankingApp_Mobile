@@ -139,9 +139,9 @@
                     android:id="@+id/otpEmailOption"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:enabled="false"
-                    android:text="OTP gửi về email (sẽ kích hoạt sau)"
-                    android:textColor="@color/text_secondary"
+                    android:enabled="true"
+                    android:text="OTP gửi về email"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
             </RadioGroup>
 

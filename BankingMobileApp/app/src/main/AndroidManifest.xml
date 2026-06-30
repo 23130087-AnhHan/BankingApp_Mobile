@@ -29,6 +29,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".VerifyOtpActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".TransactionActivity" />
+        <activity android:name=".ResetPasswordActivity" />
     </application>
 
 </manifest>

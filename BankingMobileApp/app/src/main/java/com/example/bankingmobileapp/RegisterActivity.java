@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
@@ -426,6 +425,7 @@ public class RegisterActivity extends Activity {
                 AppSession.saveUserEmail(RegisterActivity.this, email);
                 Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
                 intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
+                intent.putExtra(VerifyOtpActivity.EXTRA_FLOW, VerifyOtpActivity.FLOW_REGISTER);
                 startActivity(intent);
                 finish();
             }
