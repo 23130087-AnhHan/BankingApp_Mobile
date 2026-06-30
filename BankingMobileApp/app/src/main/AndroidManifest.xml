@@ -23,6 +23,9 @@
         <activity android:name=".QuickLoginActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".HistoryActivity" />
+        <activity android:name=".BeneficiaryActivity" />
+        <activity android:name=".NotificationActivity" />
+        <activity android:name=".TransactionDetailActivity" />
         <activity android:name=".TransferActivity" />
         <activity android:name=".PinActivity" />
         <activity android:name=".AccountActivity" />

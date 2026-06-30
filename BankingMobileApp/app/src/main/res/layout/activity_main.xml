@@ -150,6 +150,24 @@
             android:drawablePadding="12dp"
             android:text="Lịch sử giao dịch" />
 
+        <TextView
+            android:id="@+id/beneficiaryTile"
+            style="@style/ActionTileWide"
+            android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_user_add"
+            android:drawablePadding="12dp"
+            android:text="Người thụ hưởng" />
+
+        <TextView
+            android:id="@+id/notificationTile"
+            style="@style/ActionTileWide"
+            android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_wallet"
+            android:drawablePadding="12dp"
+            android:text="Thông báo" />
+
         <Button
             android:id="@+id/logoutButton"
             style="@style/TextButton"

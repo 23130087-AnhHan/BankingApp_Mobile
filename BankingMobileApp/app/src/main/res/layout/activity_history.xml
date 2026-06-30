@@ -11,12 +11,17 @@
 
         <TextView
             style="@style/MutedText"
-            android:text="Biến động tài khoản" />
+            android:text="Sao kê tài khoản" />
 
         <TextView
             style="@style/PageTitle"
             android:layout_marginTop="2dp"
             android:text="Lịch sử giao dịch" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Theo dõi tiền vào, tiền ra và trạng thái xử lý của từng giao dịch." />
 
         <LinearLayout
             style="@style/Panel"
@@ -39,8 +44,15 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/historyText"
+            android:id="@+id/summaryText"
             style="@style/ResultBox"
-            android:text="Các giao dịch sẽ hiển thị tại đây theo thứ tự mới nhất." />
+            android:text="Các giao dịch sẽ hiển thị theo thứ tự mới nhất." />
+
+        <LinearLayout
+            android:id="@+id/historyList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

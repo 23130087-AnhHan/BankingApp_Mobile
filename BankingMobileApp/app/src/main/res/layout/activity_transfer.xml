@@ -55,6 +55,11 @@
                 style="@style/Input"
                 android:spinnerMode="dropdown" />
 
+            <Button
+                android:id="@+id/selectBeneficiaryButton"
+                style="@style/SecondaryButton"
+                android:text="Chọn người thụ hưởng" />
+
             <TextView
                 style="@style/FieldLabel"
                 android:text="Số tài khoản nhận" />
@@ -64,6 +69,18 @@
                 style="@style/Input"
                 android:hint="Nhập số tài khoản người nhận"
                 android:inputType="number" />
+
+            <TextView
+                android:id="@+id/recipientNameText"
+                style="@style/ResultBox"
+                android:layout_marginTop="0dp"
+                android:minHeight="54dp"
+                android:text="Nhập số tài khoản để kiểm tra tên chủ tài khoản." />
+
+            <Button
+                android:id="@+id/saveBeneficiaryButton"
+                style="@style/SecondaryButton"
+                android:text="Lưu người nhận này" />
         </LinearLayout>
 
         <LinearLayout
@@ -139,9 +156,8 @@
                     android:id="@+id/otpEmailOption"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:enabled="false"
-                    android:text="OTP gửi về email (sẽ kích hoạt sau)"
-                    android:textColor="@color/text_secondary"
+                    android:text="OTP gửi về email"
+                    android:textColor="@color/text_primary"
                     android:textSize="15sp" />
             </RadioGroup>
 
@@ -153,6 +169,17 @@
                 android:id="@+id/pinInput"
                 style="@style/Input"
                 android:hint="Nhập PIN 6 số"
+                android:inputType="numberPassword" />
+
+            <Button
+                android:id="@+id/sendOtpButton"
+                style="@style/SecondaryButton"
+                android:text="Gửi OTP thanh toán" />
+
+            <EditText
+                android:id="@+id/otpInput"
+                style="@style/Input"
+                android:hint="Nhập OTP 6 số"
                 android:inputType="numberPassword" />
 
             <Button

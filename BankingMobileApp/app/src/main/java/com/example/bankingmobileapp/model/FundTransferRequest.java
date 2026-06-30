@@ -11,10 +11,13 @@ public class FundTransferRequest {
     public String toAccount;
     @SerializedName("amount")
     public BigDecimal amount;
+    @SerializedName("description")
+    public String description;
 
-    public FundTransferRequest(String fromAccount, String toAccount, BigDecimal amount) {
+    public FundTransferRequest(String fromAccount, String toAccount, BigDecimal amount, String description) {
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
         this.amount = amount;
+        this.description = description;
     }
 }

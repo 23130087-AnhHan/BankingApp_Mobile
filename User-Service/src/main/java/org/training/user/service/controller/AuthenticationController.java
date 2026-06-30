@@ -8,7 +8,9 @@ import org.training.user.service.model.dto.auth.LoginRequest;
 import org.training.user.service.model.dto.auth.RefreshTokenRequest;
 import org.training.user.service.model.dto.auth.ForgotPasswordRequest;
 import org.training.user.service.model.dto.auth.ResendEmailOtpRequest;
+import org.training.user.service.model.dto.auth.SendPaymentOtpRequest;
 import org.training.user.service.model.dto.auth.VerifyEmailOtpRequest;
+import org.training.user.service.model.dto.auth.VerifyPaymentOtpRequest;
 import org.training.user.service.model.dto.response.Response;
 import org.training.user.service.model.dto.response.AvailabilityResponse;
 import org.training.user.service.service.AuthenticationService;
@@ -73,5 +75,21 @@ public class AuthenticationController {
     @GetMapping("/check-phone")
     public ResponseEntity<AvailabilityResponse> checkPhone(@RequestParam String phone) {
         return ResponseEntity.ok(userAvailabilityService.checkPhone(phone));
+    }
+
+    @PostMapping("/payment-otp/send")
+    public ResponseEntity<Response> sendPaymentOtp(@Valid @RequestBody SendPaymentOtpRequest request) {
+        return ResponseEntity.ok(Response.builder()
+                .responseCode("200")
+                .responseMessage(otpService.sendPaymentOtp(request.getEmail()))
+                .build());
+    }
+
+    @PostMapping("/payment-otp/verify")
+    public ResponseEntity<Response> verifyPaymentOtp(@Valid @RequestBody VerifyPaymentOtpRequest request) {
+        return ResponseEntity.ok(Response.builder()
+                .responseCode("200")
+                .responseMessage(otpService.verifyPaymentOtp(request.getEmail(), request.getOtp()))
+                .build());
     }
 }

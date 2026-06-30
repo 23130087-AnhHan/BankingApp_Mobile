@@ -47,6 +47,8 @@ public class MainActivity extends Activity {
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.historyTile).setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
+        findViewById(R.id.beneficiaryTile).setOnClickListener(v -> Ui.open(this, BeneficiaryActivity.class));
+        findViewById(R.id.notificationTile).setOnClickListener(v -> Ui.open(this, NotificationActivity.class));
         findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
         refreshButton.setOnClickListener(v -> refreshPaymentAccount());
     }

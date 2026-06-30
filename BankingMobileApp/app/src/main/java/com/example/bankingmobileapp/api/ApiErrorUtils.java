@@ -23,7 +23,13 @@ public final class ApiErrorUtils {
 
         if (!serverMessage.isEmpty()) {
             String classified = classifyServerMessage(serverMessage);
-            return classified.isEmpty() ? serverMessage : classified;
+            if (!classified.isEmpty()) {
+                return classified;
+            }
+            if (isGenericServerError(serverMessage)) {
+                return firstNonEmpty(fallback, "Máy chủ đang gặp lỗi. Vui lòng thử lại sau.");
+            }
+            return serverMessage;
         }
 
         switch (response.code()) {
@@ -129,6 +135,13 @@ public final class ApiErrorUtils {
             return "Thông tin này đã được đăng ký trước đó.";
         }
         return "";
+    }
+
+    private static boolean isGenericServerError(String serverMessage) {
+        String normalized = serverMessage.toLowerCase(Locale.ROOT);
+        return normalized.equals("internal server error")
+                || normalized.equals("error")
+                || normalized.contains("whitelabel error page");
     }
 
     private static String firstNonEmpty(String preferred, String fallback) {

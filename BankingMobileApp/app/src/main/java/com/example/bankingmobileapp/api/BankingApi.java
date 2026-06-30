@@ -1,26 +1,33 @@
 package com.example.bankingmobileapp.api;
 
 import com.example.bankingmobileapp.model.AccountRequest;
+import com.example.bankingmobileapp.model.AccountRecipientResponse;
 import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.AccountStatusRequest;
 import com.example.bankingmobileapp.model.ApiResponse;
+import com.example.bankingmobileapp.model.BeneficiaryRequest;
+import com.example.bankingmobileapp.model.BeneficiaryResponse;
 import com.example.bankingmobileapp.model.CreateUserRequest;
 import com.example.bankingmobileapp.model.FundTransferRequest;
 import com.example.bankingmobileapp.model.FundTransferResponse;
-import com.example.bankingmobileapp.model.TransactionResponse;
 import com.example.bankingmobileapp.model.TransactionRequest;
+import com.example.bankingmobileapp.model.TransactionResponse;
 import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.LoginRequest;
+import com.example.bankingmobileapp.model.NotificationResponse;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 import com.example.bankingmobileapp.model.ResendEmailOtpRequest;
+import com.example.bankingmobileapp.model.SendPaymentOtpRequest;
 import com.example.bankingmobileapp.model.VerifyEmailOtpRequest;
+import com.example.bankingmobileapp.model.VerifyPaymentOtpRequest;
 import com.example.bankingmobileapp.model.AvailabilityResponse;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
@@ -55,11 +62,20 @@ public interface BankingApi {
     @GET("api/users/auth/check-phone")
     Call<AvailabilityResponse> checkPhone(@Query("phone") String phone);
 
+    @POST("api/users/auth/payment-otp/send")
+    Call<ApiResponse> sendPaymentOtp(@Body SendPaymentOtpRequest body);
+
+    @POST("api/users/auth/payment-otp/verify")
+    Call<ApiResponse> verifyPaymentOtp(@Body VerifyPaymentOtpRequest body);
+
     @POST("accounts")
     Call<ApiResponse> createAccount(@Body AccountRequest body);
 
     @GET("accounts/balance")
     Call<String> getBalance(@Query("accountNumber") String accountNumber);
+
+    @GET("accounts/recipient")
+    Call<AccountRecipientResponse> getRecipient(@Query("accountNumber") String accountNumber);
 
     @GET("accounts/{userId}")
     Call<AccountResponse> getAccountByUserId(@Path("userId") long userId);
@@ -72,6 +88,27 @@ public interface BankingApi {
 
     @POST("transactions")
     Call<ApiResponse> createTransaction(@Body TransactionRequest body);
+
+    @GET("transactions/reference/{referenceId}")
+    Call<TransactionResponse> getTransactionReceipt(@Path("referenceId") String referenceId);
+
+    @GET("transactions/{transactionId}")
+    Call<TransactionResponse> getTransactionReceiptById(@Path("transactionId") long transactionId);
+
+    @GET("api/users/{userId}/beneficiaries")
+    Call<List<BeneficiaryResponse>> getBeneficiaries(@Path("userId") long userId);
+
+    @POST("api/users/{userId}/beneficiaries")
+    Call<BeneficiaryResponse> createBeneficiary(@Path("userId") long userId, @Body BeneficiaryRequest body);
+
+    @DELETE("api/users/{userId}/beneficiaries/{id}")
+    Call<ApiResponse> deleteBeneficiary(@Path("userId") long userId, @Path("id") long id);
+
+    @GET("api/users/{userId}/notifications")
+    Call<List<NotificationResponse>> getNotifications(@Path("userId") long userId);
+
+    @PATCH("api/users/{userId}/notifications/{id}/read")
+    Call<NotificationResponse> markNotificationRead(@Path("userId") long userId, @Path("id") long id);
 
     @POST("fund-transfers")
     Call<FundTransferResponse> transfer(@Body FundTransferRequest body);
