@@ -21,3 +21,8 @@ local.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Local machine startup scripts
+start-all-banking-my-machine-dbpass.ps1
+start-all-banking-my-machine-dbpass-fixed.ps1
+start-all-banking-one-click.ps1
