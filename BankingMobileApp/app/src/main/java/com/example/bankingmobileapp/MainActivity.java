@@ -2,13 +2,17 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
+import com.example.bankingmobileapp.model.AccountRequest;
 import com.example.bankingmobileapp.model.AccountResponse;
+import com.example.bankingmobileapp.model.ApiResponse;
+import com.example.bankingmobileapp.model.RefreshTokenRequest;
+
+import java.math.BigDecimal;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,13 +25,13 @@ public class MainActivity extends Activity {
     private TextView balanceText;
     private TextView statusText;
     private TextView userIdText;
-    private Button setupAccountButton;
     private Button refreshButton;
+    private boolean provisioningAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!AppSession.isLoggedIn(this)) {
+        if (!AppSession.hasValidSession(this)) {
             openLoginAndFinish();
             return;
         }
@@ -38,100 +42,133 @@ public class MainActivity extends Activity {
         balanceText = findViewById(R.id.balanceText);
         statusText = findViewById(R.id.statusText);
         userIdText = findViewById(R.id.userIdText);
-        setupAccountButton = findViewById(R.id.setupAccountButton);
         refreshButton = findViewById(R.id.refreshButton);
 
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
-        findViewById(R.id.depositTile).setOnClickListener(v -> Ui.open(this, TransactionActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.historyTile).setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
+        findViewById(R.id.beneficiaryTile).setOnClickListener(v -> Ui.open(this, BeneficiaryActivity.class));
+        findViewById(R.id.notificationTile).setOnClickListener(v -> Ui.open(this, NotificationActivity.class));
         findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
-        refreshButton.setOnClickListener(v -> refreshAccount());
-        setupAccountButton.setOnClickListener(v -> Ui.open(this, AccountActivity.class));
+        refreshButton.setOnClickListener(v -> refreshPaymentAccount());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshAccount();
+        if (!AppSession.hasValidSession(this)) {
+            openLoginAndFinish();
+        } else {
+            refreshPaymentAccount();
+        }
     }
 
-    private void refreshAccount() {
+    private void refreshPaymentAccount() {
         renderSessionSnapshot();
         if (!AppSession.hasUser(this)) {
             userIdText.setText(AppSession.getUserEmail(this).isEmpty()
                     ? "Chưa có khách hàng"
                     : AppSession.getUserEmail(this));
-            statusText.setText(AppSession.hasAccount(this) ? "Tài khoản đã lưu" : "Chưa thiết lập");
-            setupAccountButton.setVisibility(AppSession.hasAccount(this) ? View.GONE : View.VISIBLE);
+            statusText.setText(AppSession.hasAccount(this) ? "Đã có tài khoản" : "Chưa có tài khoản");
             return;
         }
 
-        long userId;
-        try {
-            userId = Long.parseLong(AppSession.getUserId(this));
-        } catch (NumberFormatException ex) {
-            userIdText.setText("Mã khách hàng không hợp lệ");
-            statusText.setText("Cần thiết lập lại");
-            setupAccountButton.setVisibility(View.VISIBLE);
+        Long userId = currentUserId();
+        if (userId == null) {
+            userIdText.setText("Phiên đăng nhập hết hạn");
+            statusText.setText("Cần đăng nhập lại");
             return;
         }
 
         userIdText.setText(AppSession.getUserEmail(this).isEmpty()
                 ? "Khách hàng #" + userId
                 : AppSession.getUserEmail(this));
-        statusText.setText("Đang đồng bộ");
+        statusText.setText("Đang đồng bộ...");
         refreshButton.setEnabled(false);
+
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 refreshButton.setEnabled(true);
-                if (!response.isSuccessful() || response.body() == null) {
-                    if (response.code() == 404) {
-                        ApiErrorUtils.httpError(TAG, response, "Không tìm thấy tài khoản.");
-                        AppSession.clearAccount(MainActivity.this);
-                        balanceText.setText("0 ₫");
-                        accountNumberText.setText("Bạn chưa có tài khoản");
-                        statusText.setText("Chưa có tài khoản");
-                    } else {
-                        if (!response.isSuccessful()) {
-                            ApiErrorUtils.httpError(TAG, response, "Không thể đồng bộ tài khoản.");
-                        }
-                        statusText.setText("Không thể đồng bộ");
-                    }
-                    setupAccountButton.setVisibility(View.VISIBLE);
-                    return;
+                if (response.isSuccessful() && response.body() != null) {
+                    saveAndRenderAccount(response.body());
+                } else if (response.code() == 404 || response.code() == 400) {
+                    // Try to create if not found
+                    provisionDefaultPaymentAccount(userId);
+                } else {
+                    statusText.setText("Không thể đồng bộ");
+                    ApiErrorUtils.httpError(TAG, response, "Lỗi kết nối tài khoản.");
                 }
-                saveAndRenderAccount(response.body());
             }
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
                 refreshButton.setEnabled(true);
-                ApiErrorUtils.networkError(TAG, throwable);
-                statusText.setText(AppSession.hasAccount(MainActivity.this)
-                        ? "Offline • dữ liệu đã lưu"
-                        : "Mất kết nối");
-                setupAccountButton.setVisibility(AppSession.hasAccount(MainActivity.this) ? View.GONE : View.VISIBLE);
+                statusText.setText("Offline");
+                renderSessionSnapshot();
             }
         });
+    }
+
+    private void provisionDefaultPaymentAccount(long userId) {
+        if (provisioningAccount) return;
+        provisioningAccount = true;
+        refreshButton.setEnabled(false);
+        statusText.setText("Đang mở tài khoản...");
+
+        AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
+        ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                provisioningAccount = false;
+                // If success or already exists (409), try to fetch it again
+                if (response.isSuccessful() || response.code() == 409) {
+                    refreshPaymentAccount();
+                } else {
+                    refreshButton.setEnabled(true);
+                    statusText.setText("Lỗi cấp tài khoản");
+                    ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản mới.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                provisioningAccount = false;
+                refreshButton.setEnabled(true);
+                statusText.setText("Lỗi kết nối");
+            }
+        });
+    }
+
+    private void renderProvisioningState() {
+        balanceText.setText("0 VND");
+        accountNumberText.setText("Đang cấp tài khoản thanh toán");
+        statusText.setText("Đang mở tài khoản");
     }
 
     private void renderSessionSnapshot() {
         String accountNumber = AppSession.getAccountNumber(this);
         String balance = AppSession.getAccountBalance(this);
-        accountNumberText.setText(accountNumber.isEmpty() ? "Bạn chưa có tài khoản" : "STK  •  " + accountNumber);
-        balanceText.setText((balance.isEmpty() ? "0" : balance) + " ₫");
-        setupAccountButton.setVisibility(accountNumber.isEmpty() ? View.VISIBLE : View.GONE);
+        accountNumberText.setText(accountNumber.isEmpty()
+                ? "Đang kiểm tra tài khoản"
+                : "STK  •  " + accountNumber);
+        balanceText.setText(CurrencyUtils.formatVnd(balance));
     }
 
     private void saveAndRenderAccount(AccountResponse account) {
+        if (account == null || !AppSession.isPaymentAccount(account.accountType)) {
+            AppSession.clearAccount(this);
+            statusText.setText("Cần tài khoản thanh toán");
+            accountNumberText.setText(account == null ? "Không tìm thấy tài khoản" : "Tài khoản hiện tại không phải tài khoản thanh toán");
+            balanceText.setText("0 VND");
+            return;
+        }
+
         String accountNumber = account.accountNumber == null ? "" : account.accountNumber.trim();
         if (accountNumber.isEmpty()) {
-            accountNumberText.setText("Bạn chưa có tài khoản");
-            balanceText.setText("0 ₫");
+            accountNumberText.setText("Chưa có số tài khoản");
+            balanceText.setText("0 VND");
             statusText.setText("Thiếu số tài khoản");
-            setupAccountButton.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -139,12 +176,58 @@ public class MainActivity extends Activity {
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
 
         accountNumberText.setText("STK  •  " + accountNumber);
-        balanceText.setText(balance + " ₫");
-        statusText.setText(account.accountStatus == null ? "Không rõ trạng thái" : account.accountStatus);
-        setupAccountButton.setVisibility(View.GONE);
+        balanceText.setText(CurrencyUtils.formatVnd(balance));
+        statusText.setText(formatAccountStatus(account.accountStatus));
+    }
+
+    private boolean isPaymentAccount(AccountResponse account) {
+        return account != null && AppSession.isPaymentAccount(account.accountType);
+    }
+
+    private Long currentUserId() {
+        try {
+            return Long.parseLong(AppSession.getUserId(this));
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private String formatAccountStatus(String status) {
+        if ("ACTIVE".equals(status)) {
+            return "Đang hoạt động";
+        }
+        if ("PENDING".equals(status)) {
+            return "Đang chờ xử lý";
+        }
+        if ("BLOCKED".equals(status)) {
+            return "Đang bị khóa";
+        }
+        if ("CLOSED".equals(status)) {
+            return "Đã đóng";
+        }
+        return status == null || status.trim().isEmpty() ? "Không rõ trạng thái" : status;
     }
 
     private void logout() {
+        String refreshToken = AppSession.getRefreshToken(this);
+        if (refreshToken.isEmpty()) {
+            finishLogout();
+            return;
+        }
+        ApiClient.getApi().logout(new RefreshTokenRequest(refreshToken)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                finishLogout();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable throwable) {
+                finishLogout();
+            }
+        });
+    }
+
+    private void finishLogout() {
         AppSession.clearLoginState(this);
         Ui.openAndClear(this, WelcomeActivity.class);
     }

@@ -8,63 +8,119 @@
     android:overScrollMode="never">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="24dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="32dp">
+        style="@style/ScreenRoot">
 
-        <TextView style="@style/MutedText" android:text="Bắt đầu hành trình tài chính" />
-        <TextView style="@style/PageTitle" android:layout_marginTop="2dp" android:text="Đăng ký khách hàng" />
+        <TextView
+            style="@style/MutedText"
+            android:text="NLU Banking" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="Tạo hồ sơ khách hàng" />
+
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Điền thông tin bên dưới để tạo hồ sơ ngân hàng của bạn." />
+            android:text="Sau khi tạo hồ sơ, bạn cần nhập mã OTP được gửi qua email để hoàn tất đăng ký." />
 
-        <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Thông tin cá nhân" />
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
 
-            <TextView style="@style/FieldLabel" android:text="Tên" />
-            <EditText android:id="@+id/firstNameInput" style="@style/Input" android:hint="Ví dụ: An" android:inputType="textCapWords" />
-
-            <TextView style="@style/FieldLabel" android:text="Họ và tên đệm" />
-            <EditText android:id="@+id/lastNameInput" style="@style/Input" android:hint="Ví dụ: Nguyễn Văn" android:inputType="textCapWords" />
-
-            <TextView style="@style/FieldLabel" android:text="Số điện thoại" />
-            <EditText android:id="@+id/phoneInput" style="@style/Input" android:hint="09xx xxx xxx" android:inputType="phone" />
-
-            <TextView style="@style/FieldLabel" android:text="Email" />
-            <EditText android:id="@+id/emailInput" style="@style/Input" android:hint="tenban@email.com" android:inputType="textEmailAddress" />
-
-            <TextView style="@style/FieldLabel" android:text="Mật khẩu" />
-            <EditText android:id="@+id/passwordInput" style="@style/Input" android:hint="Nhập mật khẩu đăng nhập" android:inputType="textPassword" />
-
-            <Button android:id="@+id/registerButton" style="@style/PrimaryButton" android:text="Tạo hồ sơ khách hàng" />
-            <Button android:id="@+id/loginButton" style="@style/SecondaryButton" android:text="Quay lại đăng nhập" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Mở tài khoản bằng User ID" />
             <TextView
-                style="@style/MutedText"
-                android:layout_marginBottom="16dp"
-                android:text="Backend hiện chưa trả User ID sau đăng ký. Khi đã có User ID do hệ thống cấp, nhập vào đây để mở tài khoản tiết kiệm." />
+                style="@style/SectionTitle"
+                android:text="Thông tin cá nhân" />
 
-            <TextView style="@style/FieldLabel" android:text="User ID" />
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Tên" />
+
             <EditText
-                android:id="@+id/userIdInput"
+                android:id="@+id/firstNameInput"
                 style="@style/Input"
-                android:hint="Nhập User ID"
-                android:inputType="number" />
+                android:hint="Ví dụ: An"
+                android:inputType="textCapWords" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Họ và tên đệm" />
+
+            <EditText
+                android:id="@+id/lastNameInput"
+                style="@style/Input"
+                android:hint="Ví dụ: Nguyễn Văn"
+                android:inputType="textCapWords" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Số điện thoại" />
+
+            <EditText
+                android:id="@+id/phoneInput"
+                style="@style/Input"
+                android:hint="09xx xxx xxx"
+                android:inputType="phone" />
+
+            <TextView
+                android:id="@+id/phoneErrorText"
+                style="@style/HelperText"
+                android:textColor="@color/danger"
+                android:visibility="gone" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Email" />
+
+            <EditText
+                android:id="@+id/emailInput"
+                style="@style/Input"
+                android:hint="tenban@email.com"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                android:id="@+id/emailErrorText"
+                style="@style/HelperText"
+                android:textColor="@color/danger"
+                android:visibility="gone" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Mật khẩu" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
+                android:hint="Tạo mật khẩu đăng nhập"
+                android:inputType="textPassword" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Nhập lại mật khẩu" />
+
+            <EditText
+                android:id="@+id/confirmPasswordInput"
+                style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
+                android:hint="Nhập lại mật khẩu"
+                android:inputType="textPassword" />
 
             <Button
-                android:id="@+id/openAccountButton"
+                android:id="@+id/registerButton"
                 style="@style/PrimaryButton"
-                android:text="Mở tài khoản bằng User ID" />
+                android:text="Tạo hồ sơ" />
+
+            <Button
+                android:id="@+id/loginButton"
+                style="@style/TextButton"
+                android:text="Đã có hồ sơ? Đăng nhập" />
         </LinearLayout>
 
-        <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Kết quả đăng ký sẽ hiển thị tại đây." />
+        <TextView
+            android:id="@+id/resultText"
+            style="@style/ResultBox"
+            android:text=""
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>
