@@ -38,6 +38,7 @@
             <EditText
                 android:id="@+id/passwordInput"
                 style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
                 android:hint="Nhập mật khẩu"
                 android:inputType="textPassword" />
 

@@ -67,6 +67,12 @@
             style="@style/TextButton"
             android:text="Quên mật khẩu?" />
 
+        <Button
+            android:id="@+id/verifyEmailButton"
+            style="@style/SecondaryButton"
+            android:text="Xác thực email"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/resultText"
             style="@style/ResultBox"

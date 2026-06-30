@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,9 +14,11 @@ import android.widget.Toast;
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.AccountResponse;
+import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 import com.example.bankingmobileapp.model.LoginRequest;
+import com.example.bankingmobileapp.model.ResendEmailOtpRequest;
 
 import java.util.Locale;
 
@@ -28,7 +31,10 @@ public class LoginActivity extends Activity {
     private EditText emailInput;
     private EditText passwordInput;
     private Button loginButton;
+    private Button verifyEmailButton;
     private TextView resultText;
+    private boolean loginLoading;
+    private boolean verificationLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,7 @@ public class LoginActivity extends Activity {
         emailInput = findViewById(R.id.userIdInput);
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
+        verifyEmailButton = findViewById(R.id.verifyEmailButton);
         resultText = findViewById(R.id.resultText);
         Ui.configurePasswordVisibility(passwordInput);
 
@@ -48,6 +55,7 @@ public class LoginActivity extends Activity {
         }
 
         loginButton.setOnClickListener(v -> login());
+        verifyEmailButton.setOnClickListener(v -> resendVerificationOtp());
         findViewById(R.id.registerButton).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
         findViewById(R.id.forgotPasswordButton).setOnClickListener(v -> requestPasswordReset());
     }
@@ -59,7 +67,7 @@ public class LoginActivity extends Activity {
             emailInput.requestFocus();
             return;
         }
-        ApiClient.getApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
+        ApiClient.getAuthApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(LoginActivity.this,
@@ -81,6 +89,7 @@ public class LoginActivity extends Activity {
     private void login() {
         String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
         String password = passwordInput.getText().toString();
+        showVerificationAction(false);
         if (email.isEmpty()) {
             emailInput.setError("Email không được để trống");
             emailInput.requestFocus();
@@ -99,20 +108,25 @@ public class LoginActivity extends Activity {
 
         setLoading(true);
         showMessage("Đang xác thực...");
-        ApiClient.getApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
+        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                + "api/users/auth/login body={email=" + email + ", password=<redacted>}");
+        ApiClient.getAuthApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                Log.d(TAG, "Login HTTP status=" + response.code()
+                        + " message=" + response.message());
                 if (!response.isSuccessful() || response.body() == null) {
                     setLoading(false);
                     AppSession.clearLoginState(LoginActivity.this);
                     String errorMessage = ApiErrorUtils.httpError(
                             TAG, response, "Không thể đăng nhập lúc này.");
                     if (response.code() == 401) {
-                        errorMessage = errorMessage.contains("xác thực email")
+                        errorMessage = isVerificationRequired(errorMessage)
                                 ? "Vui lòng xác thực email trước khi đăng nhập"
                                 : "Tài khoản hoặc mật khẩu không chính xác";
                     }
                     showMessage(errorMessage);
+                    showVerificationAction(isVerificationRequired(errorMessage));
                     return;
                 }
                 AuthResponse auth = response.body();
@@ -133,6 +147,59 @@ public class LoginActivity extends Activity {
                 showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
+    }
+
+    private void resendVerificationOtp() {
+        String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
+        if (email.isEmpty()) {
+            emailInput.setError("Email không được để trống");
+            emailInput.requestFocus();
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInput.setError("Email không đúng định dạng");
+            emailInput.requestFocus();
+            return;
+        }
+
+        setVerificationLoading(true);
+        showMessage("Đang gửi lại mã xác thực...");
+        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                + "api/users/auth/resend-email-otp body={email=" + email + "}");
+        ApiClient.getAuthApi().resendEmailOtp(new ResendEmailOtpRequest(email))
+                .enqueue(new Callback<ApiResponse>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                        Log.d(TAG, "Resend verification OTP HTTP status=" + response.code()
+                                + " message=" + response.message());
+                        setVerificationLoading(false);
+                        if (!response.isSuccessful() || response.body() == null) {
+                            showMessage(ApiErrorUtils.httpError(TAG, response,
+                                    "Không thể gửi lại OTP lúc này."));
+                            return;
+                        }
+
+                        String message = firstNonEmpty(response.body().responseMessage,
+                                response.body().message);
+                        if (isAlreadyVerified(message)) {
+                            showVerificationAction(false);
+                            showMessage("Email đã được xác thực. Vui lòng đăng nhập lại.");
+                            return;
+                        }
+
+                        AppSession.saveUserEmail(LoginActivity.this, email);
+                        Intent intent = new Intent(LoginActivity.this, VerifyOtpActivity.class);
+                        intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
+                        intent.putExtra(VerifyOtpActivity.EXTRA_FLOW, VerifyOtpActivity.FLOW_REGISTER);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                        setVerificationLoading(false);
+                        showMessage(ApiErrorUtils.networkError(TAG, throwable));
+                    }
+                });
     }
 
     private void loadAccountAndContinue(long userId) {
@@ -158,8 +225,51 @@ public class LoginActivity extends Activity {
     }
 
     private void setLoading(boolean loading) {
-        loginButton.setEnabled(!loading);
+        loginLoading = loading;
+        updateLoadingState();
         loginButton.setText(loading ? "Đang đăng nhập..." : "Đăng nhập");
+    }
+
+    private void setVerificationLoading(boolean loading) {
+        verificationLoading = loading;
+        updateLoadingState();
+        verifyEmailButton.setText(loading ? "Đang gửi lại mã..." : "Xác thực email");
+    }
+
+    private void updateLoadingState() {
+        boolean idle = !loginLoading && !verificationLoading;
+        loginButton.setEnabled(idle);
+        verifyEmailButton.setEnabled(idle);
+    }
+
+    private void showVerificationAction(boolean visible) {
+        verifyEmailButton.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isVerificationRequired(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.toLowerCase(Locale.ROOT);
+        return normalized.contains("xác thực email")
+                || normalized.contains("verify email")
+                || normalized.contains("email not verified");
+    }
+
+    private boolean isAlreadyVerified(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.toLowerCase(Locale.ROOT);
+        return normalized.contains("đã được xác thực")
+                || normalized.contains("already verified");
+    }
+
+    private String firstNonEmpty(String first, String second) {
+        if (first != null && !first.trim().isEmpty()) {
+            return first.trim();
+        }
+        return second == null ? "" : second.trim();
     }
 
     private void showMessage(String message) {

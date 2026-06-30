@@ -1,13 +1,17 @@
 package org.training.user.service.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 import org.training.user.service.config.KeyCloakManager;
+import org.training.user.service.exception.ResourceConflictException;
 import org.training.user.service.service.KeycloakService;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,9 +28,18 @@ public class KeycloakServiceImpl implements KeycloakService {
      * @return                     the status code indicating the success or failure of the user creation
      */
     @Override
-    public Integer createUser(UserRepresentation userRepresentation) {
-
-        return keyCloakManager.getKeyCloakInstanceWithRealm().users().create(userRepresentation).getStatus();
+    public String createUser(UserRepresentation userRepresentation) {
+        try (Response response = keyCloakManager.getKeyCloakInstanceWithRealm()
+                .users().create(userRepresentation)) {
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+                return CreatedResponseUtil.getCreatedId(response);
+            }
+            if (response.getStatus() == Response.Status.CONFLICT.getStatusCode()) {
+                throw new ResourceConflictException("Email đã được đăng ký trước đó");
+            }
+            throw new IllegalStateException(
+                    "Keycloak không thể tạo người dùng, HTTP " + response.getStatus());
+        }
     }
 
     /**
@@ -38,7 +51,8 @@ public class KeycloakServiceImpl implements KeycloakService {
     @Override
     public List<UserRepresentation> readUserByEmail(String emailId) {
 
-        return keyCloakManager.getKeyCloakInstanceWithRealm().users().search(emailId);
+        return keyCloakManager.getKeyCloakInstanceWithRealm()
+                .users().searchByEmail(emailId, true);
     }
 
     /**
@@ -80,6 +94,12 @@ public class KeycloakServiceImpl implements KeycloakService {
 
         keyCloakManager.getKeyCloakInstanceWithRealm().users()
                 .get(userRepresentation.getId()).update(userRepresentation);
+    }
+
+    @Override
+    public void resetPassword(String authId, CredentialRepresentation credential) {
+        keyCloakManager.getKeyCloakInstanceWithRealm().users()
+                .get(authId).resetPassword(credential);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.training.user.service.service;
 
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface KeycloakService {
      * @param  userRepresentation  the user representation object containing the user details
      * @return                     the ID of the newly created user
      */
-    Integer createUser(UserRepresentation userRepresentation);
+    String createUser(UserRepresentation userRepresentation);
 
     /**
      * Retrieves a list of user representations based on the provided email ID.
@@ -44,6 +45,8 @@ public interface KeycloakService {
      * @param  userRepresentation  the user representation object containing the updated user details
      */
     void updateUser(UserRepresentation userRepresentation);
+
+    void resetPassword(String authId, CredentialRepresentation credential);
 
     void sendPasswordReset(String authId);
 }

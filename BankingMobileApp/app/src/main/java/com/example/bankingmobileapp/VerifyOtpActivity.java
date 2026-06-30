@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,6 +45,7 @@ public class VerifyOtpActivity extends Activity {
     private long expiresAtMillis;
     private boolean otpExpired;
     private boolean requestInProgress;
+    private boolean resendRequestInProgress;
     private boolean activityStarted;
 
     @Override
@@ -100,12 +102,21 @@ public class VerifyOtpActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        cancelCountdown();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong(STATE_EXPIRES_AT, expiresAtMillis);
         super.onSaveInstanceState(outState);
     }
 
     private void verifyOtp() {
+        if (requestInProgress) {
+            return;
+        }
         if (otpExpired) {
             showMessage("OTP đã hết hạn. Vui lòng gửi lại mã.");
             return;
@@ -136,12 +147,16 @@ public class VerifyOtpActivity extends Activity {
             return;
         }
 
-        setLoading(true, "Đang xác thực...");
-        ApiClient.getOtpApi().verifyEmailOtp(new VerifyEmailOtpRequest(email, otp))
+        setLoading(true, false, "Đang xác thực...");
+        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                + "api/users/auth/verify-email-otp body={email=" + email + ", otp=<redacted>}");
+        ApiClient.getAuthApi().verifyEmailOtp(new VerifyEmailOtpRequest(email, otp))
                 .enqueue(new Callback<ApiResponse>() {
                     @Override
                     public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                        setLoading(false, null);
+                        Log.d(TAG, "Verify OTP HTTP status=" + response.code()
+                                + " message=" + response.message());
+                        setLoading(false, false, null);
                         if (!response.isSuccessful() || response.body() == null) {
                             showMessage(ApiErrorUtils.httpError(
                                     TAG, response, "Không thể xác thực OTP lúc này."));
@@ -154,19 +169,31 @@ public class VerifyOtpActivity extends Activity {
 
                     @Override
                     public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                        setLoading(false, null);
+                        setLoading(false, false, null);
                         showMessage(ApiErrorUtils.networkError(TAG, throwable));
                     }
                 });
     }
 
     private void resendOtp() {
-        setLoading(true, "Đang gửi lại mã...");
-        ApiClient.getOtpApi().resendEmailOtp(new ResendEmailOtpRequest(email))
+        if (requestInProgress) {
+            return;
+        }
+        if (!otpExpired) {
+            showMessage("Bạn có thể gửi lại mã khi bộ đếm kết thúc.");
+            return;
+        }
+
+        setLoading(true, true, "Đang gửi lại mã...");
+        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                + "api/users/auth/resend-email-otp body={email=" + email + "}");
+        ApiClient.getAuthApi().resendEmailOtp(new ResendEmailOtpRequest(email))
                 .enqueue(new Callback<ApiResponse>() {
                     @Override
                     public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                        setLoading(false, null);
+                        Log.d(TAG, "Resend OTP HTTP status=" + response.code()
+                                + " message=" + response.message());
+                        setLoading(false, false, null);
                         if (!response.isSuccessful() || response.body() == null) {
                             showMessage(ApiErrorUtils.httpError(
                                     TAG, response, "Không thể gửi lại OTP lúc này."));
@@ -188,14 +215,15 @@ public class VerifyOtpActivity extends Activity {
 
                     @Override
                     public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                        setLoading(false, null);
+                        setLoading(false, false, null);
                         showMessage(ApiErrorUtils.networkError(TAG, throwable));
                     }
                 });
     }
 
-    private void setLoading(boolean loading, String message) {
+    private void setLoading(boolean loading, boolean resending, String message) {
         requestInProgress = loading;
+        resendRequestInProgress = loading && resending;
         updateButtons();
         if (message != null) {
             showMessage(message);
@@ -232,6 +260,10 @@ public class VerifyOtpActivity extends Activity {
         long seconds = totalSeconds % 60L;
         countdownText.setText(String.format(
                 Locale.getDefault(), "Mã OTP còn hiệu lực trong %02d:%02d", minutes, seconds));
+        if (!resendRequestInProgress) {
+            resendButton.setText(String.format(
+                    Locale.getDefault(), "Gửi lại mã (%02d:%02d)", minutes, seconds));
+        }
     }
 
     private void markOtpExpired() {
@@ -241,8 +273,19 @@ public class VerifyOtpActivity extends Activity {
     }
 
     private void updateButtons() {
-        verifyButton.setEnabled(!requestInProgress && !otpExpired);
-        resendButton.setEnabled(!requestInProgress && otpExpired);
+        boolean verifyEnabled = !requestInProgress && !otpExpired;
+        boolean resendEnabled = !requestInProgress && otpExpired;
+        verifyButton.setEnabled(verifyEnabled);
+        resendButton.setEnabled(resendEnabled);
+        verifyButton.setAlpha(verifyEnabled ? 1f : 0.55f);
+        resendButton.setAlpha(resendEnabled ? 1f : 0.55f);
+        verifyButton.setText(requestInProgress && !resendRequestInProgress
+                ? "Đang xác thực..." : "Xác thực");
+        if (resendRequestInProgress) {
+            resendButton.setText("Đang gửi lại mã...");
+        } else if (otpExpired) {
+            resendButton.setText("Gửi lại mã");
+        }
     }
 
     private void cancelCountdown() {

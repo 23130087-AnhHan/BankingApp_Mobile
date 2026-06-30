@@ -67,6 +67,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<Object> handleResourceConflict(ResourceConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.builder()
+                        .errorCode(errorCodeConflict)
+                        .errorMessage(exception.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<Object> handleEmailSendingFailed(EmailSendingException exception) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)

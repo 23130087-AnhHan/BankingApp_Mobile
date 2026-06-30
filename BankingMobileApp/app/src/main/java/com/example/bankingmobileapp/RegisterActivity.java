@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -108,7 +109,8 @@ public class RegisterActivity extends Activity {
             register(request, email);
         });
 
-        findViewById(R.id.loginButton).setOnClickListener(v -> finish());
+        findViewById(R.id.loginButton)
+                .setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
     }
 
     @Override
@@ -144,7 +146,7 @@ public class RegisterActivity extends Activity {
                 return;
             }
 
-            emailCheckCall = ApiClient.getApi().checkEmail(email);
+            emailCheckCall = ApiClient.getAuthApi().checkEmail(email);
             emailCheckCall.enqueue(new Callback<AvailabilityResponse>() {
                 @Override
                 public void onResponse(
@@ -217,7 +219,7 @@ public class RegisterActivity extends Activity {
                 return;
             }
 
-            phoneCheckCall = ApiClient.getApi().checkPhone(phone);
+            phoneCheckCall = ApiClient.getAuthApi().checkPhone(phone);
             phoneCheckCall.enqueue(new Callback<AvailabilityResponse>() {
                 @Override
                 public void onResponse(
@@ -407,9 +409,15 @@ public class RegisterActivity extends Activity {
     private void register(CreateUserRequest request, String email) {
         setLoading(true);
         showMessage("Đang tạo hồ sơ khách hàng...");
-        ApiClient.getApi().register(request).enqueue(new Callback<ApiResponse>() {
+        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl() + "api/users/register"
+                + " body={emailId=" + email
+                + ", contactNumber=" + request.contactNumber
+                + ", firstName=<provided>, lastName=<provided>, password=<redacted>}");
+        ApiClient.getAuthApi().register(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                Log.d(TAG, "Register HTTP status=" + response.code()
+                        + " message=" + response.message());
                 setLoading(false);
                 if (!response.isSuccessful() || response.body() == null) {
                     showMessage(ApiErrorUtils.httpError(
@@ -432,6 +440,7 @@ public class RegisterActivity extends Activity {
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                Log.e(TAG, "Register failed: " + throwable.getMessage(), throwable);
                 setLoading(false);
                 showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }

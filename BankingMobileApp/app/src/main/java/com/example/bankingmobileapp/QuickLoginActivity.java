@@ -33,6 +33,7 @@ public class QuickLoginActivity extends Activity {
 
         TextView greetingText = findViewById(R.id.greetingText);
         passwordInput = findViewById(R.id.passwordInput);
+        Ui.configurePasswordVisibility(passwordInput);
         loginButton = findViewById(R.id.loginButton);
         resultText = findViewById(R.id.resultText);
         String displayName = AppSession.getRememberedDisplayName(this);
@@ -49,7 +50,7 @@ public class QuickLoginActivity extends Activity {
             Ui.openAndClear(this, LoginActivity.class);
             return;
         }
-        ApiClient.getApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
+        ApiClient.getAuthApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(QuickLoginActivity.this,
@@ -77,7 +78,7 @@ public class QuickLoginActivity extends Activity {
         }
         setLoading(true);
         showMessage("Đang xác thực...");
-        ApiClient.getApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
+        ApiClient.getAuthApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (!response.isSuccessful() || response.body() == null || response.body().userId == null) {

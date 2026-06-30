@@ -10,7 +10,6 @@ set "MYSQL_USER=root"
 set "MYSQL_PASSWORD=123456"
 set "MYSQL_HOST=localhost"
 set "MYSQL_PORT=3306"
-set "KEYCLOAK_CLIENT_SECRET=932OFITe8vtH4z0G9gem4Afd69JhbwrI"
 
 echo --------------------------------------------------
 echo   Banking App Backend Runner
