@@ -70,7 +70,7 @@ public class ResetPasswordActivity extends Activity {
         submitButton.setEnabled(false);
 
         ResetPasswordRequest request = new ResetPasswordRequest(email, otp, password);
-        ApiClient.getApi().resetPassword(request).enqueue(new Callback<ApiResponse>() {
+        ApiClient.getAuthApi().resetPassword(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 submitButton.setEnabled(true);

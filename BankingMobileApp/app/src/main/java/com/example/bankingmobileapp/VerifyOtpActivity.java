@@ -185,40 +185,48 @@ public class VerifyOtpActivity extends Activity {
         }
 
         setLoading(true, true, "Đang gửi lại mã...");
-        Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
-                + "api/users/auth/resend-email-otp body={email=" + email + "}");
-        ApiClient.getAuthApi().resendEmailOtp(new ResendEmailOtpRequest(email))
-                .enqueue(new Callback<ApiResponse>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                        Log.d(TAG, "Resend OTP HTTP status=" + response.code()
-                                + " message=" + response.message());
-                        setLoading(false, false, null);
-                        if (!response.isSuccessful() || response.body() == null) {
-                            showMessage(ApiErrorUtils.httpError(
-                                    TAG, response, "Không thể gửi lại OTP lúc này."));
-                            return;
-                        }
-                        String message = response.body().responseMessage;
-                        if (message == null || message.trim().isEmpty()) {
-                            message = "Đã gửi lại OTP. Vui lòng kiểm tra email";
-                        }
-                        Toast.makeText(VerifyOtpActivity.this, message, Toast.LENGTH_LONG).show();
-                        showMessage(message);
-                        otpInput.setText("");
-                        otpInput.requestFocus();
-                        expiresAtMillis = System.currentTimeMillis() + OTP_DURATION_MILLIS;
-                        if (activityStarted) {
-                            startCountdown(OTP_DURATION_MILLIS);
-                        }
-                    }
+        Call<ApiResponse> call;
+        if (flow == FLOW_TRANSFER) {
+            Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                    + "api/users/auth/payment-otp/send body={email=" + email + "}");
+            call = ApiClient.getAuthApi().sendPaymentOtp(new com.example.bankingmobileapp.model.SendPaymentOtpRequest(email));
+        } else {
+            Log.d(TAG, "POST " + ApiClient.getAuthBaseUrl()
+                    + "api/users/auth/resend-email-otp body={email=" + email + "}");
+            call = ApiClient.getAuthApi().resendEmailOtp(new ResendEmailOtpRequest(email));
+        }
 
-                    @Override
-                    public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                        setLoading(false, false, null);
-                        showMessage(ApiErrorUtils.networkError(TAG, throwable));
-                    }
-                });
+        call.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                Log.d(TAG, "Resend OTP HTTP status=" + response.code()
+                        + " message=" + response.message());
+                setLoading(false, false, null);
+                if (!response.isSuccessful() || response.body() == null) {
+                    showMessage(ApiErrorUtils.httpError(
+                            TAG, response, "Không thể gửi lại OTP lúc này."));
+                    return;
+                }
+                String message = response.body().responseMessage;
+                if (message == null || message.trim().isEmpty()) {
+                    message = "Đã gửi lại OTP. Vui lòng kiểm tra email";
+                }
+                Toast.makeText(VerifyOtpActivity.this, message, Toast.LENGTH_LONG).show();
+                showMessage(message);
+                otpInput.setText("");
+                otpInput.requestFocus();
+                expiresAtMillis = System.currentTimeMillis() + OTP_DURATION_MILLIS;
+                if (activityStarted) {
+                    startCountdown(OTP_DURATION_MILLIS);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                setLoading(false, false, null);
+                showMessage(ApiErrorUtils.networkError(TAG, throwable));
+            }
+        });
     }
 
     private void setLoading(boolean loading, boolean resending, String message) {

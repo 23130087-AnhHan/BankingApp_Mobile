@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The dark background image -->
+    <item android:drawable="@drawable/bg_nlubank" />
+    
+    <!-- A soft semi-transparent dark-green overlay to reduce contrast and make it balanced and harmonious -->
+    <item>
+        <shape>
+            <solid android:color="#E0063D2C" /> <!-- 88% opacity of nlu_green_dark -->
+        </shape>
+    </item>
+</layer-list>

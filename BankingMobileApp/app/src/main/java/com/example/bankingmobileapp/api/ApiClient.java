@@ -22,8 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class ApiClient {
     private static final String TAG = "BankingApi";
-    private static final String BASE_URL = "http://10.0.2.2:8080/";
-    private static final String AUTH_BASE_URL = "http://10.0.2.2:8082/";
+    private static final String BASE_URL = "http://127.0.0.1:8080/";
+    private static final String AUTH_BASE_URL = "http://127.0.0.1:8082/";
     private static final long HTTP_TIMEOUT_SECONDS = 60L;
     private static BankingApi api;
     private static BankingApi authApi;

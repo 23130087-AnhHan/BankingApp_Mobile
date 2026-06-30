@@ -128,8 +128,12 @@ public class QuickLoginActivity extends FragmentActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(QuickLoginActivity.this,
-                        "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.",
+                        "Mã xác thực OTP đã được gửi đến email của bạn.",
                         Toast.LENGTH_LONG).show();
+                android.content.Intent intent = new android.content.Intent(QuickLoginActivity.this, VerifyOtpActivity.class);
+                intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
+                intent.putExtra(VerifyOtpActivity.EXTRA_FLOW, VerifyOtpActivity.FLOW_RESET_PASSWORD);
+                startActivity(intent);
             }
 
             @Override
