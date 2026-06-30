@@ -34,6 +34,10 @@ public class CreateUser {
     @Email(message = "Email không đúng định dạng")
     private String emailId;
 
+    @NotBlank(message = "Số CCCD không được để trống")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Số CCCD phải có đúng 12 chữ số")
+    private String identificationNumber;
+
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 8, max = 72, message = "Mật khẩu phải có ít nhất 8 ký tự")
     @Pattern(regexp = "^\\S+$", message = "Mật khẩu không được chứa khoảng trắng")

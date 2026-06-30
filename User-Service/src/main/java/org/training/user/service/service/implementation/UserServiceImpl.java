@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
                     .emailOtpExpiredAt(otpService.generateExpiredTime())
                     .status(Status.PENDING).userProfile(userProfile)
                     .authId(authId)
-                    .identificationNumber(UUID.randomUUID().toString()).build();
+                    .identificationNumber(userDto.getIdentificationNumber()).build();
 
             User savedUser = userRepository.saveAndFlush(user);
             String responseMessage = "Đăng ký thành công. Vui lòng kiểm tra email để xác thực OTP.";
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
                     .responseCode(responseCode)
                     .userId(savedUser.getUserId())
                     .emailId(savedUser.getEmailId())
-                    .displayName(userProfile.getFirstName() + " " + userProfile.getLastName())
+                    .displayName((userProfile.getLastName() + " " + userProfile.getFirstName()).trim())
                     .status(savedUser.getStatus())
                     .build();
     }

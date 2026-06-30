@@ -139,7 +139,7 @@ public class AuthenticationService {
 
     private AuthResponse toResponse(Map<String, Object> token, User user) {
         String displayName = user.getUserProfile() == null ? user.getEmailId()
-                : (user.getUserProfile().getFirstName() + " " + user.getUserProfile().getLastName()).trim();
+                : (user.getUserProfile().getLastName() + " " + user.getUserProfile().getFirstName()).trim();
         return AuthResponse.builder()
                 .accessToken(string(token.get("access_token")))
                 .refreshToken(string(token.get("refresh_token")))
