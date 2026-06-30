@@ -7,6 +7,7 @@ import org.training.user.service.model.dto.auth.AuthResponse;
 import org.training.user.service.model.dto.auth.LoginRequest;
 import org.training.user.service.model.dto.auth.RefreshTokenRequest;
 import org.training.user.service.model.dto.auth.ForgotPasswordRequest;
+import org.training.user.service.model.dto.auth.ResetPasswordRequest;
 import org.training.user.service.model.dto.auth.ResendEmailOtpRequest;
 import org.training.user.service.model.dto.auth.SendPaymentOtpRequest;
 import org.training.user.service.model.dto.auth.VerifyEmailOtpRequest;
@@ -47,6 +48,15 @@ public class AuthenticationController {
     public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authenticationService.requestPasswordReset(request.getEmail());
         return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Response> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(request);
+        return ResponseEntity.ok(Response.builder()
+                .responseCode("200")
+                .responseMessage("Mật khẩu đã được cập nhật thành công")
+                .build());
     }
 
     @PostMapping("/verify-email-otp")
