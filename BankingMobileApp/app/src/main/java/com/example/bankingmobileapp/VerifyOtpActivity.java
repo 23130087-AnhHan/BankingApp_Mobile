@@ -1,6 +1,7 @@
 package com.example.bankingmobileapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -23,11 +24,17 @@ import retrofit2.Response;
 
 public class VerifyOtpActivity extends Activity {
     public static final String EXTRA_EMAIL = "email";
+    public static final String EXTRA_FLOW = "flow";
+    public static final int FLOW_REGISTER = 0;
+    public static final int FLOW_RESET_PASSWORD = 1;
+    public static final int FLOW_TRANSFER = 2;
+
     private static final String TAG = "VerifyOtpActivity";
     private static final String STATE_EXPIRES_AT = "otp_expires_at";
     private static final long OTP_DURATION_MILLIS = 5 * 60 * 1000L;
 
     private String email;
+    private int flow;
     private EditText otpInput;
     private Button verifyButton;
     private Button resendButton;
@@ -45,6 +52,7 @@ public class VerifyOtpActivity extends Activity {
         setContentView(R.layout.activity_verify_otp);
 
         email = getIntent().getStringExtra(EXTRA_EMAIL);
+        flow = getIntent().getIntExtra(EXTRA_FLOW, FLOW_REGISTER);
         if (email == null || email.trim().isEmpty()) {
             email = AppSession.getUserEmail(this);
         }
@@ -103,19 +111,28 @@ public class VerifyOtpActivity extends Activity {
             return;
         }
         String otp = Ui.text(otpInput);
-        if (otp.isEmpty()) {
-            otpInput.setError("OTP không được để trống");
-            otpInput.requestFocus();
-            return;
-        }
-        if (!otp.matches("[0-9]+")) {
+        if (otp.isEmpty() || otp.length() != 6) {
             otpInput.setError("OTP phải gồm 6 chữ số");
             otpInput.requestFocus();
             return;
         }
-        if (otp.length() != 6) {
-            otpInput.setError("OTP phải gồm 6 chữ số");
-            otpInput.requestFocus();
+
+        if (flow == FLOW_TRANSFER) {
+            // Returning the OTP back to the activity that started this one
+            android.content.Intent data = new android.content.Intent();
+            data.putExtra("otp", otp);
+            setResult(RESULT_OK, data);
+            finish();
+            return;
+        }
+
+        if (flow == FLOW_RESET_PASSWORD) {
+            // Navigate to Password Update screen
+            Intent intent = new Intent(this, ResetPasswordActivity.class);
+            intent.putExtra("email", email);
+            intent.putExtra("otp", otp);
+            startActivity(intent);
+            finish();
             return;
         }
 

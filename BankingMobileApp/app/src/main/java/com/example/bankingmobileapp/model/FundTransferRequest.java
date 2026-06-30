@@ -11,6 +11,10 @@ public class FundTransferRequest {
     public String toAccount;
     @SerializedName("amount")
     public BigDecimal amount;
+    @SerializedName("otp")
+    public String otp;
+    @SerializedName("pin")
+    public String pin;
 
     public FundTransferRequest(String fromAccount, String toAccount, BigDecimal amount) {
         this.fromAccount = fromAccount;

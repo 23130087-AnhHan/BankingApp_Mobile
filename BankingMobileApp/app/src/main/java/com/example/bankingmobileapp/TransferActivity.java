@@ -1,6 +1,7 @@
 package com.example.bankingmobileapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -58,7 +59,10 @@ public class TransferActivity extends Activity {
     private String pendingToAccount;
     private BigDecimal pendingAmount;
     private String pendingNote;
+    private String verifiedOtp;
     private boolean formattingAmount;
+
+    private static final int REQ_VERIFY_OTP = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +202,7 @@ public class TransferActivity extends Activity {
             return;
         }
         if (!isSessionPaymentAccount()) {
-            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán.");
+            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán chuẩn.");
             setTransferEnabled(false);
             return;
         }
@@ -238,7 +242,7 @@ public class TransferActivity extends Activity {
 
     private void verifyAndSubmit() {
         if (otpEmailOption.isChecked()) {
-            resultText.setText("OTP qua email chưa được kích hoạt. Vui lòng chọn xác thực bằng PIN.");
+            sendOtpAndVerify();
             return;
         }
         if (!AppSession.hasPaymentPin(this)) {
@@ -246,15 +250,56 @@ public class TransferActivity extends Activity {
             Ui.open(this, PinActivity.class);
             return;
         }
-        if (!AppSession.verifyPaymentPin(this, Ui.text(pinInput))) {
+        String pin = Ui.text(pinInput);
+        if (!AppSession.verifyPaymentPin(this, pin)) {
             pinInput.setError("PIN không đúng");
             return;
         }
-        submitTransfer();
+        submitTransfer(null, pin);
     }
 
-    private void submitTransfer() {
+    private void sendOtpAndVerify() {
+        String email = AppSession.getUserEmail(this);
+        resultText.setText("Đang gửi mã OTP đến " + email + "...");
+        setTransferEnabled(false);
+
+        ApiClient.getOtpApi().resendEmailOtp(new com.example.bankingmobileapp.model.ResendEmailOtpRequest(email))
+                .enqueue(new Callback<com.example.bankingmobileapp.model.ApiResponse>() {
+                    @Override
+                    public void onResponse(Call<com.example.bankingmobileapp.model.ApiResponse> call, Response<com.example.bankingmobileapp.model.ApiResponse> response) {
+                        setTransferEnabled(true);
+                        if (response.isSuccessful()) {
+                            Intent intent = new Intent(TransferActivity.this, VerifyOtpActivity.class);
+                            intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
+                            intent.putExtra(VerifyOtpActivity.EXTRA_FLOW, VerifyOtpActivity.FLOW_TRANSFER);
+                            startActivityForResult(intent, REQ_VERIFY_OTP);
+                        } else {
+                            resultText.setText(ApiErrorUtils.httpError(TAG, response, "Không thể gửi OTP."));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<com.example.bankingmobileapp.model.ApiResponse> call, Throwable throwable) {
+                        setTransferEnabled(true);
+                        resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_VERIFY_OTP && resultCode == RESULT_OK && data != null) {
+            verifiedOtp = data.getStringExtra("otp");
+            submitTransfer(verifiedOtp, null);
+        }
+    }
+
+    private void submitTransfer(String otp, String pin) {
         FundTransferRequest request = new FundTransferRequest(pendingFromAccount, pendingToAccount, pendingAmount);
+        request.otp = otp;
+        request.pin = pin;
+
         resultText.setText("Đang xử lý chuyển tiền...");
         setTransferEnabled(false);
         submitButton.setEnabled(false);
@@ -357,24 +402,5 @@ public class TransferActivity extends Activity {
 
     private String digitsOnly(String value) {
         return value == null ? "" : value.replaceAll("[^0-9]", "");
-    }
-
-    private String formatMoney(String rawValue) {
-        if (rawValue == null || rawValue.trim().isEmpty()) {
-            return "0";
-        }
-        try {
-            String normalized = rawValue.replace(",", "")
-                    .replace("đ", "")
-                    .trim();
-            return moneyFormat.format(new BigDecimal(normalized));
-        } catch (NumberFormatException exception) {
-            String digits = digitsOnly(rawValue);
-            return digits.isEmpty() ? "0" : moneyFormat.format(new BigDecimal(digits));
-        }
-    }
-
-    private String formatMoney(BigDecimal amount) {
-        return amount == null ? "0" : moneyFormat.format(amount);
     }
 }

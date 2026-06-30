@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 
         Long userId = currentUserId();
         if (userId == null) {
-            userIdText.setText("Phiên đăng nhập chưa có mã khách hàng");
+            userIdText.setText("Phiên đăng nhập hết hạn");
             statusText.setText("Cần đăng nhập lại");
             return;
         }
@@ -81,68 +81,59 @@ public class MainActivity extends Activity {
         userIdText.setText(AppSession.getUserEmail(this).isEmpty()
                 ? "Khách hàng #" + userId
                 : AppSession.getUserEmail(this));
-        statusText.setText("Đang đồng bộ");
+        statusText.setText("Đang đồng bộ...");
         refreshButton.setEnabled(false);
 
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 refreshButton.setEnabled(true);
-                if (!response.isSuccessful() || response.body() == null) {
-                    if (response.code() == 404 || response.code() == 400) {
-                        ApiErrorUtils.httpError(TAG, response, "Không tìm thấy tài khoản thanh toán.");
-                        AppSession.clearAccount(MainActivity.this);
-                        renderProvisioningState();
-                        provisionDefaultPaymentAccount(userId);
-                        return;
-                    }
+                if (response.isSuccessful() && response.body() != null) {
+                    saveAndRenderAccount(response.body());
+                } else if (response.code() == 404 || response.code() == 400) {
+                    // Try to create if not found
+                    provisionDefaultPaymentAccount(userId);
+                } else {
                     statusText.setText("Không thể đồng bộ");
-                    ApiErrorUtils.httpError(TAG, response, "Không thể đồng bộ tài khoản.");
-                    return;
+                    ApiErrorUtils.httpError(TAG, response, "Lỗi kết nối tài khoản.");
                 }
-                saveAndRenderAccount(response.body());
             }
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
                 refreshButton.setEnabled(true);
-                ApiErrorUtils.networkError(TAG, throwable);
-                statusText.setText(AppSession.hasAccount(MainActivity.this)
-                        ? "Offline - dữ liệu đã lưu"
-                        : "Mất kết nối");
+                statusText.setText("Offline");
+                renderSessionSnapshot();
             }
         });
     }
 
     private void provisionDefaultPaymentAccount(long userId) {
-        if (provisioningAccount) {
-            return;
-        }
-
+        if (provisioningAccount) return;
         provisioningAccount = true;
         refreshButton.setEnabled(false);
-        // Try SAVINGS_ACCOUNT as it's more standard if PAYMENT_ACCOUNT fails on backend
+        statusText.setText("Đang mở tài khoản...");
+
         AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 provisioningAccount = false;
-                refreshButton.setEnabled(true);
-                if (!response.isSuccessful() && response.code() != 409) {
-                    statusText.setText("Không thể mở tài khoản");
-                    accountNumberText.setText(ApiErrorUtils.httpError(TAG, response,
-                            "Không thể cấp tài khoản thanh toán."));
-                    return;
+                // If success or already exists (409), try to fetch it again
+                if (response.isSuccessful() || response.code() == 409) {
+                    refreshPaymentAccount();
+                } else {
+                    refreshButton.setEnabled(true);
+                    statusText.setText("Lỗi cấp tài khoản");
+                    ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản mới.");
                 }
-                refreshPaymentAccount();
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
                 provisioningAccount = false;
                 refreshButton.setEnabled(true);
-                statusText.setText("Không thể mở tài khoản");
-                accountNumberText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                statusText.setText("Lỗi kết nối");
             }
         });
     }
