@@ -28,7 +28,7 @@ public class QuickLoginActivity extends FragmentActivity {
     private static final String TAG = "QuickLoginActivity";
     private EditText passwordInput;
     private Button loginButton;
-    private Button biometricLoginButton;
+    private View biometricLoginButton;
     private TextView resultText;
 
     @Override
