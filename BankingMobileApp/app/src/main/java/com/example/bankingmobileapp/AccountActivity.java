@@ -105,7 +105,8 @@ public class AccountActivity extends Activity {
         provisioningAccount = true;
         resultText.setText("Đang cấp tài khoản thanh toán...");
         setBusy(true);
-        AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
+        // Try SAVINGS_ACCOUNT as fallback if PAYMENT_ACCOUNT is not defined in backend enum
+        AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -131,7 +132,7 @@ public class AccountActivity extends Activity {
     }
 
     private void saveAndRenderAccount(AccountResponse account) {
-        if (!isPaymentAccount(account)) {
+        if (account == null || !AppSession.isPaymentAccount(account.accountType)) {
             AppSession.clearAccount(this);
             setAccountActionsEnabled(false);
             resultText.setText("Tài khoản hiện tại không phải tài khoản thanh toán. Vui lòng làm mới dashboard để cấp tài khoản chuẩn.");
@@ -171,7 +172,7 @@ public class AccountActivity extends Activity {
     }
 
     private boolean isPaymentAccount(AccountResponse account) {
-        return account != null && "PAYMENT_ACCOUNT".equalsIgnoreCase(account.accountType);
+        return account != null && AppSession.isPaymentAccount(account.accountType);
     }
 
     private Long currentUserId() {

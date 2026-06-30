@@ -15,11 +15,8 @@ import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 import com.example.bankingmobileapp.model.LoginRequest;
-<<<<<<< Updated upstream
 
 import java.util.Locale;
-=======
->>>>>>> Stashed changes
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -103,7 +100,6 @@ public class LoginActivity extends Activity {
                 if (!response.isSuccessful() || response.body() == null) {
                     setLoading(false);
                     AppSession.clearLoginState(LoginActivity.this);
-<<<<<<< Updated upstream
                     String errorMessage = ApiErrorUtils.httpError(
                             TAG, response, "Không thể đăng nhập lúc này.");
                     if (response.code() == 401) {
@@ -112,11 +108,6 @@ public class LoginActivity extends Activity {
                                 : "Tài khoản hoặc mật khẩu không chính xác";
                     }
                     showMessage(errorMessage);
-=======
-                    showMessage(response.code() == 401
-                            ? "Email hoặc mật khẩu không đúng."
-                            : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập lúc này."));
->>>>>>> Stashed changes
                     return;
                 }
                 AuthResponse auth = response.body();

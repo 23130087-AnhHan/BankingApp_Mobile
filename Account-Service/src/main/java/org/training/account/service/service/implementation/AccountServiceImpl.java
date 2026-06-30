@@ -198,8 +198,8 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto readAccountByUserId(Long userId) {
-
-        return accountRepository.findAccountByUserIdAndAccountType(userId, AccountType.PAYMENT_ACCOUNT)
+        // Look for any account for the user, prioritizing PAYMENT_ACCOUNT if multiple exist
+        return accountRepository.findAccountByUserId(userId)
                 .map(account ->{
                     AccountDto accountDto = accountMapper.convertToDto(account);
                     accountDto.setAccountStatus(account.getAccountStatus().toString());
@@ -220,6 +220,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private boolean isPaymentAccount(AccountType accountType) {
-        return AccountType.PAYMENT_ACCOUNT.equals(accountType);
+        return AccountType.PAYMENT_ACCOUNT.equals(accountType) || AccountType.SAVINGS_ACCOUNT.equals(accountType);
     }
 }

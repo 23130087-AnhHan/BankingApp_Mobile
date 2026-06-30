@@ -8,6 +8,7 @@ import com.example.bankingmobileapp.model.CreateUserRequest;
 import com.example.bankingmobileapp.model.FundTransferRequest;
 import com.example.bankingmobileapp.model.FundTransferResponse;
 import com.example.bankingmobileapp.model.TransactionResponse;
+import com.example.bankingmobileapp.model.TransactionRequest;
 import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.LoginRequest;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
@@ -68,6 +69,9 @@ public interface BankingApi {
 
     @GET("transactions")
     Call<List<TransactionResponse>> getTransactions(@Query("accountId") String accountId);
+
+    @POST("transactions")
+    Call<ApiResponse> createTransaction(@Body TransactionRequest body);
 
     @POST("fund-transfers")
     Call<FundTransferResponse> transfer(@Body FundTransferRequest body);

@@ -49,7 +49,7 @@ public class HistoryActivity extends Activity {
         }
         if (!isSessionPaymentAccount()) {
             currentAccountText.setText("Tài khoản hiện tại không phải tài khoản thanh toán.");
-            historyText.setText("Lịch sử giao dịch chỉ hiển thị cho PAYMENT_ACCOUNT. Hãy làm mới dashboard để đồng bộ tài khoản chuẩn.");
+            historyText.setText("Lịch sử giao dịch chỉ hiển thị cho tài khoản thanh toán chuẩn. Hãy làm mới dashboard để đồng bộ tài khoản.");
             loadHistoryButton.setEnabled(false);
             return;
         }
@@ -109,6 +109,6 @@ public class HistoryActivity extends Activity {
     }
 
     private boolean isSessionPaymentAccount() {
-        return "PAYMENT_ACCOUNT".equalsIgnoreCase(AppSession.getAccountType(this));
+        return AppSession.isPaymentAccount(AppSession.getAccountType(this));
     }
 }

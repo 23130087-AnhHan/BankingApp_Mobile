@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout style="@style/ScreenRoot">
+
+        <TextView
+            style="@style/MutedText"
+            android:text="Giao dịch" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="Nạp / Rút tiền" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Thực hiện các giao dịch nạp tiền vào tài khoản hoặc rút tiền mặt." />
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Thông tin tài khoản" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Số tài khoản" />
+
+            <EditText
+                android:id="@+id/accountNumberInput"
+                style="@style/Input"
+                android:hint="Nhập số tài khoản"
+                android:inputType="number" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Loại giao dịch" />
+
+            <EditText
+                android:id="@+id/transactionTypeInput"
+                style="@style/Input"
+                android:enabled="false"
+                android:hint="DEPOSIT / WITHDRAWAL" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Chi tiết giao dịch" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Số tiền" />
+
+            <EditText
+                android:id="@+id/amountInput"
+                style="@style/AmountInput"
+                android:hint="0 đ"
+                android:inputType="number" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Nội dung" />
+
+            <EditText
+                android:id="@+id/descriptionInput"
+                style="@style/Input"
+                android:hint="Nhập nội dung giao dịch"
+                android:inputType="textCapSentences" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/depositButton"
+                style="@style/PrimaryButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Nạp tiền" />
+
+            <Button
+                android:id="@+id/withdrawButton"
+                style="@style/SecondaryButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Rút tiền" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/resultText"
+            style="@style/ResultBox"
+            android:text="Thông báo kết quả giao dịch sẽ hiển thị ở đây." />
+    </LinearLayout>
+</ScrollView>

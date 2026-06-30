@@ -3,13 +3,10 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-<<<<<<< Updated upstream
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-=======
->>>>>>> Stashed changes
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -22,11 +19,8 @@ import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.AvailabilityResponse;
 import com.example.bankingmobileapp.model.CreateUserRequest;
-<<<<<<< Updated upstream
 
 import java.util.Locale;
-=======
->>>>>>> Stashed changes
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,7 +57,6 @@ public class RegisterActivity extends Activity {
         phoneInput = findViewById(R.id.phoneInput);
         emailInput = findViewById(R.id.emailInput);
         EditText passwordInput = findViewById(R.id.passwordInput);
-<<<<<<< Updated upstream
         EditText confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
         registerButton = findViewById(R.id.registerButton);
         resultText = findViewById(R.id.resultText);
@@ -74,10 +67,6 @@ public class RegisterActivity extends Activity {
         Ui.configurePasswordVisibility(confirmPasswordInput);
         emailInput.addTextChangedListener(afterTextChanged(this::scheduleEmailCheck));
         phoneInput.addTextChangedListener(afterTextChanged(this::schedulePhoneCheck));
-=======
-        registerButton = findViewById(R.id.registerButton);
-        resultText = findViewById(R.id.resultText);
->>>>>>> Stashed changes
 
         registerButton.setOnClickListener(v -> {
             String firstName = Ui.text(firstNameInput);
@@ -95,15 +84,8 @@ public class RegisterActivity extends Activity {
                     || !validateConfirmPassword(confirmPasswordInput, password, confirmPassword)) {
                 return;
             }
-<<<<<<< Updated upstream
             if (emailExists) {
                 showInlineError(emailErrorText, "Email đã được sử dụng");
-=======
-
-            String email = Ui.text(emailInput).toLowerCase();
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                emailInput.setError("Email không hợp lệ");
->>>>>>> Stashed changes
                 emailInput.requestFocus();
                 return;
             }
@@ -112,13 +94,10 @@ public class RegisterActivity extends Activity {
                 phoneInput.requestFocus();
                 return;
             }
-<<<<<<< Updated upstream
             if (emailCheckPending || phoneCheckPending) {
                 showMessage("Vui lòng chờ kiểm tra email và số điện thoại hoàn tất.");
                 return;
             }
-=======
->>>>>>> Stashed changes
 
             CreateUserRequest request = new CreateUserRequest(
                     firstName,
@@ -351,7 +330,6 @@ public class RegisterActivity extends Activity {
         return true;
     }
 
-<<<<<<< Updated upstream
     private boolean validatePhone(EditText input, String phone) {
         if (phone.isEmpty()) {
             input.setError("Số điện thoại không được để trống");
@@ -427,8 +405,6 @@ public class RegisterActivity extends Activity {
         return true;
     }
 
-=======
->>>>>>> Stashed changes
     private void register(CreateUserRequest request, String email) {
         setLoading(true);
         showMessage("Đang tạo hồ sơ khách hàng...");
@@ -448,17 +424,10 @@ public class RegisterActivity extends Activity {
                 AppSession.clearLoginState(RegisterActivity.this);
                 AppSession.clearAccount(RegisterActivity.this);
                 AppSession.saveUserEmail(RegisterActivity.this, email);
-<<<<<<< Updated upstream
                 Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
                 intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
                 startActivity(intent);
                 finish();
-=======
-                Toast.makeText(RegisterActivity.this,
-                        "Tạo hồ sơ thành công. Vui lòng đăng nhập để tiếp tục.",
-                        Toast.LENGTH_LONG).show();
-                Ui.openAndClear(RegisterActivity.this, LoginActivity.class);
->>>>>>> Stashed changes
             }
 
             @Override
@@ -470,7 +439,6 @@ public class RegisterActivity extends Activity {
     }
 
     private void setLoading(boolean loading) {
-<<<<<<< Updated upstream
         registerLoading = loading;
         updateRegisterButtonState();
         registerButton.setText(loading ? "Đang tạo hồ sơ..." : "Tạo hồ sơ");
@@ -485,12 +453,6 @@ public class RegisterActivity extends Activity {
                         && !phoneExists);
     }
 
-=======
-        registerButton.setEnabled(!loading);
-        registerButton.setText(loading ? "Đang tạo hồ sơ..." : "Tạo hồ sơ");
-    }
-
->>>>>>> Stashed changes
     private void showMessage(String message) {
         resultText.setVisibility(View.VISIBLE);
         resultText.setText(message);

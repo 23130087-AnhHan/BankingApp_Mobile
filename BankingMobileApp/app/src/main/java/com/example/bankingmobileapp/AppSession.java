@@ -137,6 +137,12 @@ public final class AppSession {
         return !getAccountNumber(context).isEmpty();
     }
 
+    public static boolean isPaymentAccount(String type) {
+        if (type == null) return false;
+        String normalized = type.trim().toUpperCase();
+        return "PAYMENT_ACCOUNT".equals(normalized) || "SAVINGS_ACCOUNT".equals(normalized) || "SAVINGS".equals(normalized);
+    }
+
     public static void clearAccount(Context context) {
         prefs(context).edit()
                 .remove(ACCOUNT_ID)

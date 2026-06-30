@@ -121,7 +121,8 @@ public class MainActivity extends Activity {
 
         provisioningAccount = true;
         refreshButton.setEnabled(false);
-        AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
+        // Try SAVINGS_ACCOUNT as it's more standard if PAYMENT_ACCOUNT fails on backend
+        AccountRequest request = new AccountRequest("SAVINGS_ACCOUNT", BigDecimal.ZERO, userId);
         ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -162,10 +163,10 @@ public class MainActivity extends Activity {
     }
 
     private void saveAndRenderAccount(AccountResponse account) {
-        if (!isPaymentAccount(account)) {
+        if (account == null || !AppSession.isPaymentAccount(account.accountType)) {
             AppSession.clearAccount(this);
             statusText.setText("Cần tài khoản thanh toán");
-            accountNumberText.setText("Tài khoản hiện tại không phải tài khoản thanh toán");
+            accountNumberText.setText(account == null ? "Không tìm thấy tài khoản" : "Tài khoản hiện tại không phải tài khoản thanh toán");
             balanceText.setText("0 VND");
             return;
         }
@@ -187,7 +188,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean isPaymentAccount(AccountResponse account) {
-        return account != null && "PAYMENT_ACCOUNT".equalsIgnoreCase(account.accountType);
+        return account != null && AppSession.isPaymentAccount(account.accountType);
     }
 
     private Long currentUserId() {

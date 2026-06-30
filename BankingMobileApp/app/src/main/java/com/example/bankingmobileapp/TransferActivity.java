@@ -160,7 +160,7 @@ public class TransferActivity extends Activity {
         }
         if (!isSessionPaymentAccount()) {
             sourceAccountText.setText("Tài khoản nguồn hiện tại không phải tài khoản thanh toán.");
-            resultText.setText("Chuyển tiền chỉ dùng PAYMENT_ACCOUNT. Hãy làm mới dashboard để đồng bộ tài khoản chuẩn.");
+            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán chuẩn. Hãy làm mới dashboard để đồng bộ tài khoản.");
             setTransferEnabled(false);
             return;
         }
@@ -352,7 +352,7 @@ public class TransferActivity extends Activity {
     }
 
     private boolean isSessionPaymentAccount() {
-        return "PAYMENT_ACCOUNT".equalsIgnoreCase(AppSession.getAccountType(this));
+        return AppSession.isPaymentAccount(AppSession.getAccountType(this));
     }
 
     private String digitsOnly(String value) {
