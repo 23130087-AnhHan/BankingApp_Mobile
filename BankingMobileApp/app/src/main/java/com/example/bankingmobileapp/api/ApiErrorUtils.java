@@ -29,23 +29,23 @@ public final class ApiErrorUtils {
         switch (response.code()) {
             case 400:
                 return "Dữ liệu gửi lên không hợp lệ. Vui lòng kiểm tra lại.";
-            case 404:
-                return "Không tìm thấy dữ liệu yêu cầu.";
-            case 409:
-                return "Dữ liệu đã tồn tại hoặc đang bị trùng.";
             case 401:
             case 403:
                 return "Bạn không có quyền thực hiện thao tác này.";
+            case 404:
+                return "Không tìm thấy tài khoản hoặc dữ liệu yêu cầu.";
+            case 406:
+                return "Giao dịch không đáp ứng điều kiện xử lý.";
+            case 409:
+                return "Dữ liệu đã tồn tại hoặc đang bị trùng.";
             case 502:
             case 503:
             case 504:
                 return "Dịch vụ ngân hàng đang tạm thời gián đoạn. Vui lòng thử lại.";
             default:
                 return response.code() >= 500
-                        ? (fallback == null || fallback.trim().isEmpty()
-                                ? "Máy chủ đang gặp lỗi. Vui lòng thử lại sau."
-                                : fallback)
-                        : fallback;
+                        ? firstNonEmpty(fallback, "Máy chủ đang gặp lỗi. Vui lòng thử lại sau.")
+                        : firstNonEmpty(fallback, "Không thể xử lý yêu cầu.");
         }
     }
 
@@ -102,21 +102,36 @@ public final class ApiErrorUtils {
         String normalized = serverMessage.toLowerCase(Locale.ROOT);
         if (normalized.contains("insufficient")
                 || normalized.contains("minimum balance")
-                || normalized.contains("amount is not available")) {
+                || normalized.contains("amount is not available")
+                || normalized.contains("số dư")) {
             return "Số dư không đủ để thực hiện giao dịch.";
         }
-        if (normalized.contains("inactive")
-                || normalized.contains("closed")
+        if (normalized.contains("source account is not active")
+                || normalized.contains("account is status is :pending")
                 || normalized.contains("status is pending")
-                || normalized.contains("status is :pending")) {
-            return "Tài khoản chưa kích hoạt hoặc đã đóng.";
+                || normalized.contains("inactive")
+                || normalized.contains("closed")) {
+            return "Tài khoản nguồn chưa hoạt động hoặc đã đóng.";
+        }
+        if (normalized.contains("destination account is not active")) {
+            return "Tài khoản nhận chưa hoạt động hoặc đã đóng.";
         }
         if (normalized.contains("not found") || normalized.contains("not on the server")) {
             return "Không tìm thấy tài khoản hoặc dữ liệu yêu cầu.";
+        }
+        if (normalized.contains("same")
+                || normalized.contains("must be different")
+                || normalized.contains("greater than zero")
+                || normalized.contains("missing required")) {
+            return "Thông tin chuyển tiền không hợp lệ. Vui lòng kiểm tra lại.";
         }
         if (normalized.contains("already exists") || normalized.contains("already registered")) {
             return "Thông tin này đã được đăng ký trước đó.";
         }
         return "";
+    }
+
+    private static String firstNonEmpty(String preferred, String fallback) {
+        return preferred == null || preferred.trim().isEmpty() ? fallback : preferred;
     }
 }

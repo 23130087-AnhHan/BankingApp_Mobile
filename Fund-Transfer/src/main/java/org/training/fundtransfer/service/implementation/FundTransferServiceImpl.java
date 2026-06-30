@@ -54,6 +54,8 @@ public class FundTransferServiceImpl implements FundTransferService {
     @Override
     public FundTransferResponse fundTransfer(FundTransferRequest fundTransferRequest) {
 
+        validateRequest(fundTransferRequest);
+
         Account fromAccount;
         ResponseEntity<Account> response = accountService.readByAccountNumber(fundTransferRequest.getFromAccount());
         if(Objects.isNull(response.getBody())){
@@ -61,14 +63,7 @@ public class FundTransferServiceImpl implements FundTransferService {
             throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
         }
         fromAccount = response.getBody();
-        if (!fromAccount.getAccountStatus().equals("ACTIVE")) {
-            log.error("account status is pending or inactive, please update the account status");
-            throw new AccountUpdateException("account is status is :pending", GlobalErrorCode.NOT_ACCEPTABLE);
-        }
-        if (fromAccount.getAvailableBalance().compareTo(fundTransferRequest.getAmount()) < 0) {
-            log.error("required amount to transfer is not available");
-            throw new InsufficientBalance("requested amount is not available", GlobalErrorCode.NOT_ACCEPTABLE);
-        }
+
         Account toAccount;
         response = accountService.readByAccountNumber(fundTransferRequest.getToAccount());
         if(Objects.isNull(response.getBody())) {
@@ -76,6 +71,9 @@ public class FundTransferServiceImpl implements FundTransferService {
             throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
         }
         toAccount = response.getBody();
+
+        validateAccounts(fromAccount, toAccount, fundTransferRequest.getAmount());
+
         String transactionId = internalTransfer(fromAccount, toAccount, fundTransferRequest.getAmount());
         FundTransfer fundTransfer = FundTransfer.builder()
                 .transferType(TransferType.INTERNAL)
@@ -89,6 +87,63 @@ public class FundTransferServiceImpl implements FundTransferService {
         return FundTransferResponse.builder()
                 .transactionId(transactionId)
                 .message("Fund transfer was successful").build();
+    }
+
+    private void validateRequest(FundTransferRequest request) {
+        if (Objects.isNull(request)
+                || isBlank(request.getFromAccount())
+                || isBlank(request.getToAccount())
+                || Objects.isNull(request.getAmount())) {
+            throw new AccountUpdateException("Transfer request is missing required information", GlobalErrorCode.BAD_REQUEST);
+        }
+        if (request.getFromAccount().trim().equals(request.getToAccount().trim())) {
+            throw new AccountUpdateException("Source and destination accounts must be different", GlobalErrorCode.BAD_REQUEST);
+        }
+        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new AccountUpdateException("Transfer amount must be greater than zero", GlobalErrorCode.BAD_REQUEST);
+        }
+    }
+
+    private void validateAccounts(Account fromAccount, Account toAccount, BigDecimal amount) {
+        if (!isActive(fromAccount)) {
+            log.error("source account is not active");
+            throw new AccountUpdateException("Source account is not active. Please activate the account before transferring money.", GlobalErrorCode.NOT_ACCEPTABLE);
+        }
+        if (!isActive(toAccount)) {
+            log.error("destination account is not active");
+            throw new AccountUpdateException("Destination account is not active. Please choose an active receiving account.", GlobalErrorCode.NOT_ACCEPTABLE);
+        }
+        if (!isPaymentAccount(fromAccount)) {
+            log.error("source account is not a payment account");
+            throw new AccountUpdateException("Source account must be a payment account.", GlobalErrorCode.NOT_ACCEPTABLE);
+        }
+        if (!isPaymentAccount(toAccount)) {
+            log.error("destination account is not a payment account");
+            throw new AccountUpdateException("Destination account must be a payment account.", GlobalErrorCode.NOT_ACCEPTABLE);
+        }
+        if (Objects.isNull(fromAccount.getAvailableBalance())
+                || fromAccount.getAvailableBalance().compareTo(amount) < 0) {
+            log.error("required amount to transfer is not available");
+            throw new InsufficientBalance("Insufficient balance to complete this transfer.", GlobalErrorCode.NOT_ACCEPTABLE);
+        }
+    }
+
+    private boolean isActive(Account account) {
+        return !Objects.isNull(account)
+                && !Objects.isNull(account.getAccountStatus())
+                && "ACTIVE".equalsIgnoreCase(account.getAccountStatus().trim());
+    }
+
+    private boolean isPaymentAccount(Account account) {
+        if (Objects.isNull(account) || Objects.isNull(account.getAccountType())) {
+            return false;
+        }
+        String accountType = account.getAccountType().trim();
+        return "PAYMENT_ACCOUNT".equalsIgnoreCase(accountType);
+    }
+
+    private boolean isBlank(String value) {
+        return Objects.isNull(value) || value.trim().isEmpty();
     }
 
     /**

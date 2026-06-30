@@ -7,7 +7,6 @@ import com.example.bankingmobileapp.model.ApiResponse;
 import com.example.bankingmobileapp.model.CreateUserRequest;
 import com.example.bankingmobileapp.model.FundTransferRequest;
 import com.example.bankingmobileapp.model.FundTransferResponse;
-import com.example.bankingmobileapp.model.TransactionRequest;
 import com.example.bankingmobileapp.model.TransactionResponse;
 import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.LoginRequest;
@@ -66,9 +65,6 @@ public interface BankingApi {
 
     @PATCH("accounts")
     Call<ApiResponse> activateAccount(@Query("accountNumber") String accountNumber, @Body AccountStatusRequest body);
-
-    @POST("transactions")
-    Call<ApiResponse> createTransaction(@Body TransactionRequest body);
 
     @GET("transactions")
     Call<List<TransactionResponse>> getTransactions(@Query("accountId") String accountId);

@@ -15,10 +15,12 @@ public final class AppSession {
     private static final String REMEMBERED_DISPLAY_NAME = "remembered_display_name";
     private static final String ACCOUNT_ID = "account_id";
     private static final String ACCOUNT_NUMBER = "account_number";
+    private static final String ACCOUNT_TYPE = "account_type";
     private static final String ACCOUNT_BALANCE = "account_balance";
     private static final String AUTH_TOKEN = "auth_token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String TOKEN_EXPIRES_AT = "token_expires_at";
+    private static final String PAYMENT_PIN = "payment_pin";
 
     private AppSession() {
     }
@@ -94,11 +96,11 @@ public final class AppSession {
         String current = getAccountNumber(context);
         SharedPreferences.Editor editor = prefs(context).edit();
         if (normalized.isEmpty()) {
-            editor.remove(ACCOUNT_NUMBER).remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE).apply();
+            editor.remove(ACCOUNT_NUMBER).remove(ACCOUNT_ID).remove(ACCOUNT_TYPE).remove(ACCOUNT_BALANCE).apply();
             return;
         }
         if (!normalized.equals(current)) {
-            editor.remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE);
+            editor.remove(ACCOUNT_ID).remove(ACCOUNT_TYPE).remove(ACCOUNT_BALANCE);
         }
         editor.putString(ACCOUNT_NUMBER, normalized).apply();
     }
@@ -113,6 +115,14 @@ public final class AppSession {
 
     public static String getAccountId(Context context) {
         return getString(context, ACCOUNT_ID);
+    }
+
+    public static void saveAccountType(Context context, String accountType) {
+        putOrRemove(context, ACCOUNT_TYPE, accountType);
+    }
+
+    public static String getAccountType(Context context) {
+        return getString(context, ACCOUNT_TYPE);
     }
 
     public static void saveAccountBalance(Context context, String balance) {
@@ -131,6 +141,7 @@ public final class AppSession {
         prefs(context).edit()
                 .remove(ACCOUNT_ID)
                 .remove(ACCOUNT_NUMBER)
+                .remove(ACCOUNT_TYPE)
                 .remove(ACCOUNT_BALANCE)
                 .apply();
     }
@@ -173,6 +184,23 @@ public final class AppSession {
         return isLoggedIn(context) && !getAuthToken(context).isEmpty() && !getRefreshToken(context).isEmpty();
     }
 
+    public static void savePaymentPin(Context context, String pin) {
+        SecureTokenStore.put(prefs(context), paymentPinKey(context), pin);
+    }
+
+    public static boolean hasPaymentPin(Context context) {
+        return !SecureTokenStore.get(prefs(context), paymentPinKey(context)).isEmpty();
+    }
+
+    public static boolean verifyPaymentPin(Context context, String pin) {
+        String savedPin = SecureTokenStore.get(prefs(context), paymentPinKey(context));
+        return !savedPin.isEmpty() && savedPin.equals(normalize(pin));
+    }
+
+    public static void clearPaymentPin(Context context) {
+        prefs(context).edit().remove(paymentPinKey(context)).remove(PAYMENT_PIN).apply();
+    }
+
     public static void saveAccount(Context context, AccountResponse account) {
         if (account == null) {
             return;
@@ -184,6 +212,7 @@ public final class AppSession {
             saveAccountId(context, String.valueOf(account.accountId));
         }
         saveAccountNumber(context, account.accountNumber);
+        saveAccountType(context, account.accountType);
         if (account.availableBalance != null) {
             saveAccountBalance(context, account.availableBalance.toPlainString());
         }
@@ -228,5 +257,10 @@ public final class AppSession {
 
     private static String normalize(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private static String paymentPinKey(Context context) {
+        String userId = getUserId(context);
+        return PAYMENT_PIN + "_" + (userId.isEmpty() ? "anonymous" : userId);
     }
 }
