@@ -7,201 +7,47 @@
     android:fillViewport="true"
     android:overScrollMode="never">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
 
-        <TextView
-            style="@style/MutedText"
-            android:text="Chuyển tiền" />
-
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Tạo giao dịch" />
-
+        <TextView style="@style/MutedText" android:text="Chuyển tiền nội bộ" />
+        <TextView style="@style/PageTitle" android:layout_marginTop="2dp" android:text="Chuyển tiền" />
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Nhập thông tin người nhận, kiểm tra lại giao dịch và xác thực bằng PIN thanh toán." />
+            android:text="Kiểm tra kỹ thông tin người nhận trước khi xác nhận." />
 
-        <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
+        <LinearLayout style="@style/Panel" android:orientation="vertical">
+            <TextView style="@style/SectionTitle" android:text="Thông tin chuyển tiền" />
 
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Tài khoản nguồn" />
+            <TextView style="@style/FieldLabel" android:text="Từ tài khoản" />
+            <EditText android:id="@+id/fromAccountInput" style="@style/Input" android:hint="Số tài khoản nguồn" android:inputType="number" />
 
-            <TextView
-                android:id="@+id/sourceAccountText"
-                style="@style/ResultBox"
-                android:layout_marginTop="0dp"
-                android:text="Đang kiểm tra tài khoản nguồn..." />
-        </LinearLayout>
+            <TextView style="@style/FieldLabel" android:text="Đến tài khoản" />
+            <EditText android:id="@+id/toAccountInput" style="@style/Input" android:hint="Số tài khoản người nhận" android:inputType="number" />
 
-        <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
+            <TextView style="@style/FieldLabel" android:text="Số tiền" />
+            <EditText android:id="@+id/amountInput" style="@style/AmountInput" android:hint="0 ₫" android:inputType="numberDecimal" />
 
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Người nhận" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Ngân hàng nhận" />
-
-            <Spinner
-                android:id="@+id/bankSpinner"
-                style="@style/Input"
-                android:spinnerMode="dropdown" />
-
-            <Button
-                android:id="@+id/selectBeneficiaryButton"
-                style="@style/SecondaryButton"
-                android:text="Chọn người thụ hưởng" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Số tài khoản nhận" />
-
-            <EditText
-                android:id="@+id/toAccountInput"
-                style="@style/Input"
-                android:hint="Nhập số tài khoản người nhận"
-                android:inputType="number" />
-
-            <TextView
-                android:id="@+id/recipientNameText"
-                style="@style/ResultBox"
-                android:layout_marginTop="0dp"
-                android:minHeight="54dp"
-                android:text="Nhập số tài khoản để kiểm tra tên chủ tài khoản." />
-
-            <Button
-                android:id="@+id/saveBeneficiaryButton"
-                style="@style/SecondaryButton"
-                android:text="Lưu người nhận này" />
-        </LinearLayout>
-
-        <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Số tiền và nội dung" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Số tiền" />
-
-            <EditText
-                android:id="@+id/amountInput"
-                style="@style/AmountInput"
-                android:hint="0 đ"
-                android:inputType="number" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Nội dung" />
-
+            <TextView style="@style/FieldLabel" android:text="Nội dung chuyển tiền" />
             <EditText
                 android:id="@+id/transferNoteInput"
                 style="@style/Input"
-                android:hint="Ví dụ: Chuyen tien an trua"
+                android:hint="Nhập lời nhắn (tùy chọn)"
                 android:inputType="textCapSentences" />
+            <TextView
+                style="@style/HelperText"
+                android:text="Lời nhắn dùng để kiểm tra trước khi gửi; API hiện tại chưa lưu trường này." />
 
-            <Button
-                android:id="@+id/transferButton"
-                style="@style/PrimaryButton"
-                android:text="Tiếp tục" />
+            <Button android:id="@+id/transferButton" style="@style/PrimaryButton" android:text="Xác nhận chuyển tiền" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/confirmationPanel"
-            style="@style/Panel"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Xác nhận giao dịch" />
-
-            <TextView
-                android:id="@+id/confirmSummaryText"
-                style="@style/ResultBox"
-                android:layout_marginTop="0dp"
-                android:text="Thông tin giao dịch sẽ hiển thị tại đây." />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:layout_marginTop="14dp"
-                android:text="Phương thức xác thực" />
-
-            <RadioGroup
-                android:id="@+id/authMethodGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <RadioButton
-                    android:id="@+id/pinOption"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:checked="true"
-                    android:text="Nhập mã PIN"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp" />
-
-                <RadioButton
-                    android:id="@+id/otpEmailOption"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:enabled="true"
-                    android:text="OTP gửi về email"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp" />
-            </RadioGroup>
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Mã PIN" />
-
-            <EditText
-                android:id="@+id/pinInput"
-                style="@style/Input"
-                android:hint="Nhập PIN 6 số"
-                android:inputType="numberPassword" />
-
-            <Button
-                android:id="@+id/sendOtpButton"
-                style="@style/SecondaryButton"
-                android:text="Gửi OTP thanh toán" />
-
-            <EditText
-                android:id="@+id/otpInput"
-                style="@style/Input"
-                android:hint="Nhập OTP 6 số"
-                android:inputType="numberPassword" />
-
-            <Button
-                android:id="@+id/managePinButton"
-                style="@style/SecondaryButton"
-                android:text="Thiết lập PIN" />
-
-            <Button
-                android:id="@+id/submitButton"
-                style="@style/PrimaryButton"
-                android:text="Xác nhận chuyển tiền" />
-
-            <Button
-                android:id="@+id/editButton"
-                style="@style/TextButton"
-                android:text="Sửa thông tin" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/resultText"
-            style="@style/ResultBox"
-            android:text="Biên lai chuyển tiền sẽ hiển thị tại đây." />
+        <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Biên nhận chuyển tiền sẽ hiển thị tại đây." />
     </LinearLayout>
 </ScrollView>

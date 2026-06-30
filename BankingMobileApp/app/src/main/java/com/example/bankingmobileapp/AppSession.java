@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.bankingmobileapp.model.AccountResponse;
-import com.example.bankingmobileapp.model.AuthResponse;
 
 public final class AppSession {
     private static final String PREFS = "banking_demo_session";
@@ -15,12 +14,8 @@ public final class AppSession {
     private static final String REMEMBERED_DISPLAY_NAME = "remembered_display_name";
     private static final String ACCOUNT_ID = "account_id";
     private static final String ACCOUNT_NUMBER = "account_number";
-    private static final String ACCOUNT_TYPE = "account_type";
     private static final String ACCOUNT_BALANCE = "account_balance";
     private static final String AUTH_TOKEN = "auth_token";
-    private static final String REFRESH_TOKEN = "refresh_token";
-    private static final String TOKEN_EXPIRES_AT = "token_expires_at";
-    private static final String PAYMENT_PIN = "payment_pin";
 
     private AppSession() {
     }
@@ -96,11 +91,11 @@ public final class AppSession {
         String current = getAccountNumber(context);
         SharedPreferences.Editor editor = prefs(context).edit();
         if (normalized.isEmpty()) {
-            editor.remove(ACCOUNT_NUMBER).remove(ACCOUNT_ID).remove(ACCOUNT_TYPE).remove(ACCOUNT_BALANCE).apply();
+            editor.remove(ACCOUNT_NUMBER).remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE).apply();
             return;
         }
         if (!normalized.equals(current)) {
-            editor.remove(ACCOUNT_ID).remove(ACCOUNT_TYPE).remove(ACCOUNT_BALANCE);
+            editor.remove(ACCOUNT_ID).remove(ACCOUNT_BALANCE);
         }
         editor.putString(ACCOUNT_NUMBER, normalized).apply();
     }
@@ -117,14 +112,6 @@ public final class AppSession {
         return getString(context, ACCOUNT_ID);
     }
 
-    public static void saveAccountType(Context context, String accountType) {
-        putOrRemove(context, ACCOUNT_TYPE, accountType);
-    }
-
-    public static String getAccountType(Context context) {
-        return getString(context, ACCOUNT_TYPE);
-    }
-
     public static void saveAccountBalance(Context context, String balance) {
         putOrRemove(context, ACCOUNT_BALANCE, balance);
     }
@@ -137,74 +124,24 @@ public final class AppSession {
         return !getAccountNumber(context).isEmpty();
     }
 
-    public static boolean isPaymentAccount(String type) {
-        if (type == null) return false;
-        String normalized = type.trim().toUpperCase();
-        return "PAYMENT_ACCOUNT".equals(normalized) || "SAVINGS_ACCOUNT".equals(normalized) || "SAVINGS".equals(normalized);
-    }
-
     public static void clearAccount(Context context) {
         prefs(context).edit()
                 .remove(ACCOUNT_ID)
                 .remove(ACCOUNT_NUMBER)
-                .remove(ACCOUNT_TYPE)
                 .remove(ACCOUNT_BALANCE)
                 .apply();
     }
 
     public static void saveAuthToken(Context context, String token) {
-        SecureTokenStore.put(prefs(context), AUTH_TOKEN, token);
+        putOrRemove(context, AUTH_TOKEN, token);
     }
 
     public static String getAuthToken(Context context) {
-        return SecureTokenStore.get(prefs(context), AUTH_TOKEN);
+        return getString(context, AUTH_TOKEN);
     }
 
     public static void clearAuthToken(Context context) {
-        prefs(context).edit().remove(AUTH_TOKEN).remove(REFRESH_TOKEN).remove(TOKEN_EXPIRES_AT).apply();
-    }
-
-    public static String getRefreshToken(Context context) {
-        return SecureTokenStore.get(prefs(context), REFRESH_TOKEN);
-    }
-
-    public static void saveAuth(Context context, AuthResponse auth) {
-        if (auth == null || auth.accessToken == null || auth.accessToken.trim().isEmpty()) return;
-        saveAuthToken(context, auth.accessToken);
-        SecureTokenStore.put(prefs(context), REFRESH_TOKEN, auth.refreshToken);
-        long expiresIn = auth.expiresIn == null ? 0L : auth.expiresIn;
-        prefs(context).edit().putLong(TOKEN_EXPIRES_AT,
-                System.currentTimeMillis() + Math.max(0L, expiresIn - 30L) * 1000L).apply();
-        if (auth.userId != null) {
-            String nextUserId = String.valueOf(auth.userId);
-            if (!nextUserId.equals(getUserId(context))) {
-                clearAccount(context);
-            }
-            saveUserId(context, nextUserId);
-        }
-        saveUserEmail(context, auth.email);
-        saveRememberedUser(context, auth.userId == null ? "" : String.valueOf(auth.userId), auth.displayName);
-    }
-
-    public static boolean hasValidSession(Context context) {
-        return isLoggedIn(context) && !getAuthToken(context).isEmpty() && !getRefreshToken(context).isEmpty();
-    }
-
-    public static void savePaymentPin(Context context, String pin) {
-        SecureTokenStore.put(prefs(context), paymentPinKey(context), pin);
-    }
-
-    public static boolean hasPaymentPin(Context context) {
-        return !SecureTokenStore.get(prefs(context), paymentPinKey(context)).isEmpty();
-    }
-
-    public static boolean verifyPaymentPin(Context context, String pin) {
-        String savedPin = SecureTokenStore.get(prefs(context), paymentPinKey(context));
-        return !savedPin.isEmpty() && savedPin.equals(normalize(pin));
-    }
-
-    public static void clearPaymentPin(Context context) {
-        prefs(context).edit().remove(paymentPinKey(context)).remove(PAYMENT_PIN).apply();
+        prefs(context).edit().remove(AUTH_TOKEN).apply();
     }
 
     public static void saveAccount(Context context, AccountResponse account) {
@@ -218,7 +155,6 @@ public final class AppSession {
             saveAccountId(context, String.valueOf(account.accountId));
         }
         saveAccountNumber(context, account.accountNumber);
-        saveAccountType(context, account.accountType);
         if (account.availableBalance != null) {
             saveAccountBalance(context, account.availableBalance.toPlainString());
         }
@@ -228,8 +164,6 @@ public final class AppSession {
         prefs(context).edit()
                 .putBoolean(IS_LOGGED_IN, false)
                 .remove(AUTH_TOKEN)
-                .remove(REFRESH_TOKEN)
-                .remove(TOKEN_EXPIRES_AT)
                 .apply();
     }
 
@@ -263,10 +197,5 @@ public final class AppSession {
 
     private static String normalize(String value) {
         return value == null ? "" : value.trim();
-    }
-
-    private static String paymentPinKey(Context context) {
-        String userId = getUserId(context);
-        return PAYMENT_PIN + "_" + (userId.isEmpty() ? "anonymous" : userId);
     }
 }

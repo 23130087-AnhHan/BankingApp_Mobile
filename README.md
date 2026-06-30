@@ -27,6 +27,10 @@
 
 <h2>🚀 Microservices</h2>
 
+- **🌐 Service Registry (Eureka):** Acts as a service discovery server, allowing microservices to find and communicate with each other dynamically.
+
+- **🛡️ API Gateway:** The central entry point for all client requests. It handles routing to appropriate microservices and manages security (authentication and authorization).
+
 - **👤 User Service:** The user microservice provides functionalities for user management. This includes user registration, updating user details, viewing user information, and accessing all accounts associated with the user. Additionally, this microservice handles user authentication and authorization processes.
 
 - **💼 Account Service:** The account microservice manages account-related APIs. It enables users to modify account details, view all accounts linked to the user profile, access transaction histories for each account, and supports the account closure process.
@@ -35,17 +39,49 @@
 
 - **💳 Transactions Service:** The transaction service offers a range of transaction-related services. Users can view transactions based on specific accounts or transaction reference IDs, as well as make deposits or withdrawals from their accounts.
 
+- **🔢 Sequence Generator Service:** Responsible for generating unique sequences for various entities across the banking application.
+
 <h2>🚀 Getting Started</h2>
 
-To get started, follow these steps to run the application on your local application:
+To get started, follow these steps to run the application on your local system:
 
-- Make sure you have Java 17 installed on your system. You can download it from the official Oracle website.
-- Select an Integrated Development Environment (IDE) such as Eclipse, Spring Tool Suite, or IntelliJ IDEA. Configure the IDE according to your preferences.
-- Clone the repository containing the microservices onto your local system using Git. Navigate to the directory where you have cloned the repository.
-- Navigate to each microservice directory within the cloned repository and run the application. You can do this by using your IDE or running specific commands depending on the build tool used (e.g., Maven or Gradle).
-- Set up Keycloak from the official Server ZIP on Windows; Docker is not required. See [RUN_KEYCLOAK_WINDOWS.md](./RUN_KEYCLOAK_WINDOWS.md).
-- `User-Service` requires a real Keycloak server at `http://localhost:8571` and the `KEYCLOAK_CLIENT_SECRET` environment variable; there is no disable flag, bypass, or fallback secret. Create realm `banking-service`, confidential client `banking-service-api-client`, enable its service account, and grant the service account user-management permissions. Without the variable User-Service will not start; if Keycloak/client/roles are unavailable or invalid, registration and authentication fail. See [RUN_LOCAL.md](./RUN_LOCAL.md) or run `./run-user-service.ps1` from PowerShell.
-- Some microservices and APIs may depend on others being up and running. Ensure that all necessary microservices and APIs are up and functioning correctly to avoid any issues in the application workflow.
+### 1. Prerequisites
+- **Java 17** installed.
+- **Maven** installed.
+- **WampServer** (đã chạy MySQL trên port 3306).
+- **Keycloak** (bạn cần tải và chạy thủ công hoặc dùng Docker nếu muốn).
+
+### 2. Khởi tạo Database (WampServer)
+Bạn hãy mở **phpMyAdmin** hoặc dùng tool SQL (như Navicat, DBeaver) và tạo các database sau:
+- `user_service`
+- `account_service`
+- `transaction_service`
+- `fund_transfer_service`
+- `sequence_generator`
+
+*Lưu ý: Mặc định code đang để user là `root` và password là `123456`. Nếu Wamp của bạn để trống password, hãy cập nhật trong các file `application.yml` của từng service.*
+
+### 3. Chạy các Microservices
+Bạn có thể dùng file script PowerShell tôi đã tạo để chạy tất cả service theo đúng thứ tự:
+
+```powershell
+./run-services.ps1
+```
+
+Script này sẽ:
+1. Chạy **Service Registry** (Cổng 8761) và đợi nó sẵn sàng.
+2. Chạy **API Gateway** (Cổng 8080).
+3. Chạy tất cả các service còn lại trong các cửa sổ riêng biệt.
+
+<h3>💡 PowerShell Shortcut</h3>
+
+If you are on Windows, you can use this PowerShell "trick" to start all microservices at once in separate windows. Run this command in the project root:
+
+```powershell
+Get-ChildItem -Filter pom.xml -Recurse | ForEach-Object { Start-Process powershell -ArgumentList "cd $($_.DirectoryName); mvn spring-boot:run" }
+```
+
+Alternatively, you can run the provided `run-services.ps1` script (if available) which handles the startup order (starting Service Registry first).
 
 <h2>📖 Documentation</h2>
 <h3>📂 Microservices Documentation</h3>
@@ -56,6 +92,9 @@ For detailed information about each microservice, refer to their respective READ
 - [💼 Account Service](./Account-Service/README.md)
 - [💸 Fund Transfer Service](./Fund-Transfer/README.md)
 - [💳 Transactions Service](./Transaction-Service/README.md)
+- [🔢 Sequence Generator Service](./Sequence-Generator/README.md)
+- [🌐 Service Registry](./Service-Registry/README.md)
+- [🛡️ API Gateway](./API-Gateway/README.md)
 
 <h3>📖 API Documentation</h3>
 

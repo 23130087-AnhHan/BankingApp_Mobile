@@ -120,7 +120,7 @@ public class TransactionActivity extends Activity {
                     return;
                 }
                 AppSession.saveAccountBalance(TransactionActivity.this, response.body());
-                resultText.setText(receipt + "\n\nSố dư mới: " + CurrencyUtils.formatVnd(response.body()));
+                resultText.setText(receipt + "\n\nSố dư mới: " + response.body() + " ₫");
             }
 
             @Override

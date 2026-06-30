@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: banking-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - banking-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: banking-keycloak
+    command: start-dev --http-port 8571
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8571:8571"
+    networks:
+      - banking-network
+
+networks:
+  banking-network:
+    driver: bridge

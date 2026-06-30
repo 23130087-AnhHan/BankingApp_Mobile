@@ -1,0 +1,45 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.bankingmobileapp-mergeDebugResources-2:/values/values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Asus\\AndroidStudioProjects\\BankingApp_New_Clone\\BankingMobileApp\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "77,89,1,26,59,51,9,37,66,47,17",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3382,3949,17,1155,2596,2265,415,1674,2875,2130,760",
+                        "endLines": "87,91,7,35,64,57,15,45,75,49,24",
+                        "endColumns": "12,12,12,12,12,12,12,12,12,12,12",
+                        "endOffsets": "3941,4075,407,1666,2867,2588,752,2122,3374,2257,1147"
+                    },
+                    "to": {
+                        "startLines": "3,14,17,24,34,40,47,54,63,73,76",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,659,788,1177,1684,1955,2277,2613,3058,3553,3683",
+                        "endLines": "13,16,23,33,39,46,53,62,72,75,83",
+                        "endColumns": "12,12,12,12,12,12,12,12,12,12,12",
+                        "endOffsets": "654,783,1172,1679,1950,2272,2608,3053,3548,3678,4063"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Asus\\AndroidStudioProjects\\BankingApp_New_Clone\\BankingMobileApp\\app\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "17",
+                        "endColumns": "49",
+                        "endOffsets": "62"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "49",
+                        "endOffsets": "100"
+                    }
+                }
+            ]
+        }
+    ]
+}

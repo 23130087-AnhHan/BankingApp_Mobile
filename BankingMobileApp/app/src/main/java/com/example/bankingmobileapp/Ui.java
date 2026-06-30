@@ -2,9 +2,6 @@ package com.example.bankingmobileapp;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.text.method.PasswordTransformationMethod;
-import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -33,33 +30,6 @@ public final class Ui {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivity(intent);
         activity.finish();
-    }
-
-    public static void configurePasswordVisibility(EditText input) {
-        input.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        input.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                0, 0, R.drawable.ic_visibility_off, 0);
-        input.setOnTouchListener((view, event) -> {
-            if (event.getAction() != MotionEvent.ACTION_UP
-                    || event.getX() < input.getWidth() - input.getTotalPaddingRight()) {
-                return false;
-            }
-
-            int selection = Math.max(0, input.getSelectionStart());
-            Typeface typeface = input.getTypeface();
-            boolean currentlyVisible = input.getTransformationMethod() == null;
-            input.setTransformationMethod(currentlyVisible
-                    ? PasswordTransformationMethod.getInstance()
-                    : null);
-            input.setTypeface(typeface);
-            input.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    0, 0,
-                    currentlyVisible ? R.drawable.ic_visibility_off : R.drawable.ic_visibility,
-                    0);
-            input.setSelection(Math.min(selection, input.length()));
-            view.performClick();
-            return true;
-        });
     }
 
     public static <T> void runCall(String action, TextView resultView, Call<T> call) {

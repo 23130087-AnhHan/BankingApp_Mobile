@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.math.BigDecimal;
 
 public class TransactionRequest {
-    @SerializedName("accountNumber")
-    public String accountNumber;
+    @SerializedName("accountId")
+    public String accountId;
     @SerializedName("transactionType")
     public String transactionType;
     @SerializedName("amount")
@@ -14,8 +14,8 @@ public class TransactionRequest {
     @SerializedName("description")
     public String description;
 
-    public TransactionRequest(String accountNumber, String transactionType, BigDecimal amount, String description) {
-        this.accountNumber = accountNumber;
+    public TransactionRequest(String accountId, String transactionType, BigDecimal amount, String description) {
+        this.accountId = accountId;
         this.transactionType = transactionType;
         this.amount = amount;
         this.description = description;

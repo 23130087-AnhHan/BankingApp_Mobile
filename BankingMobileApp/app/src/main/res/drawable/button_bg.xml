@@ -1,9 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:angle="0"
-        android:endColor="@color/bank_blue_dark"
-        android:startColor="@color/bank_blue" />
-    <corners android:radius="8dp" />
+    <solid android:color="@color/bank_blue" />
+    <corners android:radius="14dp" />
     <padding
         android:bottom="10dp"
         android:left="12dp"
