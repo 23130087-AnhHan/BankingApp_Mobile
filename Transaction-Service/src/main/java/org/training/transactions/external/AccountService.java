@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.training.transactions.configuration.FeignClientConfiguration;
 import org.training.transactions.model.external.Account;
+import org.training.transactions.model.external.AccountRecipient;
 import org.training.transactions.model.response.Response;
 
 @FeignClient(name = "account-service", configuration = FeignClientConfiguration.class)
@@ -18,6 +19,9 @@ public interface AccountService {
      */
     @GetMapping("/accounts")
     ResponseEntity<Account> readByAccountNumber(@RequestParam String accountNumber);
+
+    @GetMapping("/accounts/recipient")
+    ResponseEntity<AccountRecipient> readRecipient(@RequestParam String accountNumber);
 
     /**
      * Update an account with the given account number.

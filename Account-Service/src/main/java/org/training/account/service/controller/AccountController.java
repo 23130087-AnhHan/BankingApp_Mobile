@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.training.account.service.model.dto.AccountDto;
+import org.training.account.service.model.dto.AccountRecipientDto;
 import org.training.account.service.model.dto.AccountStatusUpdate;
 import org.training.account.service.model.dto.response.Response;
 import org.training.account.service.model.dto.external.TransactionResponse;
@@ -53,6 +54,11 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<AccountDto> readByAccountNumber(@RequestParam String accountNumber) {
         return ResponseEntity.ok(accountService.readAccountByAccountNumber(accountNumber));
+    }
+
+    @GetMapping("/recipient")
+    public ResponseEntity<AccountRecipientDto> readRecipient(@RequestParam String accountNumber) {
+        return ResponseEntity.ok(accountService.readRecipientByAccountNumber(accountNumber));
     }
 
     /**

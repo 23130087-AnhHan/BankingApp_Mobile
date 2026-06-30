@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout style="@style/ScreenRoot">
+
+        <TextView
+            style="@style/MutedText"
+            android:text="Cập nhật tài khoản" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="Thông báo" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Theo dõi biến động số dư và trạng thái giao dịch gần đây." />
+
+        <TextView
+            android:id="@+id/notificationSummaryText"
+            style="@style/ResultBox"
+            android:text="Thông báo sẽ hiển thị tại đây." />
+
+        <Button
+            android:id="@+id/refreshNotificationButton"
+            style="@style/SecondaryButton"
+            android:text="Làm mới thông báo" />
+
+        <LinearLayout
+            android:id="@+id/notificationList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical" />
+    </LinearLayout>
+</ScrollView>

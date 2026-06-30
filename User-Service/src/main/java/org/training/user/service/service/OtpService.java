@@ -74,6 +74,43 @@ public class OtpService {
         return "Đã gửi lại OTP. Vui lòng kiểm tra email";
     }
 
+    @Transactional
+    public String sendPaymentOtp(String email) {
+        String normalizedEmail = requireValue(email, "Email khong duoc de trong")
+                .toLowerCase(Locale.ROOT);
+        User user = findByEmail(normalizedEmail);
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw badRequest("Email chua duoc xac thuc");
+        }
+
+        String otp = generateOtp();
+        user.setPaymentOtp(otp);
+        user.setPaymentOtpExpiredAt(generateExpiredTime());
+        userRepository.save(user);
+        emailService.sendPaymentOtp(user.getEmailId(), otp);
+        return "Da gui OTP thanh toan. Vui long kiem tra email";
+    }
+
+    @Transactional
+    public String verifyPaymentOtp(String email, String otp) {
+        String normalizedEmail = requireValue(email, "Email khong duoc de trong")
+                .toLowerCase(Locale.ROOT);
+        String normalizedOtp = requireValue(otp, "OTP khong duoc de trong");
+        User user = findByEmail(normalizedEmail);
+
+        if (isExpired(user.getPaymentOtpExpiredAt())) {
+            throw badRequest("OTP thanh toan da het han");
+        }
+        if (!normalizedOtp.equals(user.getPaymentOtp())) {
+            throw badRequest("OTP thanh toan khong chinh xac");
+        }
+
+        user.setPaymentOtp(null);
+        user.setPaymentOtpExpiredAt(null);
+        userRepository.save(user);
+        return "Xac thuc OTP thanh toan thanh cong";
+    }
+
     private User findByEmail(String email) {
         return userRepository.findByEmailIdIgnoreCase(email)
                 .orElseThrow(() -> badRequest("Email không tồn tại"));

@@ -1,6 +1,7 @@
 package org.training.account.service.service;
 
 import org.training.account.service.model.dto.AccountDto;
+import org.training.account.service.model.dto.AccountRecipientDto;
 import org.training.account.service.model.dto.AccountStatusUpdate;
 import org.training.account.service.model.dto.response.Response;
 import org.training.account.service.model.dto.external.TransactionResponse;
@@ -74,4 +75,6 @@ public interface AccountService {
      * @return The account information as an AccountDto object
      */
     AccountDto readAccountByUserId(Long userId);
+
+    AccountRecipientDto readRecipientByAccountNumber(String accountNumber);
 }
