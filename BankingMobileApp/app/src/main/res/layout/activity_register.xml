@@ -76,7 +76,8 @@
                 android:id="@+id/cccdInput"
                 style="@style/Input"
                 android:hint="Nhập 12 chữ số CCCD"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="12" />
 
             <TextView
                 style="@style/FieldLabel"
