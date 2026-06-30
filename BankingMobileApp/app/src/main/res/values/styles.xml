@@ -130,6 +130,27 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="RegisterFieldLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/nlu_green_deep</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="RegisterInput" parent="Input">
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginBottom">13dp</item>
+        <item name="android:background">@drawable/edit_text_bg</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">#83908A</item>
+    </style>
+
+    <style name="RegisterHelperText" parent="HelperText">
+        <item name="android:textColor">@color/danger</item>
+    </style>
+
     <style name="ResultBox">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
