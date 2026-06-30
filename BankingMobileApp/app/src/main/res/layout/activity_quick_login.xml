@@ -2,72 +2,192 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@drawable/bg_nlubank"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
     <LinearLayout
-        style="@style/ScreenRoot"
-        android:paddingTop="28dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <TextView
-            style="@style/BrandMark"
-            android:text="NLU" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/greetingText"
-            style="@style/PageTitle"
-            android:layout_marginTop="22dp"
-            android:text="Xin chào" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <TextView
-            style="@style/MutedText"
-            android:layout_marginTop="8dp"
-            android:text="Nhập mật khẩu để tiếp tục phiên NLU Banking đã ghi nhớ." />
+                <ImageView
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
+                    android:contentDescription="NLU Bank"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/nlu_logo" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="NLU Bank"
+                        android:textColor="@color/text_on_primary"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Ngân hàng số cho sinh viên NLU"
+                        android:textColor="@color/nlu_mint"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="57dp"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="Tiếng Việt"
+                android:padding="3dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_flag_vn" />
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="180dp" />
 
         <LinearLayout
-            style="@style/Panel"
-            android:layout_marginTop="22dp"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/welcome_glass_panel"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:padding="24dp">
 
             <TextView
-                style="@style/FieldLabel"
-                android:text="Mật khẩu" />
+                android:id="@+id/greetingText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Xin chào"
+                android:textColor="@color/text_on_primary"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Nhập mật khẩu để tiếp tục với NLU Bank"
+                android:textColor="@color/nlu_mint"
+                android:textSize="14sp" />
 
             <EditText
                 android:id="@+id/passwordInput"
-                style="@style/Input"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="22dp"
+                android:background="@android:color/transparent"
                 android:drawableEnd="@drawable/ic_visibility_off"
-                android:hint="Nhập mật khẩu"
-                android:inputType="textPassword" />
+                android:hint="Mật khẩu"
+                android:inputType="textPassword"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textColorHint="#90FFFFFF"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#55FFFFFF" />
 
             <Button
                 android:id="@+id/loginButton"
-                style="@style/PrimaryButton"
-                android:text="Đăng nhập" />
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/welcome_brand_badge"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
+                android:text="Đăng nhập"
+                android:textAllCaps="false"
+                android:textColor="@color/nlu_green_deep"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/biometricLoginButton"
-                style="@style/SecondaryButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
                 android:text="Đăng nhập bằng vân tay"
+                android:textAllCaps="false"
+                android:textColor="@color/nlu_mint"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/otherAccountButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="start|center_vertical"
+                    android:minWidth="0dp"
+                    android:padding="0dp"
+                    android:stateListAnimator="@null"
+                    android:text="Dùng tài khoản khác"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/forgotPasswordButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:minWidth="0dp"
+                    android:padding="0dp"
+                    android:stateListAnimator="@null"
+                    android:text="Quên mật khẩu?"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/resultText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/nlu_mint"
+                android:textSize="14sp"
                 android:visibility="gone" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/otherAccountButton"
-            style="@style/SecondaryButton"
-            android:text="Dùng tài khoản khác" />
-
-        <Button
-            android:id="@+id/forgotPasswordButton"
-            style="@style/TextButton"
-            android:text="Quên mật khẩu?" />
-
-        <TextView
-            android:id="@+id/resultText"
-            style="@style/ResultBox"
-            android:text=""
-            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>
