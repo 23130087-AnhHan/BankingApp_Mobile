@@ -124,7 +124,7 @@ public class TransferActivity extends Activity {
                     return;
                 }
                 AppSession.saveAccountBalance(TransferActivity.this, response.body());
-                resultText.setText(receipt + "\n\nSố dư còn lại: " + response.body() + " ₫");
+                resultText.setText(receipt + "\n\nSố dư còn lại: " + CurrencyUtils.formatVnd(response.body()));
             }
 
             @Override

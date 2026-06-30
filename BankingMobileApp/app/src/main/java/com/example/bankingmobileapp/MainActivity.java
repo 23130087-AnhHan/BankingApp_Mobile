@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
                     if (response.code() == 404 || response.code() == 400) {
                         ApiErrorUtils.httpError(TAG, response, "Không tìm thấy tài khoản.");
                         AppSession.clearAccount(MainActivity.this);
-                        balanceText.setText("0 đ");
+                        balanceText.setText("0 VND");
                         accountNumberText.setText("Bạn chưa có tài khoản");
                         statusText.setText("Chưa có tài khoản");
                     } else {
@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
         String accountNumber = AppSession.getAccountNumber(this);
         String balance = AppSession.getAccountBalance(this);
         accountNumberText.setText(accountNumber.isEmpty() ? "Bạn chưa có tài khoản" : "STK  •  " + accountNumber);
-        balanceText.setText((balance.isEmpty() ? "0" : balance) + " đ");
+        balanceText.setText(CurrencyUtils.formatVnd(balance));
         setupAccountButton.setVisibility(accountNumber.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -134,7 +134,7 @@ public class MainActivity extends Activity {
         String accountNumber = account.accountNumber == null ? "" : account.accountNumber.trim();
         if (accountNumber.isEmpty()) {
             accountNumberText.setText("Bạn chưa có tài khoản");
-            balanceText.setText("0 đ");
+            balanceText.setText("0 VND");
             statusText.setText("Thiếu số tài khoản");
             setupAccountButton.setVisibility(View.VISIBLE);
             return;
@@ -144,7 +144,7 @@ public class MainActivity extends Activity {
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
 
         accountNumberText.setText("STK  •  " + accountNumber);
-        balanceText.setText(balance + " đ");
+        balanceText.setText(CurrencyUtils.formatVnd(balance));
         statusText.setText(formatAccountStatus(account.accountStatus));
         setupAccountButton.setVisibility(View.GONE);
     }

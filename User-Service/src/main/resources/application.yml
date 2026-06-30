@@ -12,7 +12,7 @@ spring:
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB_NAME:user_service}
     username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:12345678}
+    password: ${MYSQL_PASSWORD:123456}
   jpa:
     hibernate:
       ddl-auto: update
@@ -41,5 +41,5 @@ app:
       server-url: ${KEYCLOAK_URL:http://localhost:8571}
       realm: ${KEYCLOAK_REALM:banking-service}
       client-id: ${KEYCLOAK_CLIENT_ID:banking-service-api-client}
-      client-secret: ${KEYCLOAK_CLIENT_SECRET}
+      client-secret: TjeQGZma15XGmLGIMI6M84oBU9549Sf9
 
