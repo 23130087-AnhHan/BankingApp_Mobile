@@ -106,12 +106,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/refreshButton"
-            style="@style/SecondaryButton"
-            android:layout_marginTop="14dp"
-            android:text="Làm mới số dư" />
-
         <TextView
             style="@style/SectionTitle"
             android:layout_marginTop="24dp"

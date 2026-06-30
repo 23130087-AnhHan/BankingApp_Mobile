@@ -3,7 +3,6 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
@@ -28,7 +27,6 @@ public class MainActivity extends Activity {
     private TextView balanceText;
     private TextView statusText;
     private TextView userIdText;
-    private Button refreshButton;
     private boolean provisioningAccount;
 
     @Override
@@ -45,8 +43,6 @@ public class MainActivity extends Activity {
         balanceText = findViewById(R.id.balanceText);
         statusText = findViewById(R.id.statusText);
         userIdText = findViewById(R.id.userIdText);
-        refreshButton = findViewById(R.id.refreshButton);
-
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.scanQrTile).setOnClickListener(v -> scanTransferQr());
@@ -55,7 +51,6 @@ public class MainActivity extends Activity {
         findViewById(R.id.myQrTile).setOnClickListener(v -> Ui.open(this, MyQrActivity.class));
         findViewById(R.id.notificationTile).setOnClickListener(v -> Ui.open(this, NotificationActivity.class));
         findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
-        refreshButton.setOnClickListener(v -> refreshPaymentAccount());
     }
 
     @Override
@@ -101,12 +96,9 @@ public class MainActivity extends Activity {
                 ? "Khách hàng #" + userId
                 : AppSession.getUserEmail(this));
         statusText.setText("Đang đồng bộ...");
-        refreshButton.setEnabled(false);
-
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                refreshButton.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
                     AccountResponse account = response.body();
                     if (!AppSession.isPaymentAccount(account.accountType)) {
@@ -125,7 +117,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onFailure(Call<AccountResponse> call, Throwable throwable) {
-                refreshButton.setEnabled(true);
                 statusText.setText("Offline");
                 renderSessionSnapshot();
             }
@@ -170,7 +161,6 @@ public class MainActivity extends Activity {
     private void provisionDefaultPaymentAccount(long userId) {
         if (provisioningAccount) return;
         provisioningAccount = true;
-        refreshButton.setEnabled(false);
         statusText.setText("Đang mở tài khoản...");
 
         AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
@@ -182,7 +172,6 @@ public class MainActivity extends Activity {
                 if (response.isSuccessful() || response.code() == 409) {
                     refreshPaymentAccount();
                 } else {
-                    refreshButton.setEnabled(true);
                     statusText.setText("Lỗi cấp tài khoản");
                     ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản mới.");
                 }
@@ -191,7 +180,6 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable throwable) {
                 provisioningAccount = false;
-                refreshButton.setEnabled(true);
                 statusText.setText("Lỗi kết nối");
             }
         });
