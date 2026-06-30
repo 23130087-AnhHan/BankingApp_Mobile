@@ -1,4 +1,4 @@
-spring:
+﻿spring:
   application:
     name: account-service
     bad_request: 400
