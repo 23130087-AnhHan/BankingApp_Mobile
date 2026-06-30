@@ -21,12 +21,24 @@ spring:
       hibernate:
         format_sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    default-encoding: UTF-8
+    username: phannguyenminhthang456@gmail.com
+    password: bxuhrxevwxbiliew
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 app:
   config:
     keycloak:
-      server-url: http://localhost:8571
-      realm: banking-service
-      client-id: banking-service-api-client
-      client-secret: 932OFITe8vtH4z0G9gem4Afd69JhbwrI
-
+      server-url: ${KEYCLOAK_URL:http://localhost:8571}
+      realm: ${KEYCLOAK_REALM:banking-service}
+      client-id: ${KEYCLOAK_CLIENT_ID:banking-service-api-client}
+      client-secret: TjeQGZma15XGmLGIMI6M84oBU9549Sf9

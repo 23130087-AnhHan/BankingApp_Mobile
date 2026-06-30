@@ -4,19 +4,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:allowBackup="true"
+        android:name=".BankingApplication"
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".TransferActivity" />
-        <activity android:name=".TransactionActivity" />
-        <activity android:name=".AccountActivity" />
-        <activity android:name=".RegisterActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +20,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".QuickLoginActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".HistoryActivity" />
+        <activity android:name=".BeneficiaryActivity" />
+        <activity android:name=".NotificationActivity" />
+        <activity android:name=".TransactionDetailActivity" />
+        <activity android:name=".TransferActivity" />
+        <activity android:name=".PinActivity" />
+        <activity android:name=".AccountActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".VerifyOtpActivity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".TransactionActivity" />
+        <activity android:name=".ResetPasswordActivity" />
     </application>
 
 </manifest>

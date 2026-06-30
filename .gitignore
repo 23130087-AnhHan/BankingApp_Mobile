@@ -1,0 +1,28 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Java and Spring Boot build output
+target/
+*.log
+hs_err_pid*.log
+replay_pid*.log
+user-service-log.txt
+docs/
+
+# Android and Gradle build output
+.gradle/
+build/
+**/.gradle/
+**/build/
+local.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local machine startup scripts
+start-all-banking-my-machine-dbpass.ps1
+start-all-banking-my-machine-dbpass-fixed.ps1
+start-all-banking-one-click.ps1

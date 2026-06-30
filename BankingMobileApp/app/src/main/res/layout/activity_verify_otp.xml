@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        style="@style/ScreenRoot"
+        android:paddingTop="28dp">
+
+        <TextView
+            style="@style/BrandMark"
+            android:text="NLU" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="22dp"
+            android:text="Xác thực email" />
+
+        <TextView
+            android:id="@+id/otpDestinationText"
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Mã OTP đã được gửi đến email:" />
+
+        <TextView
+            android:id="@+id/otpCountdownText"
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Mã OTP còn hiệu lực trong 05:00" />
+
+        <LinearLayout
+            style="@style/Panel"
+            android:layout_marginTop="22dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Mã OTP" />
+
+            <EditText
+                android:id="@+id/otpInput"
+                style="@style/Input"
+                android:digits="0123456789"
+                android:gravity="center"
+                android:hint="Nhập 6 chữ số"
+                android:inputType="number"
+                android:letterSpacing="0.2"
+                android:maxLength="6" />
+
+            <Button
+                android:id="@+id/verifyOtpButton"
+                style="@style/PrimaryButton"
+                android:text="Xác thực" />
+
+            <Button
+                android:id="@+id/resendOtpButton"
+                style="@style/SecondaryButton"
+                android:text="Gửi lại mã" />
+
+            <Button
+                android:id="@+id/backToLoginButton"
+                style="@style/TextButton"
+                android:text="Quay về đăng nhập" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/resultText"
+            style="@style/ResultBox"
+            android:text=""
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

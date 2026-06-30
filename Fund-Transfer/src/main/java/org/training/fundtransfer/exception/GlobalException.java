@@ -1,21 +1,15 @@
 package org.training.fundtransfer.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class GlobalException extends RuntimeException {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class GlobalException extends RuntimeException{
+    private final String errorCode;
 
-    private String errorCode;
+    public GlobalException(String message, String errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
 
-    private String message;
-
-    public GlobalException(String message) {
-        this.message = message;
+    public String getErrorCode() {
+        return errorCode;
     }
 }

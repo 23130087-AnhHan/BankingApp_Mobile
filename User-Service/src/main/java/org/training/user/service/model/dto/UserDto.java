@@ -16,8 +16,6 @@ public class UserDto {
 
     private String emailId;
 
-    private String password;
-
     private String identificationNumber;
 
     private String authId;

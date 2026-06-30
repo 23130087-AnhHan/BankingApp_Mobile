@@ -33,8 +33,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        return new ResponseEntity<>(new ErrorResponse(errorCodeBadRequest, ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("Dữ liệu gửi lên không hợp lệ");
+        return new ResponseEntity<>(
+                new ErrorResponse(errorCodeBadRequest, message), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -51,6 +55,33 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse.builder()
                         .errorMessage(globalException.getMessage())
                         .errorCode(globalException.getErrorCode())
+                        .build());
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<Object> handleAuthenticationFailed(AuthenticationFailedException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.builder()
+                        .errorCode("401")
+                        .errorMessage(exception.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<Object> handleResourceConflict(ResourceConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.builder()
+                        .errorCode(errorCodeConflict)
+                        .errorMessage(exception.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Object> handleEmailSendingFailed(EmailSendingException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.builder()
+                        .errorCode("502")
+                        .errorMessage(exception.getMessage())
                         .build());
     }
 

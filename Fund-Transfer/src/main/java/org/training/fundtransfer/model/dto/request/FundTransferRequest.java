@@ -18,4 +18,6 @@ public class FundTransferRequest {
     private String toAccount;
 
     private BigDecimal amount;
+
+    private String description;
 }

@@ -1,7 +1,0 @@
-com.example.bankingmobileapp-pngs-0 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\build\generated\res\pngs\debug
-com.example.bankingmobileapp-resValues-1 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\build\generated\res\resValues\debug
-com.example.bankingmobileapp-packageDebugResources-2 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.example.bankingmobileapp-packageDebugResources-3 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.example.bankingmobileapp-debug-4 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\build\intermediates\merged_res\debug\mergeDebugResources
-com.example.bankingmobileapp-debug-5 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\debug\res
-com.example.bankingmobileapp-main-6 D:\Spring-Boot-Microservices-Banking-Application\BankingMobileApp\app\src\main\res

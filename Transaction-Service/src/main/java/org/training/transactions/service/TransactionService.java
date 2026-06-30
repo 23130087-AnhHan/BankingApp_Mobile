@@ -2,6 +2,7 @@ package org.training.transactions.service;
 
 import org.training.transactions.model.dto.TransactionDto;
 import org.training.transactions.model.response.Response;
+import org.training.transactions.model.response.TransactionReceiptResponse;
 import org.training.transactions.model.response.TransactionRequest;
 
 import java.util.List;
@@ -40,4 +41,8 @@ public interface TransactionService {
      * @return A list of transaction requests matching the given transaction reference.
      */
     List<TransactionRequest> getTransactionByTransactionReference(String transactionReference);
+
+    TransactionReceiptResponse getTransactionReceiptByReference(String transactionReference);
+
+    TransactionReceiptResponse getTransactionReceiptById(Long transactionId);
 }

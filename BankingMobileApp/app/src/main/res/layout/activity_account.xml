@@ -2,36 +2,74 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg">
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="18dp">
+    <LinearLayout style="@style/ScreenRoot">
 
-        <TextView style="@style/MutedText" android:text="Account services" />
-        <TextView style="@style/PageTitle" android:text="Manage account" />
+        <TextView
+            style="@style/MutedText"
+            android:text="NLU Banking" />
 
-        <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Open account" />
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="Tài khoản" />
 
-            <EditText android:id="@+id/userIdInput" style="@style/Input" android:hint="User ID" android:inputType="number" />
-            <EditText android:id="@+id/accountTypeInput" style="@style/Input" android:hint="SAVINGS_ACCOUNT" />
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Quản lý tài khoản thanh toán chính dùng cho nhận tiền, chuyển tiền và lịch sử giao dịch." />
 
-            <Button android:id="@+id/createAccountButton" style="@style/PrimaryButton" android:text="Open savings account" />
-            <Button android:id="@+id/findAccountButton" style="@style/SecondaryButton" android:text="Find account by User ID" />
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Tài khoản thanh toán" />
+
+            <TextView
+                android:id="@+id/resultText"
+                style="@style/ResultBox"
+                android:layout_marginTop="0dp"
+                android:text="Đang tải tài khoản thanh toán..." />
+
+            <Button
+                android:id="@+id/refreshAccountButton"
+                style="@style/SecondaryButton"
+                android:text="Làm mới thông tin" />
         </LinearLayout>
 
-        <LinearLayout style="@style/Panel" android:orientation="vertical">
-            <TextView style="@style/SectionTitle" android:text="Account operations" />
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
 
-            <EditText android:id="@+id/accountNumberInput" style="@style/Input" android:hint="Account number" />
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Thao tác" />
 
-            <Button android:id="@+id/activateButton" style="@style/PrimaryButton" android:text="Activate account" />
-            <Button android:id="@+id/balanceButton" style="@style/SecondaryButton" android:text="Check balance" />
+            <Button
+                android:id="@+id/transferButton"
+                style="@style/PrimaryButton"
+                android:text="Chuyển tiền" />
+
+            <Button
+                android:id="@+id/historyButton"
+                style="@style/SecondaryButton"
+                android:text="Xem lịch sử giao dịch" />
+
+            <Button
+                android:id="@+id/pinButton"
+                style="@style/SecondaryButton"
+                android:text="Quản lý mã PIN" />
         </LinearLayout>
 
-        <TextView android:id="@+id/resultText" style="@style/ResultBox" android:text="Account details will appear here." />
+        <Button
+            android:id="@+id/backToDashboardButton"
+            style="@style/TextButton"
+            android:text="Về trang chủ" />
     </LinearLayout>
 </ScrollView>

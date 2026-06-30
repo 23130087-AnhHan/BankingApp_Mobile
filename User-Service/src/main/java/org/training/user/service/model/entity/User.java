@@ -9,6 +9,7 @@ import org.training.user.service.model.Status;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -28,6 +29,22 @@ public class User {
     private String authId;
 
     private String identificationNumber;
+
+    @Builder.Default
+    @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean emailVerified = false;
+
+    @Column(name = "email_otp", length = 10)
+    private String emailOtp;
+
+    @Column(name = "email_otp_expired_at")
+    private LocalDateTime emailOtpExpiredAt;
+
+    @Column(name = "payment_otp", length = 10)
+    private String paymentOtp;
+
+    @Column(name = "payment_otp_expired_at")
+    private LocalDateTime paymentOtpExpiredAt;
 
     @CreationTimestamp
     private LocalDate creationOn;

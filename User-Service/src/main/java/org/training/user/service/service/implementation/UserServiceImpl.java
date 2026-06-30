@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.training.user.service.exception.EmptyFields;
+import org.training.user.service.exception.EmailSendingException;
 import org.training.user.service.exception.ResourceConflictException;
 import org.training.user.service.exception.ResourceNotFound;
 import org.training.user.service.external.AccountService;
@@ -24,6 +25,8 @@ import org.training.user.service.model.external.Account;
 import org.training.user.service.model.mapper.UserMapper;
 import org.training.user.service.repository.UserRepository;
 import org.training.user.service.service.KeycloakService;
+import org.training.user.service.service.EmailService;
+import org.training.user.service.service.OtpService;
 import org.training.user.service.service.UserService;
 import org.training.user.service.utils.FieldChecker;
 
@@ -41,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;
     private final AccountService accountService;
+    private final OtpService otpService;
+    private final EmailService emailService;
 
     private UserMapper userMapper = new UserMapper();
 
@@ -61,18 +66,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response createUser(CreateUser userDto) {
 
-        List<UserRepresentation> userRepresentations = keycloakService.readUserByEmail(userDto.getEmailId());
-        if(userRepresentations.size() > 0) {
-            log.error("This emailId is already registered as a user");
-            throw new ResourceConflictException("This emailId is already registered as a user");
+        userDto.setEmailId(userDto.getEmailId().trim().toLowerCase(Locale.ROOT));
+
+        if (userRepository.existsByEmailIdIgnoreCase(userDto.getEmailId())) {
+            throw new ResourceConflictException("Email đã được đăng ký trước đó");
         }
+        if (userRepository.existsByContactNo(userDto.getContactNumber())) {
+            throw new ResourceConflictException("Số điện thoại đã được đăng ký trước đó");
+        }
+
+        List<UserRepresentation> userRepresentations = keycloakService.readUserByEmail(userDto.getEmailId());
 
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userDto.getEmailId());
         userRepresentation.setFirstName(userDto.getFirstName());
         userRepresentation.setLastName(userDto.getLastName());
         userRepresentation.setEmailVerified(false);
-        userRepresentation.setEnabled(false);
+        // Keep the Keycloak account enabled so credentials can be checked at login;
+        // the local emailVerified flag blocks token delivery until OTP verification.
+        userRepresentation.setEnabled(true);
         userRepresentation.setEmail(userDto.getEmailId());
 
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
@@ -80,11 +92,25 @@ public class UserServiceImpl implements UserService {
         credentialRepresentation.setTemporary(false);
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
 
-        Integer userCreationResponse = keycloakService.createUser(userRepresentation);
+        String authId;
+        if (userRepresentations.isEmpty()) {
+            authId = keycloakService.createUser(userRepresentation);
+        } else {
+            // A previous DB transaction may have rolled back after Keycloak creation.
+            // Reuse that orphan safely so the customer is not permanently locked out.
+            UserRepresentation orphan = userRepresentations.get(0);
+            authId = orphan.getId();
+            orphan.setUsername(userDto.getEmailId());
+            orphan.setEmail(userDto.getEmailId());
+            orphan.setFirstName(userDto.getFirstName());
+            orphan.setLastName(userDto.getLastName());
+            orphan.setEnabled(true);
+            orphan.setEmailVerified(false);
+            keycloakService.updateUser(orphan);
+            keycloakService.resetPassword(authId, credentialRepresentation);
+            log.warn("Recovered orphan Keycloak user for email {}", userDto.getEmailId());
+        }
 
-        if (userCreationResponse.equals(201)) {
-
-            List<UserRepresentation> representations = keycloakService.readUserByEmail(userDto.getEmailId());
             UserProfile userProfile = UserProfile.builder()
                     .firstName(userDto.getFirstName())
                     .lastName(userDto.getLastName()).build();
@@ -92,16 +118,30 @@ public class UserServiceImpl implements UserService {
             User user = User.builder()
                     .emailId(userDto.getEmailId())
                     .contactNo(userDto.getContactNumber())
+                    .emailVerified(false)
+                    .emailOtp(otpService.generateOtp())
+                    .emailOtpExpiredAt(otpService.generateExpiredTime())
                     .status(Status.PENDING).userProfile(userProfile)
-                    .authId(representations.get(0).getId())
+                    .authId(authId)
                     .identificationNumber(UUID.randomUUID().toString()).build();
 
-            userRepository.save(user);
+            User savedUser = userRepository.saveAndFlush(user);
+            String responseMessage = "Đăng ký thành công. Vui lòng kiểm tra email để xác thực OTP.";
+            String responseCode = responseCodeSuccess;
+            try {
+                emailService.sendOtp(savedUser.getEmailId(), savedUser.getEmailOtp());
+            } catch (EmailSendingException exception) {
+                responseMessage = "Đăng ký thành công nhưng không thể gửi email OTP. Vui lòng thử gửi lại OTP.";
+                responseCode = "502";
+            }
             return Response.builder()
-                    .responseMessage("User created successfully")
-                    .responseCode(responseCodeSuccess).build();
-        }
-        throw new RuntimeException("User with identification number not found");
+                    .responseMessage(responseMessage)
+                    .responseCode(responseCode)
+                    .userId(savedUser.getUserId())
+                    .emailId(savedUser.getEmailId())
+                    .displayName(userProfile.getFirstName() + " " + userProfile.getLastName())
+                    .status(savedUser.getStatus())
+                    .build();
     }
 
     /**

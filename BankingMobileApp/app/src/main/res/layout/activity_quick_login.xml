@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        style="@style/ScreenRoot"
+        android:paddingTop="28dp">
+
+        <TextView
+            style="@style/BrandMark"
+            android:text="NLU" />
+
+        <TextView
+            android:id="@+id/greetingText"
+            style="@style/PageTitle"
+            android:layout_marginTop="22dp"
+            android:text="Xin chào" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Nhập mật khẩu để tiếp tục phiên NLU Banking đã ghi nhớ." />
+
+        <LinearLayout
+            style="@style/Panel"
+            android:layout_marginTop="22dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Mật khẩu" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
+                android:hint="Nhập mật khẩu"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/loginButton"
+                style="@style/PrimaryButton"
+                android:text="Đăng nhập" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/otherAccountButton"
+            style="@style/SecondaryButton"
+            android:text="Dùng tài khoản khác" />
+
+        <Button
+            android:id="@+id/forgotPasswordButton"
+            style="@style/TextButton"
+            android:text="Quên mật khẩu?" />
+
+        <TextView
+            android:id="@+id/resultText"
+            style="@style/ResultBox"
+            android:text=""
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>
