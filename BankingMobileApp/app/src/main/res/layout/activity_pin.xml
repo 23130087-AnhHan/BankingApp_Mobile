@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout style="@style/ScreenRoot">
+
+        <TextView
+            style="@style/MutedText"
+            android:text="Bảo mật thanh toán" />
+
+        <TextView
+            style="@style/PageTitle"
+            android:layout_marginTop="2dp"
+            android:text="Quản lý mã PIN" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="PIN gồm 6 chữ số và dùng để xác nhận giao dịch chuyển tiền trong app." />
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Trạng thái" />
+
+            <TextView
+                android:id="@+id/statusText"
+                style="@style/ResultBox"
+                android:layout_marginTop="0dp"
+                android:text="Đang kiểm tra PIN..." />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Panel"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Thiết lập PIN" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="PIN hiện tại" />
+
+            <EditText
+                android:id="@+id/currentPinInput"
+                style="@style/Input"
+                android:hint="Nhập PIN hiện tại"
+                android:inputType="numberPassword" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="PIN mới" />
+
+            <EditText
+                android:id="@+id/newPinInput"
+                style="@style/Input"
+                android:hint="6 chữ số"
+                android:inputType="numberPassword" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Nhập lại PIN mới" />
+
+            <EditText
+                android:id="@+id/confirmPinInput"
+                style="@style/Input"
+                android:hint="Nhập lại 6 chữ số"
+                android:inputType="numberPassword" />
+
+            <Button
+                android:id="@+id/savePinButton"
+                style="@style/PrimaryButton"
+                android:text="Lưu PIN" />
+
+            <Button
+                android:id="@+id/clearPinButton"
+                style="@style/WarningButton"
+                android:text="Xóa PIN" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/backButton"
+            style="@style/TextButton"
+            android:text="Quay lại" />
+    </LinearLayout>
+</ScrollView>

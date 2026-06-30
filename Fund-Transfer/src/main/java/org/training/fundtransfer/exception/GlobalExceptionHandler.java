@@ -41,10 +41,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleGlobalException(GlobalException globalException) {
 
         return ResponseEntity
-                .badRequest()
+                .status(resolveStatus(globalException.getErrorCode()))
                 .body(ErrorResponse.builder()
                         .errorCode(globalException.getErrorCode())
                         .message(globalException.getMessage())
                         .build());
+    }
+
+    private HttpStatus resolveStatus(String errorCode) {
+        if (GlobalErrorCode.NOT_FOUND.equals(errorCode)) {
+            return HttpStatus.NOT_FOUND;
+        }
+        if (GlobalErrorCode.NOT_ACCEPTABLE.equals(errorCode)) {
+            return HttpStatus.NOT_ACCEPTABLE;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 }

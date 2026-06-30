@@ -3,7 +3,6 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
@@ -21,10 +20,13 @@ import retrofit2.Response;
 public class AccountActivity extends Activity {
     private static final String TAG = "AccountActivity";
 
-    private RadioGroup accountTypeGroup;
     private TextView resultText;
-    private Button createAccountButton;
+    private Button refreshButton;
+    private Button transferButton;
+    private Button historyButton;
+    private Button pinButton;
     private Button backToDashboardButton;
+    private boolean provisioningAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,92 +38,140 @@ public class AccountActivity extends Activity {
 
         setContentView(R.layout.activity_account);
 
-        accountTypeGroup = findViewById(R.id.accountTypeGroup);
         resultText = findViewById(R.id.resultText);
-        createAccountButton = findViewById(R.id.createAccountButton);
+        refreshButton = findViewById(R.id.refreshAccountButton);
+        transferButton = findViewById(R.id.transferButton);
+        historyButton = findViewById(R.id.historyButton);
+        pinButton = findViewById(R.id.pinButton);
         backToDashboardButton = findViewById(R.id.backToDashboardButton);
 
-        createAccountButton.setOnClickListener(v -> createAccount());
+        refreshButton.setOnClickListener(v -> loadPaymentAccount());
+        transferButton.setOnClickListener(v -> Ui.open(this, TransferActivity.class));
+        historyButton.setOnClickListener(v -> Ui.open(this, HistoryActivity.class));
+        pinButton.setOnClickListener(v -> Ui.open(this, PinActivity.class));
         backToDashboardButton.setOnClickListener(v -> finish());
-
-        if (AppSession.hasAccount(this)) {
-            resultText.setText("Bạn đã có tài khoản mặc định.\nSố tài khoản: "
-                    + AppSession.getAccountNumber(this)
-                    + "\nSố dư: " + balanceOrZero() + " đ");
-            createAccountButton.setEnabled(false);
-        }
     }
 
-    private void createAccount() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPaymentAccount();
+    }
+
+    private void loadPaymentAccount() {
         Long userId = currentUserId();
         if (userId == null) {
             resultText.setText("Phiên đăng nhập chưa có mã khách hàng. Vui lòng đăng nhập lại.");
+            setBusy(false);
+            setAccountActionsEnabled(false);
             return;
         }
 
-        resultText.setText("Đang mở tài khoản...");
-        createAccountButton.setEnabled(false);
-        AccountRequest request = new AccountRequest(selectedBackendAccountType(), BigDecimal.ZERO, userId);
-        ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
+        resultText.setText("Đang tải tài khoản thanh toán...");
+        setBusy(true);
+        ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if (!response.isSuccessful()) {
-                    if (response.code() == 409) {
-                        loadAccountByUserId(userId, "Bạn đã có tài khoản. Đang cập nhật dashboard...");
+            public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    if (response.code() == 404 || response.code() == 400) {
+                        AppSession.clearAccount(AccountActivity.this);
+                        provisionPaymentAccount(userId);
                         return;
                     }
-                    createAccountButton.setEnabled(true);
-                    resultText.setText(ApiErrorUtils.httpError(TAG, response, "Không thể mở tài khoản."));
+                    setBusy(false);
+                    setAccountActionsEnabled(false);
+                    resultText.setText(ApiErrorUtils.httpError(TAG, response,
+                            "Không thể tải tài khoản thanh toán."));
                     return;
                 }
-                loadAccountByUserId(userId, "Mở tài khoản thành công.");
+                setBusy(false);
+                saveAndRenderAccount(response.body());
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                createAccountButton.setEnabled(true);
+            public void onFailure(Call<AccountResponse> call, Throwable throwable) {
+                setBusy(false);
+                setAccountActionsEnabled(AppSession.hasAccount(AccountActivity.this));
                 resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
     }
 
-    private void loadAccountByUserId(long userId, String successPrefix) {
-        ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
+    private void provisionPaymentAccount(long userId) {
+        if (provisioningAccount) {
+            return;
+        }
+
+        provisioningAccount = true;
+        resultText.setText("Đang cấp tài khoản thanh toán...");
+        setBusy(true);
+        AccountRequest request = new AccountRequest("PAYMENT_ACCOUNT", BigDecimal.ZERO, userId);
+        ApiClient.getApi().createAccount(request).enqueue(new Callback<ApiResponse>() {
             @Override
-            public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
-                createAccountButton.setEnabled(true);
-                if (!response.isSuccessful() || response.body() == null) {
-                    String message = response.isSuccessful()
-                            ? "Backend đã tạo tài khoản nhưng chưa trả về dữ liệu tài khoản."
-                            : ApiErrorUtils.httpError(TAG, response, "Không thể tải tài khoản vừa mở.");
-                    resultText.setText(successPrefix + "\n" + message);
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                provisioningAccount = false;
+                if (!response.isSuccessful() && response.code() != 409) {
+                    setBusy(false);
+                    setAccountActionsEnabled(false);
+                    resultText.setText(ApiErrorUtils.httpError(TAG, response,
+                            "Không thể cấp tài khoản thanh toán."));
                     return;
                 }
-                saveAndRenderAccount(response.body(), successPrefix);
+                loadPaymentAccount();
             }
 
             @Override
-            public void onFailure(Call<AccountResponse> call, Throwable throwable) {
-                createAccountButton.setEnabled(true);
-                resultText.setText(successPrefix + "\n" + ApiErrorUtils.networkError(TAG, throwable));
+            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                provisioningAccount = false;
+                setBusy(false);
+                setAccountActionsEnabled(false);
+                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
     }
 
-    private void saveAndRenderAccount(AccountResponse account, String successPrefix) {
+    private void saveAndRenderAccount(AccountResponse account) {
+        if (!isPaymentAccount(account)) {
+            AppSession.clearAccount(this);
+            setAccountActionsEnabled(false);
+            resultText.setText("Tài khoản hiện tại không phải tài khoản thanh toán. Vui lòng làm mới dashboard để cấp tài khoản chuẩn.");
+            return;
+        }
+
         String accountNumber = account.accountNumber == null ? "" : account.accountNumber.trim();
         if (accountNumber.isEmpty()) {
-            resultText.setText(successPrefix + "\nBackend chưa trả về số tài khoản.");
+            setAccountActionsEnabled(false);
+            resultText.setText("Backend chưa trả về số tài khoản thanh toán.");
             return;
         }
 
         AppSession.saveAccount(this, account);
+        setAccountActionsEnabled(true);
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
-        resultText.setText(successPrefix
+
+        resultText.setText("Tài khoản thanh toán"
                 + "\nSố tài khoản: " + accountNumber
-                + "\nLoại tài khoản: " + displayAccountType(account.accountType)
                 + "\nTrạng thái: " + displayAccountStatus(account.accountStatus)
-                + "\nSố dư: " + balance + " đ");
+                + "\nSố dư khả dụng: " + balance + " đ"
+                + "\n\nTài khoản này dùng để nhận tiền, chuyển tiền và xem lịch sử giao dịch.");
+    }
+
+    private void setBusy(boolean busy) {
+        refreshButton.setEnabled(!busy);
+        backToDashboardButton.setEnabled(!busy);
+        if (busy) {
+            setAccountActionsEnabled(false);
+        }
+    }
+
+    private void setAccountActionsEnabled(boolean enabled) {
+        transferButton.setEnabled(enabled);
+        historyButton.setEnabled(enabled);
+        pinButton.setEnabled(enabled);
+    }
+
+    private boolean isPaymentAccount(AccountResponse account) {
+        return account != null && "PAYMENT_ACCOUNT".equalsIgnoreCase(account.accountType);
     }
 
     private Long currentUserId() {
@@ -132,35 +182,19 @@ public class AccountActivity extends Activity {
         }
     }
 
-    private String selectedBackendAccountType() {
-        if (accountTypeGroup.getCheckedRadioButtonId() == R.id.savingsAccountOption) {
-            return "FIXED_DEPOSIT";
-        }
-        return "SAVINGS_ACCOUNT";
-    }
-
-    private String displayAccountType(String type) {
-        if ("FIXED_DEPOSIT".equals(type)) {
-            return "Tài khoản tiết kiệm";
-        }
-        return "Tài khoản thanh toán";
-    }
-
     private String displayAccountStatus(String status) {
         if ("ACTIVE".equals(status)) {
             return "Đang hoạt động";
         }
         if ("PENDING".equals(status)) {
-            return "Đang xử lý";
+            return "Đang chờ xử lý";
+        }
+        if ("BLOCKED".equals(status)) {
+            return "Đang bị khóa";
         }
         if ("CLOSED".equals(status)) {
             return "Đã đóng";
         }
         return status == null || status.trim().isEmpty() ? "Không rõ trạng thái" : status;
-    }
-
-    private String balanceOrZero() {
-        String balance = AppSession.getAccountBalance(this);
-        return balance.isEmpty() ? "0" : balance;
     }
 }

@@ -3,7 +3,6 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.bankingmobileapp.api.ApiClient;
@@ -19,7 +18,7 @@ import retrofit2.Response;
 public class HistoryActivity extends Activity {
     private static final String TAG = "HistoryActivity";
 
-    private EditText accountNumberInput;
+    private TextView currentAccountText;
     private TextView historyText;
     private Button loadHistoryButton;
 
@@ -28,34 +27,43 @@ public class HistoryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        accountNumberInput = findViewById(R.id.accountNumberInput);
+        currentAccountText = findViewById(R.id.currentAccountText);
         historyText = findViewById(R.id.historyText);
         loadHistoryButton = findViewById(R.id.loadHistoryButton);
 
-        if (AppSession.hasAccount(this)) {
-            String accountNumber = AppSession.getAccountNumber(this);
-            accountNumberInput.setText(accountNumber);
-            loadHistory(accountNumber);
-        } else {
-            historyText.setText("Chưa có tài khoản để xem lịch sử. Hãy mở hoặc chọn tài khoản trước.");
+        loadHistoryButton.setOnClickListener(v -> loadHistoryForCurrentAccount());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadHistoryForCurrentAccount();
+    }
+
+    private void loadHistoryForCurrentAccount() {
+        if (!AppSession.hasAccount(this)) {
+            currentAccountText.setText("Bạn chưa có tài khoản thanh toán.");
+            historyText.setText("Chưa có tài khoản để xem lịch sử. Hãy quay lại dashboard để hệ thống cấp tài khoản.");
+            loadHistoryButton.setEnabled(false);
+            return;
+        }
+        if (!isSessionPaymentAccount()) {
+            currentAccountText.setText("Tài khoản hiện tại không phải tài khoản thanh toán.");
+            historyText.setText("Lịch sử giao dịch chỉ hiển thị cho PAYMENT_ACCOUNT. Hãy làm mới dashboard để đồng bộ tài khoản chuẩn.");
+            loadHistoryButton.setEnabled(false);
+            return;
         }
 
-        loadHistoryButton.setOnClickListener(v -> {
-            String accountNumber = Ui.text(accountNumberInput);
-            if (accountNumber.isEmpty()) {
-                accountNumberInput.setError("Vui lòng nhập số tài khoản");
-                historyText.setText("Chưa có tài khoản để xem lịch sử.");
-                return;
-            }
-            AppSession.saveAccountNumber(this, accountNumber);
-            loadHistory(accountNumber);
-        });
+        String accountNumber = AppSession.getAccountNumber(this);
+        currentAccountText.setText("STK: " + accountNumber);
+        loadHistoryButton.setEnabled(true);
+        loadHistory(accountNumber);
     }
 
     private void loadHistory(String accountNumber) {
         historyText.setText("Đang tải lịch sử giao dịch...");
         loadHistoryButton.setEnabled(false);
-        // Query có tên accountId nhưng luồng /transactions hiện lưu và tra cứu bằng accountNumber.
+        // Query name is accountId, but the current Transaction-Service lookup uses account number.
         ApiClient.getApi().getTransactions(accountNumber).enqueue(new Callback<List<TransactionResponse>>() {
             @Override
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
@@ -78,14 +86,14 @@ public class HistoryActivity extends Activity {
                     builder.append(item.transactionType == null ? "GIAO DỊCH" : item.transactionType)
                             .append("    ")
                             .append(item.amount == null ? "0" : item.amount.toPlainString())
-                            .append(" ₫")
+                            .append(" đ")
                             .append("\n")
                             .append(item.transactionStatus == null ? "Không rõ trạng thái" : item.transactionStatus)
                             .append("  •  ")
                             .append(item.localDateTime == null ? "Chưa có thời gian" : item.localDateTime)
                             .append("\nMã tham chiếu: ")
-                            .append(item.referenceId == null ? "—" : item.referenceId)
-                            .append("\n────────────────────\n\n");
+                            .append(item.referenceId == null ? "-" : item.referenceId)
+                            .append("\n--------------------\n\n");
                 }
                 historyText.setText(builder.length() == 0
                         ? "Tài khoản chưa có giao dịch hợp lệ."
@@ -98,5 +106,9 @@ public class HistoryActivity extends Activity {
                 historyText.setText(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
+    }
+
+    private boolean isSessionPaymentAccount() {
+        return "PAYMENT_ACCOUNT".equalsIgnoreCase(AppSession.getAccountType(this));
     }
 }

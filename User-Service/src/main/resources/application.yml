@@ -42,4 +42,3 @@ app:
       realm: ${KEYCLOAK_REALM:banking-service}
       client-id: ${KEYCLOAK_CLIENT_ID:banking-service-api-client}
       client-secret: TjeQGZma15XGmLGIMI6M84oBU9549Sf9
-

@@ -6,6 +6,8 @@ import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.training.fundtransfer.exception.ErrorResponse;
+import org.training.fundtransfer.exception.GlobalErrorCode;
 import org.training.fundtransfer.exception.GlobalException;
 
 import java.io.IOException;
@@ -29,7 +31,7 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
         GlobalException globalException = extractGlobalException(response);
 
         switch (response.status()) {
-            case 400 -> {
+            case 400, 404, 406, 409 -> {
                 log.error(globalException.getErrorCode() + " - " + globalException.getMessage());
                 return globalException;
             }
@@ -57,7 +59,10 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
             log.error(result);
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            globalException = mapper.readValue(result, GlobalException.class);
+            ErrorResponse errorResponse = mapper.readValue(result, ErrorResponse.class);
+            String message = errorResponse.getMessage() == null ? "Downstream service error" : errorResponse.getMessage();
+            String errorCode = errorResponse.getErrorCode() == null ? String.valueOf(response.status()) : errorResponse.getErrorCode();
+            globalException = new GlobalException(message, errorCode);
             log.error(globalException.toString());
         } catch (IOException e) {
             log.error("IO Exception while reading the global exception", e);
@@ -70,6 +75,9 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
                     log.error("IO Exception while closing the global exception", e);
                 }
             }
+        }
+        if (Objects.isNull(globalException)) {
+            return new GlobalException("Downstream service error", GlobalErrorCode.BAD_REQUEST);
         }
         return globalException;
     }

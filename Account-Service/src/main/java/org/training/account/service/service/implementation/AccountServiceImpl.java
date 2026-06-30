@@ -48,7 +48,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Response createAccount(AccountDto accountDto) {
 
-        accountRepository.findAccountByUserIdAndAccountType(accountDto.getUserId(), AccountType.valueOf(accountDto.getAccountType()))
+        AccountType accountType = parseAccountType(accountDto.getAccountType());
+        accountRepository.findAccountByUserIdAndAccountType(accountDto.getUserId(), accountType)
                 .ifPresent(account -> {
                     log.error("Account already exists on the server");
                     throw new ResourceConflict("Account already exists on the server");
@@ -56,9 +57,11 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = accountMapper.convertToEntity(accountDto);
         account.setAccountNumber(ACC_PREFIX + String.valueOf(System.currentTimeMillis()).substring(6));
-        account.setAccountStatus(AccountStatus.PENDING);
+        account.setAccountStatus(isPaymentAccount(accountType)
+                ? AccountStatus.ACTIVE
+                : AccountStatus.PENDING);
         account.setAvailableBalance(BigDecimal.valueOf(0));
-        account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
+        account.setAccountType(accountType);
         accountRepository.save(account);
         return Response.builder()
                 .responseCode(success)
@@ -80,10 +83,15 @@ public class AccountServiceImpl implements AccountService {
 
         return accountRepository.findAccountByAccountNumber(accountNumber)
                 .map(account -> {
-                    if(account.getAccountStatus().equals(AccountStatus.ACTIVE)){
-                        throw new AccountStatusException("Account is inactive/closed");
+                    if (accountUpdate == null || accountUpdate.getAccountStatus() == null) {
+                        throw new AccountStatusException("Account status is required");
                     }
-                    if(account.getAvailableBalance().compareTo(BigDecimal.ZERO) < 0 || account.getAvailableBalance().compareTo(BigDecimal.valueOf(1000)) < 0){
+                    if(account.getAccountStatus().equals(AccountStatus.CLOSED)){
+                        throw new AccountStatusException("Account is closed");
+                    }
+                    if(accountUpdate.getAccountStatus().equals(AccountStatus.ACTIVE)
+                            && account.getAccountType().equals(AccountType.FIXED_DEPOSIT)
+                            && account.getAvailableBalance().compareTo(BigDecimal.valueOf(1000)) < 0){
                         throw new InSufficientFunds("Minimum balance of Rs.1000 is required");
                     }
                     account.setAccountStatus(accountUpdate.getAccountStatus());
@@ -118,9 +126,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Response updateAccount(String accountNumber, AccountDto accountDto) {
 
-        return accountRepository.findAccountByAccountNumber(accountDto.getAccountNumber())
+        return accountRepository.findAccountByAccountNumber(accountNumber)
                 .map(account -> {
                     BeanUtils.copyProperties(accountDto, account);
+                    account.setAccountNumber(accountNumber);
                     accountRepository.save(account);
                     return Response.builder()
                             .responseCode(success)
@@ -190,12 +199,27 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDto readAccountByUserId(Long userId) {
 
-        return accountRepository.findAccountByUserId(userId)
+        return accountRepository.findAccountByUserIdAndAccountType(userId, AccountType.PAYMENT_ACCOUNT)
                 .map(account ->{
                     AccountDto accountDto = accountMapper.convertToDto(account);
                     accountDto.setAccountStatus(account.getAccountStatus().toString());
                     accountDto.setAccountType(account.getAccountType().toString());
                     return accountDto;
                 }).orElseThrow(ResourceNotFound::new);
+    }
+
+    private AccountType parseAccountType(String rawType) {
+        if (rawType == null || rawType.trim().isEmpty()) {
+            throw new AccountStatusException("Account type is required");
+        }
+        try {
+            return AccountType.valueOf(rawType.trim());
+        } catch (IllegalArgumentException exception) {
+            throw new AccountStatusException("Unsupported account type: " + rawType);
+        }
+    }
+
+    private boolean isPaymentAccount(AccountType accountType) {
+        return AccountType.PAYMENT_ACCOUNT.equals(accountType);
     }
 }

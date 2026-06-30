@@ -6,7 +6,8 @@ public class GlobalException extends RuntimeException{
 
     private final String errorMessage;
 
-    public GlobalException(String errorCode, String errorMessage) {
+    public GlobalException(String errorMessage, String errorCode) {
+        super(errorMessage);
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
