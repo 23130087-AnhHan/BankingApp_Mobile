@@ -11,13 +11,11 @@ import org.training.fundtransfer.exception.InsufficientBalance;
 import org.training.fundtransfer.exception.ResourceNotFound;
 import org.training.fundtransfer.external.AccountService;
 import org.training.fundtransfer.external.TransactionService;
-import org.training.fundtransfer.external.UserService;
 import org.training.fundtransfer.model.mapper.FundTransferMapper;
 import org.training.fundtransfer.model.TransactionStatus;
 import org.training.fundtransfer.model.TransferType;
 import org.training.fundtransfer.model.dto.Account;
 import org.training.fundtransfer.model.dto.FundTransferDto;
-import org.training.fundtransfer.model.dto.NotificationRequest;
 import org.training.fundtransfer.model.dto.Transaction;
 import org.training.fundtransfer.model.dto.request.FundTransferRequest;
 import org.training.fundtransfer.model.dto.response.FundTransferResponse;
@@ -38,7 +36,6 @@ public class FundTransferServiceImpl implements FundTransferService {
     private final AccountService accountService;
     private final FundTransferRepository fundTransferRepository;
     private final TransactionService transactionService;
-    private final UserService userService;
 
     @Value("${spring.application.ok}")
     private String ok;
@@ -57,46 +54,44 @@ public class FundTransferServiceImpl implements FundTransferService {
     @Override
     public FundTransferResponse fundTransfer(FundTransferRequest fundTransferRequest) {
 
-        Account fromAccount = null;
-        Account toAccount = null;
-        try {
-            validateRequest(fundTransferRequest);
+        validateRequest(fundTransferRequest);
 
-            ResponseEntity<Account> response = accountService.readByAccountNumber(fundTransferRequest.getFromAccount());
-            if(Objects.isNull(response.getBody())){
-                log.error("requested account "+fundTransferRequest.getFromAccount()+" is not found on the server");
-                throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
-            }
-            fromAccount = response.getBody();
-
-            response = accountService.readByAccountNumber(fundTransferRequest.getToAccount());
-            if(Objects.isNull(response.getBody())) {
-                log.error("requested account "+fundTransferRequest.getToAccount()+" is not found on the server");
-                throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
-            }
-            toAccount = response.getBody();
-
-            validateAccounts(fromAccount, toAccount, fundTransferRequest.getAmount());
-
-            String transactionId = internalTransfer(fromAccount, toAccount, fundTransferRequest.getAmount(),
-                    fundTransferRequest.getDescription());
-            FundTransfer fundTransfer = FundTransfer.builder()
-                    .transferType(TransferType.INTERNAL)
-                    .amount(fundTransferRequest.getAmount())
-                    .fromAccount(fromAccount.getAccountNumber())
-                    .transactionReference(transactionId)
-                    .status(TransactionStatus.SUCCESS)
-                    .toAccount(toAccount.getAccountNumber()).build();
-
-            fundTransferRepository.save(fundTransfer);
-            createSuccessNotifications(fromAccount, toAccount, fundTransferRequest.getAmount(), transactionId);
-            return FundTransferResponse.builder()
-                    .transactionId(transactionId)
-                    .message("Fund transfer was successful").build();
-        } catch (RuntimeException exception) {
-            createFailureNotification(fromAccount, fundTransferRequest, exception.getMessage());
-            throw exception;
+        Account fromAccount;
+        ResponseEntity<Account> response = accountService.readByAccountNumber(fundTransferRequest.getFromAccount());
+        if(Objects.isNull(response.getBody())){
+            log.error("requested account "+fundTransferRequest.getFromAccount()+" is not found on the server");
+            throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
         }
+        fromAccount = response.getBody();
+
+        Account toAccount;
+        response = accountService.readByAccountNumber(fundTransferRequest.getToAccount());
+        if(Objects.isNull(response.getBody())) {
+            log.error("requested account "+fundTransferRequest.getToAccount()+" is not found on the server");
+            throw new ResourceNotFound("requested account not found on the server", GlobalErrorCode.NOT_FOUND);
+        }
+        toAccount = response.getBody();
+
+        validateAccounts(fromAccount, toAccount, fundTransferRequest.getAmount());
+
+        // Simple security check: if OTP is provided, it should be 6 digits (Mock verification)
+        if (fundTransferRequest.getOtp() != null && fundTransferRequest.getOtp().length() != 6) {
+             throw new AccountUpdateException("Invalid OTP provided", GlobalErrorCode.BAD_REQUEST);
+        }
+
+        String transactionId = internalTransfer(fromAccount, toAccount, fundTransferRequest.getAmount());
+        FundTransfer fundTransfer = FundTransfer.builder()
+                .transferType(TransferType.INTERNAL)
+                .amount(fundTransferRequest.getAmount())
+                .fromAccount(fromAccount.getAccountNumber())
+                .transactionReference(transactionId)
+                .status(TransactionStatus.SUCCESS)
+                .toAccount(toAccount.getAccountNumber()).build();
+
+        fundTransferRepository.save(fundTransfer);
+        return FundTransferResponse.builder()
+                .transactionId(transactionId)
+                .message("Fund transfer was successful").build();
     }
 
     private void validateRequest(FundTransferRequest request) {
@@ -164,7 +159,7 @@ public class FundTransferServiceImpl implements FundTransferService {
      * @param amount The amount of funds to transfer.
      * @return The transaction reference number.
      */
-    private String internalTransfer(Account fromAccount, Account toAccount, BigDecimal amount, String description) {
+    private String internalTransfer(Account fromAccount, Account toAccount, BigDecimal amount) {
 
         fromAccount.setAvailableBalance(fromAccount.getAvailableBalance().subtract(amount));
         accountService.updateAccount(fromAccount.getAccountNumber(), fromAccount);
@@ -172,93 +167,22 @@ public class FundTransferServiceImpl implements FundTransferService {
         toAccount.setAvailableBalance(toAccount.getAvailableBalance().add(amount));
         accountService.updateAccount(toAccount.getAccountNumber(), toAccount);
 
-        String note = normalizeDescription(description);
-        String noteSuffix = note.isEmpty() ? "" : " | note: " + note;
         List<Transaction> transactions = List.of(
                 Transaction.builder()
                         .accountId(fromAccount.getAccountNumber())
                         .transactionType("INTERNAL_TRANSFER")
                         .amount(amount.negate())
-                        .description("Internal fund transfer from " + fromAccount.getAccountNumber()
-                                + " to " + toAccount.getAccountNumber() + noteSuffix)
+                        .description("Internal fund transfer from "+fromAccount.getAccountNumber()+" to "+toAccount.getAccountNumber())
                         .build(),
                 Transaction.builder()
                         .accountId(toAccount.getAccountNumber())
                         .transactionType("INTERNAL_TRANSFER")
                         .amount(amount)
-                        .description("Internal fund transfer received from: "
-                                + fromAccount.getAccountNumber() + noteSuffix).build());
+                        .description("Internal fund transfer received from: "+fromAccount.getAccountNumber()).build());
 
         String transactionReference = UUID.randomUUID().toString();
         transactionService.makeInternalTransactions(transactions, transactionReference);
         return transactionReference;
-    }
-
-    private String normalizeDescription(String description) {
-        return description == null ? "" : description.trim();
-    }
-
-    private void createSuccessNotifications(Account fromAccount, Account toAccount, BigDecimal amount, String referenceId) {
-        createNotification(fromAccount.getUserId(),
-                "Chuyển tiền thành công",
-                "Bạn đã chuyển " + formatAmount(amount) + " đ đến tài khoản " + maskAccount(toAccount.getAccountNumber()) + ".",
-                "TRANSFER_OUT",
-                referenceId);
-        createNotification(toAccount.getUserId(),
-                "Bạn vừa nhận tiền",
-                "Tài khoản của bạn vừa nhận " + formatAmount(amount) + " đ từ " + maskAccount(fromAccount.getAccountNumber()) + ".",
-                "TRANSFER_IN",
-                referenceId);
-    }
-
-    private void createFailureNotification(Account fromAccount, FundTransferRequest request, String reason) {
-        if (Objects.isNull(fromAccount) || Objects.isNull(fromAccount.getUserId())) {
-            return;
-        }
-        BigDecimal amount = request == null ? BigDecimal.ZERO : request.getAmount();
-        String toAccount = request == null ? "" : request.getToAccount();
-        createNotification(fromAccount.getUserId(),
-                "Chuyển tiền thất bại",
-                "Giao dịch " + formatAmount(amount) + " đ đến " + maskAccount(toAccount)
-                        + " chưa hoàn tất. Lý do: " + safeReason(reason) + ".",
-                "TRANSFER_FAILED",
-                null);
-    }
-
-    private void createNotification(Long userId, String title, String message, String type, String referenceId) {
-        if (Objects.isNull(userId)) {
-            return;
-        }
-        try {
-            userService.createNotification(NotificationRequest.builder()
-                    .userId(userId)
-                    .title(title)
-                    .message(message)
-                    .type(type)
-                    .referenceId(referenceId)
-                    .build());
-        } catch (RuntimeException exception) {
-            log.warn("Unable to create notification for user {}: {}", userId, exception.getMessage());
-        }
-    }
-
-    private String formatAmount(BigDecimal amount) {
-        return amount == null ? "0" : amount.stripTrailingZeros().toPlainString();
-    }
-
-    private String maskAccount(String accountNumber) {
-        if (accountNumber == null || accountNumber.trim().isEmpty()) {
-            return "không xác định";
-        }
-        String value = accountNumber.trim();
-        if (value.length() <= 4) {
-            return value;
-        }
-        return "..." + value.substring(value.length() - 4);
-    }
-
-    private String safeReason(String reason) {
-        return reason == null || reason.trim().isEmpty() ? "Thông tin giao dịch không hợp lệ" : reason.trim();
     }
 
     /**

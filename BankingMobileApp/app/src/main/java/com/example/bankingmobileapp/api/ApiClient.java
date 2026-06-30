@@ -20,7 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.concurrent.TimeUnit;
 
 public final class ApiClient {
-    private static final String BASE_URL = "http://192.168.1.70:8080/";
+    private static final String BASE_URL = "http://10.0.2.2:8080/";
     private static final String OTP_BASE_URL = BASE_URL;
     private static BankingApi api;
     private static BankingApi publicApi;
@@ -52,9 +52,9 @@ public final class ApiClient {
                     })
                     .authenticator(new TokenAuthenticator())
                     .addInterceptor(logging)
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(20, TimeUnit.SECONDS)
-                    .writeTimeout(20, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
                     .build();
 
             api = new Retrofit.Builder()
@@ -72,9 +72,9 @@ public final class ApiClient {
             otpApi = new Retrofit.Builder()
                     .baseUrl(OTP_BASE_URL)
                     .client(new OkHttpClient.Builder()
-                            .connectTimeout(15, TimeUnit.SECONDS)
-                            .readTimeout(20, TimeUnit.SECONDS)
-                            .writeTimeout(20, TimeUnit.SECONDS)
+                            .connectTimeout(30, TimeUnit.SECONDS)
+                            .readTimeout(60, TimeUnit.SECONDS)
+                            .writeTimeout(60, TimeUnit.SECONDS)
                             .build())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
@@ -88,8 +88,8 @@ public final class ApiClient {
             publicApi = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(new OkHttpClient.Builder()
-                            .connectTimeout(15, TimeUnit.SECONDS)
-                            .readTimeout(20, TimeUnit.SECONDS)
+                            .connectTimeout(30, TimeUnit.SECONDS)
+                            .readTimeout(60, TimeUnit.SECONDS)
                             .build())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

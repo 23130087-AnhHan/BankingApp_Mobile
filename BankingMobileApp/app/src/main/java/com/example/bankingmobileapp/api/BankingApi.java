@@ -17,6 +17,7 @@ import com.example.bankingmobileapp.model.LoginRequest;
 import com.example.bankingmobileapp.model.NotificationResponse;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
+import com.example.bankingmobileapp.model.ResetPasswordRequest;
 import com.example.bankingmobileapp.model.ResendEmailOtpRequest;
 import com.example.bankingmobileapp.model.SendPaymentOtpRequest;
 import com.example.bankingmobileapp.model.VerifyEmailOtpRequest;
@@ -46,6 +47,9 @@ public interface BankingApi {
 
     @POST("api/users/auth/forgot-password")
     Call<Void> forgotPassword(@Body ForgotPasswordRequest body);
+
+    @POST("api/users/auth/reset-password")
+    Call<ApiResponse> resetPassword(@Body ResetPasswordRequest body);
 
     @POST("api/users/register")
     Call<ApiResponse> register(@Body CreateUserRequest body);

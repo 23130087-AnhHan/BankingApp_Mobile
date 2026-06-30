@@ -6,6 +6,14 @@
     <color name="bank_blue_soft">#EAF3FF</color>
     <color name="bank_teal">#00A896</color>
     <color name="bank_green">#16A34A</color>
+    <color name="launcher_background">#084E2E</color>
+    <color name="nlu_green_dark">#063D2C</color>
+    <color name="nlu_green_deep">#075B35</color>
+    <color name="nlu_green">#0F8A3A</color>
+    <color name="nlu_green_light">#26B85A</color>
+    <color name="nlu_mint">#D8FBE6</color>
+    <color name="nlu_lime">#A3E635</color>
+    <color name="nlu_glass">#B0073D2B</color>
     <color name="app_background">#F3F6FA</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_alt">#F8FAFC</color>

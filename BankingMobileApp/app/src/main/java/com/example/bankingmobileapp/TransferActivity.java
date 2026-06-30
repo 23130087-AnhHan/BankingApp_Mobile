@@ -405,7 +405,7 @@ public class TransferActivity extends Activity {
             return;
         }
         if (!isSessionPaymentAccount()) {
-            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán.");
+            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán chuẩn.");
             setTransferEnabled(false);
             return;
         }
@@ -650,7 +650,6 @@ public class TransferActivity extends Activity {
     private String digitsOnly(String value) {
         return value == null ? "" : value.replaceAll("[^0-9]", "");
     }
-
     private String formatMoney(String rawValue) {
         if (rawValue == null || rawValue.trim().isEmpty()) {
             return "0";

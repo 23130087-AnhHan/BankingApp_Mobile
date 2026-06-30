@@ -19,5 +19,7 @@ public class FundTransferRequest {
 
     private BigDecimal amount;
 
-    private String description;
+    private String otp;
+
+    private String pin;
 }

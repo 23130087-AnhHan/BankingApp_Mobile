@@ -1,6 +1,7 @@
 package com.example.bankingmobileapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -62,8 +63,12 @@ public class LoginActivity extends Activity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(LoginActivity.this,
-                        "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.",
+                        "Mã xác thực OTP đã được gửi đến email của bạn.",
                         Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(LoginActivity.this, VerifyOtpActivity.class);
+                intent.putExtra(VerifyOtpActivity.EXTRA_EMAIL, email);
+                intent.putExtra(VerifyOtpActivity.EXTRA_FLOW, VerifyOtpActivity.FLOW_RESET_PASSWORD);
+                startActivity(intent);
             }
 
             @Override
