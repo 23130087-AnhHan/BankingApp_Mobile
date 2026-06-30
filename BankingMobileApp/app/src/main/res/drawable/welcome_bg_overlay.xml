@@ -6,7 +6,7 @@
     <!-- A soft semi-transparent dark-green overlay to reduce contrast and make it balanced and harmonious -->
     <item>
         <shape>
-            <solid android:color="#E0063D2C" /> <!-- 88% opacity of nlu_green_dark -->
+            <solid android:color="#CC084E2E" /> <!-- 80% opacity of launcher_background -->
         </shape>
     </item>
 </layer-list>

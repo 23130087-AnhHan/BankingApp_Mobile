@@ -61,7 +61,7 @@ public class VerifyOtpActivity extends Activity {
         email = email.trim().toLowerCase(Locale.ROOT);
         if (email.isEmpty()) {
             Toast.makeText(this, "Không tìm thấy email cần xác thực.", Toast.LENGTH_LONG).show();
-            Ui.openAndClear(this, LoginActivity.class);
+            Ui.openAndClear(this, WelcomeActivity.class);
             return;
         }
 
@@ -81,7 +81,7 @@ public class VerifyOtpActivity extends Activity {
         verifyButton.setOnClickListener(v -> verifyOtp());
         resendButton.setOnClickListener(v -> resendOtp());
         findViewById(R.id.backToLoginButton)
-                .setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
+                .setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
     }
 
     @Override
@@ -164,7 +164,7 @@ public class VerifyOtpActivity extends Activity {
                         }
                         Toast.makeText(VerifyOtpActivity.this,
                                 "Xác thực email thành công", Toast.LENGTH_LONG).show();
-                        Ui.openAndClear(VerifyOtpActivity.this, LoginActivity.class);
+                        Ui.openAndClear(VerifyOtpActivity.this, WelcomeActivity.class);
                     }
 
                     @Override

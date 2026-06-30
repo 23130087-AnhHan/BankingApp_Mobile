@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".QuickLoginActivity" />
-        <activity android:name=".LoginActivity" />
+
         <activity android:name=".HistoryActivity" />
         <activity android:name=".BeneficiaryActivity" />
         <activity android:name=".NotificationActivity" />

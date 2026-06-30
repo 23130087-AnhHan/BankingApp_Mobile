@@ -76,7 +76,7 @@ public class ResetPasswordActivity extends Activity {
                 submitButton.setEnabled(true);
                 if (response.isSuccessful()) {
                     Toast.makeText(ResetPasswordActivity.this, "Cập nhật mật khẩu thành công", Toast.LENGTH_LONG).show();
-                    Ui.openAndClear(ResetPasswordActivity.this, LoginActivity.class);
+                    Ui.openAndClear(ResetPasswordActivity.this, WelcomeActivity.class);
                 } else {
                     resultText.setText(ApiErrorUtils.httpError(TAG, response, "Lỗi cập nhật mật khẩu"));
                 }

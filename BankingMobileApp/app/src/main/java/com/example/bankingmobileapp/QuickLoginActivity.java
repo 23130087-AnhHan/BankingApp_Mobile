@@ -48,7 +48,7 @@ public class QuickLoginActivity extends FragmentActivity {
 
         loginButton.setOnClickListener(v -> loginRememberedUser());
         biometricLoginButton.setOnClickListener(v -> authenticateWithBiometric());
-        findViewById(R.id.otherAccountButton).setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
+        findViewById(R.id.otherAccountButton).setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
         findViewById(R.id.forgotPasswordButton).setOnClickListener(v -> requestPasswordReset());
         renderBiometricState();
     }
@@ -121,7 +121,7 @@ public class QuickLoginActivity extends FragmentActivity {
     private void requestPasswordReset() {
         String email = AppSession.getUserEmail(this);
         if (email.isEmpty()) {
-            Ui.openAndClear(this, LoginActivity.class);
+            Ui.openAndClear(this, WelcomeActivity.class);
             return;
         }
         ApiClient.getAuthApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
@@ -147,7 +147,7 @@ public class QuickLoginActivity extends FragmentActivity {
         String email = AppSession.getUserEmail(this);
         String password = Ui.text(passwordInput);
         if (email.isEmpty()) {
-            Ui.openAndClear(this, LoginActivity.class);
+            Ui.openAndClear(this, WelcomeActivity.class);
             return;
         }
         if (password.isEmpty()) {

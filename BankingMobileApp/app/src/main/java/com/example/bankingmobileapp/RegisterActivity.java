@@ -110,7 +110,7 @@ public class RegisterActivity extends Activity {
         });
 
         findViewById(R.id.loginButton)
-                .setOnClickListener(v -> Ui.openAndClear(this, LoginActivity.class));
+                .setOnClickListener(v -> Ui.openAndClear(this, WelcomeActivity.class));
     }
 
     @Override
