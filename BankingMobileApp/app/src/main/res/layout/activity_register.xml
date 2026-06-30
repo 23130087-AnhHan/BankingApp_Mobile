@@ -22,7 +22,7 @@
         <TextView
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Sau khi có hồ sơ, bạn có thể đăng nhập và mở tài khoản ngân hàng trên dashboard." />
+            android:text="Sau khi tạo hồ sơ, bạn cần nhập mã OTP được gửi qua email để hoàn tất đăng ký." />
 
         <LinearLayout
             style="@style/Panel"
@@ -63,6 +63,12 @@
                 android:inputType="phone" />
 
             <TextView
+                android:id="@+id/phoneErrorText"
+                style="@style/HelperText"
+                android:textColor="@color/danger"
+                android:visibility="gone" />
+
+            <TextView
                 style="@style/FieldLabel"
                 android:text="Email" />
 
@@ -73,13 +79,31 @@
                 android:inputType="textEmailAddress" />
 
             <TextView
+                android:id="@+id/emailErrorText"
+                style="@style/HelperText"
+                android:textColor="@color/danger"
+                android:visibility="gone" />
+
+            <TextView
                 style="@style/FieldLabel"
                 android:text="Mật khẩu" />
 
             <EditText
                 android:id="@+id/passwordInput"
                 style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
                 android:hint="Tạo mật khẩu đăng nhập"
+                android:inputType="textPassword" />
+
+            <TextView
+                style="@style/FieldLabel"
+                android:text="Nhập lại mật khẩu" />
+
+            <EditText
+                android:id="@+id/confirmPasswordInput"
+                style="@style/Input"
+                android:drawableEnd="@drawable/ic_visibility_off"
+                android:hint="Nhập lại mật khẩu"
                 android:inputType="textPassword" />
 
             <Button

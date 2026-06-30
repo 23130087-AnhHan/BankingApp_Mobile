@@ -27,6 +27,7 @@
         <activity android:name=".TransactionActivity" />
         <activity android:name=".AccountActivity" />
         <activity android:name=".RegisterActivity" />
+        <activity android:name=".VerifyOtpActivity" />
         <activity android:name=".MainActivity" />
     </application>
 

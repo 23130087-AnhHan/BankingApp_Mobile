@@ -18,12 +18,19 @@
         <TextView
             style="@style/PageTitle"
             android:layout_marginTop="22dp"
-            android:text="Chào mừng trở lại" />
+            android:text="Xác thực email" />
 
         <TextView
+            android:id="@+id/otpDestinationText"
             style="@style/MutedText"
             android:layout_marginTop="8dp"
-            android:text="Đăng nhập NLU Banking để xem số dư và tiếp tục giao dịch." />
+            android:text="Mã OTP đã được gửi đến email:" />
+
+        <TextView
+            android:id="@+id/otpCountdownText"
+            style="@style/MutedText"
+            android:layout_marginTop="8dp"
+            android:text="Mã OTP còn hiệu lực trong 05:00" />
 
         <LinearLayout
             style="@style/Panel"
@@ -32,40 +39,33 @@
 
             <TextView
                 style="@style/FieldLabel"
-                android:text="Email" />
+                android:text="Mã OTP" />
 
             <EditText
-                android:id="@+id/userIdInput"
+                android:id="@+id/otpInput"
                 style="@style/Input"
-                android:hint="tenban@email.com"
-                android:inputType="textEmailAddress" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Mật khẩu" />
-
-            <EditText
-                android:id="@+id/passwordInput"
-                style="@style/Input"
-                android:drawableEnd="@drawable/ic_visibility_off"
-                android:hint="Nhập mật khẩu"
-                android:inputType="textPassword" />
+                android:digits="0123456789"
+                android:gravity="center"
+                android:hint="Nhập 6 chữ số"
+                android:inputType="number"
+                android:letterSpacing="0.2"
+                android:maxLength="6" />
 
             <Button
-                android:id="@+id/loginButton"
+                android:id="@+id/verifyOtpButton"
                 style="@style/PrimaryButton"
-                android:text="Đăng nhập" />
+                android:text="Xác thực" />
+
+            <Button
+                android:id="@+id/resendOtpButton"
+                style="@style/SecondaryButton"
+                android:text="Gửi lại mã" />
+
+            <Button
+                android:id="@+id/backToLoginButton"
+                style="@style/TextButton"
+                android:text="Quay về đăng nhập" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/registerButton"
-            style="@style/SecondaryButton"
-            android:text="Tạo hồ sơ khách hàng" />
-
-        <Button
-            android:id="@+id/forgotPasswordButton"
-            style="@style/TextButton"
-            android:text="Quên mật khẩu?" />
 
         <TextView
             android:id="@+id/resultText"

@@ -16,6 +16,8 @@ import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
 import com.example.bankingmobileapp.model.LoginRequest;
 
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +39,7 @@ public class LoginActivity extends Activity {
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
         resultText = findViewById(R.id.resultText);
+        Ui.configurePasswordVisibility(passwordInput);
 
         String rememberedEmail = AppSession.getUserEmail(this);
         if (!rememberedEmail.isEmpty()) {
@@ -49,7 +52,7 @@ public class LoginActivity extends Activity {
     }
 
     private void requestPasswordReset() {
-        String email = Ui.text(emailInput).toLowerCase();
+        String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailInput.setError("Nhập email hợp lệ để đặt lại mật khẩu");
             emailInput.requestFocus();
@@ -71,10 +74,15 @@ public class LoginActivity extends Activity {
     }
 
     private void login() {
-        String email = Ui.text(emailInput).toLowerCase();
-        String password = Ui.text(passwordInput);
+        String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
+        String password = passwordInput.getText().toString();
+        if (email.isEmpty()) {
+            emailInput.setError("Email không được để trống");
+            emailInput.requestFocus();
+            return;
+        }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Email không hợp lệ");
+            emailInput.setError("Email không đúng định dạng");
             emailInput.requestFocus();
             return;
         }
@@ -92,9 +100,14 @@ public class LoginActivity extends Activity {
                 if (!response.isSuccessful() || response.body() == null) {
                     setLoading(false);
                     AppSession.clearLoginState(LoginActivity.this);
-                    showMessage(response.code() == 401
-                            ? "Email hoặc mật khẩu không đúng."
-                            : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập lúc này."));
+                    String errorMessage = ApiErrorUtils.httpError(
+                            TAG, response, "Không thể đăng nhập lúc này.");
+                    if (response.code() == 401) {
+                        errorMessage = errorMessage.contains("xác thực email")
+                                ? "Vui lòng xác thực email trước khi đăng nhập"
+                                : "Tài khoản hoặc mật khẩu không chính xác";
+                    }
+                    showMessage(errorMessage);
                     return;
                 }
                 AuthResponse auth = response.body();

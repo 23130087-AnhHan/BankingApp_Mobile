@@ -15,7 +15,8 @@ public class SecurityConfig {
         http
                 .authorizeExchange()
                 .pathMatchers("/api/users/register", "/api/users/auth/login", "/api/users/auth/refresh",
-                        "/api/users/auth/forgot-password").permitAll()
+                        "/api/users/auth/forgot-password", "/api/users/auth/check-email",
+                        "/api/users/auth/check-phone").permitAll()
                 .pathMatchers("/actuator/health").permitAll()
                 .anyExchange().authenticated()
                 .and()

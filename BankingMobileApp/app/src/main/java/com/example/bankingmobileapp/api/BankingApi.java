@@ -13,6 +13,9 @@ import com.example.bankingmobileapp.model.AuthResponse;
 import com.example.bankingmobileapp.model.LoginRequest;
 import com.example.bankingmobileapp.model.RefreshTokenRequest;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
+import com.example.bankingmobileapp.model.ResendEmailOtpRequest;
+import com.example.bankingmobileapp.model.VerifyEmailOtpRequest;
+import com.example.bankingmobileapp.model.AvailabilityResponse;
 
 import java.util.List;
 
@@ -39,6 +42,18 @@ public interface BankingApi {
 
     @POST("api/users/register")
     Call<ApiResponse> register(@Body CreateUserRequest body);
+
+    @POST("api/users/auth/verify-email-otp")
+    Call<ApiResponse> verifyEmailOtp(@Body VerifyEmailOtpRequest body);
+
+    @POST("api/users/auth/resend-email-otp")
+    Call<ApiResponse> resendEmailOtp(@Body ResendEmailOtpRequest body);
+
+    @GET("api/users/auth/check-email")
+    Call<AvailabilityResponse> checkEmail(@Query("email") String email);
+
+    @GET("api/users/auth/check-phone")
+    Call<AvailabilityResponse> checkPhone(@Query("phone") String phone);
 
     @POST("accounts")
     Call<ApiResponse> createAccount(@Body AccountRequest body);
