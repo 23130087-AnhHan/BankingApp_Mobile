@@ -3,6 +3,7 @@ package com.example.bankingmobileapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,8 +13,8 @@ import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
 import com.example.bankingmobileapp.model.AccountResponse;
 import com.example.bankingmobileapp.model.AuthResponse;
-import com.example.bankingmobileapp.model.LoginRequest;
 import com.example.bankingmobileapp.model.ForgotPasswordRequest;
+import com.example.bankingmobileapp.model.LoginRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +39,9 @@ public class LoginActivity extends Activity {
         resultText = findViewById(R.id.resultText);
 
         String rememberedEmail = AppSession.getUserEmail(this);
-        if (!rememberedEmail.isEmpty()) emailInput.setText(rememberedEmail);
+        if (!rememberedEmail.isEmpty()) {
+            emailInput.setText(rememberedEmail);
+        }
 
         loginButton.setOnClickListener(v -> login());
         findViewById(R.id.registerButton).setOnClickListener(v -> Ui.open(this, RegisterActivity.class));
@@ -56,12 +59,13 @@ public class LoginActivity extends Activity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(LoginActivity.this,
-                        "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.", Toast.LENGTH_LONG).show();
+                        "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.",
+                        Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable throwable) {
-                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
     }
@@ -81,22 +85,22 @@ public class LoginActivity extends Activity {
         }
 
         setLoading(true);
-        resultText.setText("Đang xác thực an toàn...");
+        showMessage("Đang xác thực...");
         ApiClient.getApi().login(new LoginRequest(email, password)).enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {
                     setLoading(false);
                     AppSession.clearLoginState(LoginActivity.this);
-                    resultText.setText(response.code() == 401
-                            ? "Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị khóa."
+                    showMessage(response.code() == 401
+                            ? "Email hoặc mật khẩu không đúng."
                             : ApiErrorUtils.httpError(TAG, response, "Không thể đăng nhập lúc này."));
                     return;
                 }
                 AuthResponse auth = response.body();
                 if (auth.userId == null || auth.accessToken == null || auth.accessToken.isEmpty()) {
                     setLoading(false);
-                    resultText.setText("Dữ liệu phiên đăng nhập từ server không hợp lệ.");
+                    showMessage("Phiên đăng nhập từ server không hợp lệ.");
                     return;
                 }
                 AppSession.saveAuth(LoginActivity.this, auth);
@@ -108,20 +112,20 @@ public class LoginActivity extends Activity {
             public void onFailure(Call<AuthResponse> call, Throwable throwable) {
                 setLoading(false);
                 AppSession.clearLoginState(LoginActivity.this);
-                resultText.setText(ApiErrorUtils.networkError(TAG, throwable));
+                showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }
         });
     }
 
     private void loadAccountAndContinue(long userId) {
-        resultText.setText("Đăng nhập thành công. Đang đồng bộ tài khoản...");
+        showMessage("Đăng nhập thành công. Đang đồng bộ tài khoản...");
         ApiClient.getApi().getAccountByUserId(userId).enqueue(new Callback<AccountResponse>() {
             @Override
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 setLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     AppSession.saveAccount(LoginActivity.this, response.body());
-                } else if (response.code() == 404) {
+                } else if (response.code() == 404 || response.code() == 400) {
                     AppSession.clearAccount(LoginActivity.this);
                 }
                 Ui.openAndClear(LoginActivity.this, MainActivity.class);
@@ -138,5 +142,10 @@ public class LoginActivity extends Activity {
     private void setLoading(boolean loading) {
         loginButton.setEnabled(!loading);
         loginButton.setText(loading ? "Đang đăng nhập..." : "Đăng nhập");
+    }
+
+    private void showMessage(String message) {
+        resultText.setVisibility(View.VISIBLE);
+        resultText.setText(message);
     }
 }

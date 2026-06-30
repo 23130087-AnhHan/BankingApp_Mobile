@@ -7,6 +7,8 @@ target/
 *.log
 hs_err_pid*.log
 replay_pid*.log
+user-service-log.txt
+docs/
 
 # Android and Gradle build output
 .gradle/

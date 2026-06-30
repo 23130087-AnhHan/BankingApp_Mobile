@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
             userIdText.setText(AppSession.getUserEmail(this).isEmpty()
                     ? "Chưa có khách hàng"
                     : AppSession.getUserEmail(this));
-            statusText.setText(AppSession.hasAccount(this) ? "Tài khoản đã lưu" : "Chưa thiết lập");
+            statusText.setText(AppSession.hasAccount(this) ? "Đã có tài khoản" : "Chưa có tài khoản");
             setupAccountButton.setVisibility(AppSession.hasAccount(this) ? View.GONE : View.VISIBLE);
             return;
         }
@@ -76,8 +76,8 @@ public class MainActivity extends Activity {
         try {
             userId = Long.parseLong(AppSession.getUserId(this));
         } catch (NumberFormatException ex) {
-            userIdText.setText("Mã khách hàng không hợp lệ");
-            statusText.setText("Cần thiết lập lại");
+            userIdText.setText("Phiên đăng nhập chưa có mã khách hàng");
+            statusText.setText("Cần đăng nhập lại");
             setupAccountButton.setVisibility(View.VISIBLE);
             return;
         }
@@ -92,10 +92,10 @@ public class MainActivity extends Activity {
             public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
                 refreshButton.setEnabled(true);
                 if (!response.isSuccessful() || response.body() == null) {
-                    if (response.code() == 404) {
+                    if (response.code() == 404 || response.code() == 400) {
                         ApiErrorUtils.httpError(TAG, response, "Không tìm thấy tài khoản.");
                         AppSession.clearAccount(MainActivity.this);
-                        balanceText.setText("0 ₫");
+                        balanceText.setText("0 đ");
                         accountNumberText.setText("Bạn chưa có tài khoản");
                         statusText.setText("Chưa có tài khoản");
                     } else {
@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
                 refreshButton.setEnabled(true);
                 ApiErrorUtils.networkError(TAG, throwable);
                 statusText.setText(AppSession.hasAccount(MainActivity.this)
-                        ? "Offline • dữ liệu đã lưu"
+                        ? "Offline - dữ liệu đã lưu"
                         : "Mất kết nối");
                 setupAccountButton.setVisibility(AppSession.hasAccount(MainActivity.this) ? View.GONE : View.VISIBLE);
             }
@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
         String accountNumber = AppSession.getAccountNumber(this);
         String balance = AppSession.getAccountBalance(this);
         accountNumberText.setText(accountNumber.isEmpty() ? "Bạn chưa có tài khoản" : "STK  •  " + accountNumber);
-        balanceText.setText((balance.isEmpty() ? "0" : balance) + " ₫");
+        balanceText.setText((balance.isEmpty() ? "0" : balance) + " đ");
         setupAccountButton.setVisibility(accountNumber.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -134,7 +134,7 @@ public class MainActivity extends Activity {
         String accountNumber = account.accountNumber == null ? "" : account.accountNumber.trim();
         if (accountNumber.isEmpty()) {
             accountNumberText.setText("Bạn chưa có tài khoản");
-            balanceText.setText("0 ₫");
+            balanceText.setText("0 đ");
             statusText.setText("Thiếu số tài khoản");
             setupAccountButton.setVisibility(View.VISIBLE);
             return;
@@ -144,9 +144,22 @@ public class MainActivity extends Activity {
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
 
         accountNumberText.setText("STK  •  " + accountNumber);
-        balanceText.setText(balance + " ₫");
-        statusText.setText(account.accountStatus == null ? "Không rõ trạng thái" : account.accountStatus);
+        balanceText.setText(balance + " đ");
+        statusText.setText(formatAccountStatus(account.accountStatus));
         setupAccountButton.setVisibility(View.GONE);
+    }
+
+    private String formatAccountStatus(String status) {
+        if ("ACTIVE".equals(status)) {
+            return "Đang hoạt động";
+        }
+        if ("PENDING".equals(status)) {
+            return "Đang xử lý";
+        }
+        if ("CLOSED".equals(status)) {
+            return "Đã đóng";
+        }
+        return status == null || status.trim().isEmpty() ? "Không rõ trạng thái" : status;
     }
 
     private void logout() {
