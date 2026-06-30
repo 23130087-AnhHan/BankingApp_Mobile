@@ -57,6 +57,7 @@ public class BeneficiaryActivity extends Activity {
         refreshButton = findViewById(R.id.refreshBeneficiaryButton);
 
         bankNameInput.setText("NLU Banking");
+        findViewById(R.id.backBeneficiaryButton).setOnClickListener(v -> finish());
         saveButton.setOnClickListener(v -> saveBeneficiary());
         refreshButton.setOnClickListener(v -> loadBeneficiaries());
         loadBeneficiaries();
@@ -105,7 +106,7 @@ public class BeneficiaryActivity extends Activity {
     private View createBeneficiaryView(BeneficiaryResponse beneficiary) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.panel_bg);
+        card.setBackgroundResource(R.drawable.nlu_list_card_bg);
         card.setPadding(dp(16), dp(14), dp(16), dp(14));
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -133,7 +134,7 @@ public class BeneficiaryActivity extends Activity {
         if (selectMode) {
             TextView action = new TextView(this);
             action.setText("Chọn người thụ hưởng");
-            action.setTextColor(Color.parseColor("#0F6BFF"));
+            action.setTextColor(Color.parseColor("#075B35"));
             action.setTextSize(14);
             action.setTypeface(Typeface.DEFAULT_BOLD);
             action.setPadding(0, dp(10), 0, 0);

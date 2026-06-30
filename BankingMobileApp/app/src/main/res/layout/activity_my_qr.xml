@@ -2,49 +2,117 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@color/app_background"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
 
-        <TextView
-            style="@style/MutedText"
-            android:text="QR chuyển tiền" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="176dp"
+            android:background="@drawable/account_header_bg"
+            android:padding="20dp">
 
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="QR của tôi" />
+            <Button
+                android:id="@+id/backButton"
+                style="@style/NluHeaderButton"
+                android:text="‹" />
 
-        <TextView
-            style="@style/MutedText"
-            android:layout_marginTop="8dp"
-            android:text="Tạo QR để người khác quét và chuyển tiền nội bộ NLU Banking." />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="QR của tôi"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Nhận tiền nhanh bằng mã QR NLU"
+                    android:textColor="@color/nlu_mint"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="-48dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/account_info_card_bg"
+            android:elevation="7dp"
+            android:orientation="vertical"
+            android:padding="18dp">
 
             <TextView
-                style="@style/SectionTitle"
-                android:text="Thông tin nhận tiền" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/main_user_badge_bg"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="Thông tin nhận tiền"
+                android:textColor="@color/nlu_green_deep"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/accountInfoText"
-                style="@style/ResultBox"
-                android:layout_marginTop="0dp"
-                android:text="Đang kiểm tra tài khoản..." />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:lineSpacingExtra="3dp"
+                android:text="Đang kiểm tra tài khoản..."
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/account_info_card_bg"
+            android:orientation="vertical"
+            android:padding="18dp">
 
             <TextView
-                style="@style/SectionTitle"
-                android:text="Tùy chọn QR" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Tùy chọn QR"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="16dp"
+                android:text="Có thể bỏ trống số tiền để tạo QR chỉ chứa thông tin người nhận."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
 
             <TextView
                 style="@style/FieldLabel"
@@ -63,43 +131,58 @@
             <EditText
                 android:id="@+id/noteInput"
                 style="@style/Input"
-                android:hint="Ví dụ: Thanh toan tien an"
+                android:hint="Ví dụ: Thanh toán tiền ăn"
                 android:inputType="textCapSentences" />
 
             <Button
                 android:id="@+id/generateQrButton"
-                style="@style/PrimaryButton"
-                android:text="Tạo QR" />
+                style="@style/NluPrimaryButton"
+                android:text="Tạo QR nhận tiền" />
         </LinearLayout>
 
         <LinearLayout
-            style="@style/Panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/qr_display_card_bg"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="18dp">
 
             <TextView
-                style="@style/SectionTitle"
-                android:text="Mã QR" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="Mã QR nhận tiền"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/qrImage"
-                android:layout_width="280dp"
-                android:layout_height="280dp"
+                android:layout_width="264dp"
+                android:layout_height="264dp"
+                android:layout_marginTop="14dp"
                 android:adjustViewBounds="true"
-                android:background="@color/surface"
+                android:background="@drawable/qr_image_bg"
                 android:contentDescription="Mã QR nhận tiền"
-                android:padding="12dp"
+                android:padding="14dp"
                 android:scaleType="fitCenter" />
 
             <TextView
                 android:id="@+id/resultText"
-                style="@style/ResultBox"
-                android:text="QR không chứa thông tin bảo mật. Người gửi vẫn phải xác thực PIN hoặc OTP khi chuyển tiền." />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/main_notification_bg"
+                android:lineSpacingExtra="2dp"
+                android:padding="13dp"
+                android:text="QR không chứa thông tin bảo mật. Người gửi vẫn phải xác thực PIN hoặc OTP khi chuyển tiền."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/backButton"
-            style="@style/TextButton"
-            android:text="Quay lại" />
     </LinearLayout>
 </ScrollView>

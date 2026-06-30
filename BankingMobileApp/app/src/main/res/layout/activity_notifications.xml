@@ -2,42 +2,119 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@color/app_background"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
-    <LinearLayout style="@style/ScreenRoot">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:background="@drawable/account_header_bg"
+            android:padding="20dp">
+
+            <Button
+                android:id="@+id/backNotificationButton"
+                style="@style/NluHeaderButton"
+                android:text="‹" />
+
+            <TextView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/main_round_icon_bg"
+                android:gravity="center"
+                android:text="🔔"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Thông báo"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Biến động số dư và giao dịch"
+                    android:textColor="@color/nlu_mint"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="-44dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/history_summary_bg"
+            android:elevation="7dp"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Tổng quan thông báo"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/notificationSummaryText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="Thông báo sẽ hiển thị tại đây."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/refreshNotificationButton"
+                style="@style/NluPrimaryButton"
+                android:layout_marginTop="16dp"
+                android:text="Làm mới thông báo" />
+        </LinearLayout>
 
         <TextView
-            style="@style/MutedText"
-            android:text="Cập nhật tài khoản" />
-
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Thông báo" />
-
-        <TextView
-            style="@style/MutedText"
-            android:layout_marginTop="8dp"
-            android:text="Theo dõi biến động số dư và trạng thái giao dịch gần đây." />
-
-        <TextView
-            android:id="@+id/notificationSummaryText"
-            style="@style/ResultBox"
-            android:text="Thông báo sẽ hiển thị tại đây." />
-
-        <Button
-            android:id="@+id/refreshNotificationButton"
-            style="@style/SecondaryButton"
-            android:text="Làm mới thông báo" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Danh sách thông báo"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/notificationList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="20dp"
             android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

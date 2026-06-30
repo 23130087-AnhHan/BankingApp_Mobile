@@ -32,6 +32,9 @@
         <activity android:name=".MyQrActivity" />
         <activity android:name=".TransactionDetailActivity" />
         <activity android:name=".TransferActivity" />
+        <activity android:name=".TransferConfirmActivity" />
+        <activity android:name=".TransferAuthActivity" />
+        <activity android:name=".TransferSuccessActivity" />
         <activity android:name=".PinActivity" />
         <activity android:name=".AccountActivity" />
         <activity android:name=".RegisterActivity" />

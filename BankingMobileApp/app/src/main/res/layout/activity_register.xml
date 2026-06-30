@@ -59,7 +59,7 @@
             <EditText
                 android:id="@+id/phoneInput"
                 style="@style/Input"
-                android:hint="09xx xxx xxx"
+                android:hint="0xxx xxx xxx"
                 android:inputType="phone" />
 
             <TextView

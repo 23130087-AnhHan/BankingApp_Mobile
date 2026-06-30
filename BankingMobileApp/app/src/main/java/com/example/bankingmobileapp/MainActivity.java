@@ -1,9 +1,21 @@
 package com.example.bankingmobileapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bankingmobileapp.api.ApiClient;
 import com.example.bankingmobileapp.api.ApiErrorUtils;
@@ -27,6 +39,10 @@ public class MainActivity extends Activity {
     private TextView balanceText;
     private TextView statusText;
     private TextView userIdText;
+    private TextView userNameText;
+    private ImageButton toggleBalanceButton;
+    private String formattedBalance = CurrencyUtils.formatVnd("0");
+    private boolean balanceVisible;
     private boolean provisioningAccount;
 
     @Override
@@ -43,6 +59,8 @@ public class MainActivity extends Activity {
         balanceText = findViewById(R.id.balanceText);
         statusText = findViewById(R.id.statusText);
         userIdText = findViewById(R.id.userIdText);
+        userNameText = findViewById(R.id.userNameText);
+        toggleBalanceButton = findViewById(R.id.toggleBalanceButton);
         findViewById(R.id.accountTile).setOnClickListener(v -> Ui.open(this, AccountActivity.class));
         findViewById(R.id.transferTile).setOnClickListener(v -> Ui.open(this, TransferActivity.class));
         findViewById(R.id.scanQrTile).setOnClickListener(v -> scanTransferQr());
@@ -50,7 +68,11 @@ public class MainActivity extends Activity {
         findViewById(R.id.beneficiaryTile).setOnClickListener(v -> Ui.open(this, BeneficiaryActivity.class));
         findViewById(R.id.myQrTile).setOnClickListener(v -> Ui.open(this, MyQrActivity.class));
         findViewById(R.id.notificationTile).setOnClickListener(v -> Ui.open(this, NotificationActivity.class));
-        findViewById(R.id.logoutButton).setOnClickListener(v -> logout());
+        findViewById(R.id.productTile).setOnClickListener(v -> Toast.makeText(
+                this, "Tính năng sản phẩm đang được phát triển", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.copyAccountButton).setOnClickListener(v -> copyAccountNumber());
+        toggleBalanceButton.setOnClickListener(v -> toggleBalanceVisibility());
+        findViewById(R.id.logoutButton).setOnClickListener(v -> confirmLogout());
     }
 
     @Override
@@ -186,18 +208,20 @@ public class MainActivity extends Activity {
     }
 
     private void renderProvisioningState() {
-        balanceText.setText("0 VND");
+        setBalance("0");
         accountNumberText.setText("Đang cấp tài khoản thanh toán");
         statusText.setText("Đang mở tài khoản");
     }
 
     private void renderSessionSnapshot() {
+        String displayName = AppSession.getRememberedDisplayName(this);
+        userNameText.setText(displayName.isEmpty() ? "Khách hàng NLU" : displayName);
         String accountNumber = AppSession.getAccountNumber(this);
         String balance = AppSession.getAccountBalance(this);
         accountNumberText.setText(accountNumber.isEmpty()
                 ? "Đang kiểm tra tài khoản"
-                : "STK  •  " + accountNumber);
-        balanceText.setText(CurrencyUtils.formatVnd(balance));
+                : accountNumber);
+        setBalance(balance);
     }
 
     private void saveAndRenderAccount(AccountResponse account) {
@@ -205,14 +229,14 @@ public class MainActivity extends Activity {
             AppSession.clearAccount(this);
             statusText.setText("Cần tài khoản thanh toán");
             accountNumberText.setText(account == null ? "Không tìm thấy tài khoản" : "Tài khoản hiện tại không phải tài khoản thanh toán");
-            balanceText.setText("0 VND");
+            setBalance("0");
             return;
         }
 
         String accountNumber = account.accountNumber == null ? "" : account.accountNumber.trim();
         if (accountNumber.isEmpty()) {
             accountNumberText.setText("Chưa có số tài khoản");
-            balanceText.setText("0 VND");
+            setBalance("0");
             statusText.setText("Thiếu số tài khoản");
             return;
         }
@@ -220,9 +244,37 @@ public class MainActivity extends Activity {
         AppSession.saveAccount(this, account);
         String balance = account.availableBalance == null ? "0" : account.availableBalance.toPlainString();
 
-        accountNumberText.setText("STK  •  " + accountNumber);
-        balanceText.setText(CurrencyUtils.formatVnd(balance));
+        accountNumberText.setText(accountNumber);
+        setBalance(balance);
         statusText.setText(formatAccountStatus(account.accountStatus));
+    }
+
+    private void copyAccountNumber() {
+        String accountNumber = AppSession.getAccountNumber(this);
+        if (accountNumber.isEmpty()) {
+            Toast.makeText(this, "Chưa có số tài khoản để sao chép", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(ClipData.newPlainText("Số tài khoản NLU Bank", accountNumber));
+        Toast.makeText(this, "Đã sao chép số tài khoản", Toast.LENGTH_SHORT).show();
+    }
+
+    private void toggleBalanceVisibility() {
+        balanceVisible = !balanceVisible;
+        renderBalanceVisibility();
+    }
+
+    private void setBalance(String balance) {
+        formattedBalance = CurrencyUtils.formatVnd(balance);
+        renderBalanceVisibility();
+    }
+
+    private void renderBalanceVisibility() {
+        balanceText.setText(balanceVisible ? formattedBalance : "********");
+        toggleBalanceButton.setImageResource(
+                balanceVisible ? R.drawable.ic_visibility : R.drawable.ic_visibility_off);
+        toggleBalanceButton.setContentDescription(balanceVisible ? "Ẩn số dư" : "Hiện số dư");
     }
 
     private boolean isPaymentAccount(AccountResponse account) {
@@ -251,6 +303,27 @@ public class MainActivity extends Activity {
             return "Đã đóng";
         }
         return status == null || status.trim().isEmpty() ? "Không rõ trạng thái" : status;
+    }
+
+    private void confirmLogout() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_logout, null);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        dialogView.findViewById(R.id.cancelLogoutButton).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.confirmLogoutButton).setOnClickListener(v -> {
+            dialog.dismiss();
+            logout();
+        });
+
+        dialog.setOnShowListener(d -> {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        });
+        dialog.show();
     }
 
     private void logout() {
