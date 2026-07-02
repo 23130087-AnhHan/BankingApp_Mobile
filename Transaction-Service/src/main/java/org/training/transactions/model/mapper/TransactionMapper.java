@@ -14,6 +14,7 @@ public class TransactionMapper extends BaseMapper<Transaction, TransactionDto> {
         Transaction transaction = new Transaction();
         if(!Objects.isNull(dto)){
             BeanUtils.copyProperties(dto, transaction);
+            transaction.setComments(dto.getDescription());
         }
         return transaction;
     }
@@ -24,6 +25,7 @@ public class TransactionMapper extends BaseMapper<Transaction, TransactionDto> {
         TransactionDto transactionDto = new TransactionDto();
         if(!Objects.isNull(entity)) {
             BeanUtils.copyProperties(entity, transactionDto);
+            transactionDto.setDescription(entity.getComments());
         }
         return transactionDto;    }
 }

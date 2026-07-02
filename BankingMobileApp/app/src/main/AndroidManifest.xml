@@ -18,7 +18,8 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".WelcomeActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,7 +28,7 @@
         </activity>
         <activity
             android:name=".QuickLoginActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <activity android:name=".HistoryActivity" />
         <activity android:name=".BeneficiaryActivity" />
@@ -36,25 +37,29 @@
         <activity android:name=".TransactionDetailActivity" />
         <activity
             android:name=".TransferActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".TransferConfirmActivity" />
-        <activity android:name=".TransferAuthActivity" />
+        <activity
+            android:name=".TransferAuthActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".TransferSuccessActivity" />
         <activity
             android:name=".PinActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".AccountActivity" />
         <activity
             android:name=".RegisterActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".VerifyOtpActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".TransactionActivity" />
+        <activity
+            android:name=".TransactionActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".ResetPasswordActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

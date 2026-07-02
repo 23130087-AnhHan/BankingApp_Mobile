@@ -92,13 +92,11 @@ public class AuthenticationService {
             throw new AuthenticationFailedException("Invalid OTP");
         }
 
-        org.keycloak.representations.idm.UserRepresentation keycloakUser = keycloakService.readUser(user.getAuthId());
         org.keycloak.representations.idm.CredentialRepresentation cred = new org.keycloak.representations.idm.CredentialRepresentation();
         cred.setType(org.keycloak.representations.idm.CredentialRepresentation.PASSWORD);
         cred.setValue(request.getNewPassword());
         cred.setTemporary(false);
-        keycloakUser.setCredentials(java.util.Collections.singletonList(cred));
-        keycloakService.updateUser(keycloakUser);
+        keycloakService.resetPassword(user.getAuthId(), cred);
 
         user.setEmailOtp(null);
         user.setEmailOtpExpiredAt(null);

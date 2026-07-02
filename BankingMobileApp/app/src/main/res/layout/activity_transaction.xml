@@ -49,7 +49,7 @@
                 android:id="@+id/transactionTypeInput"
                 style="@style/Input"
                 android:enabled="false"
-                android:hint="DEPOSIT / WITHDRAWAL" />
+                android:hint="NẠP TIỀN / RÚT TIỀN" />
         </LinearLayout>
 
         <LinearLayout

@@ -22,4 +22,6 @@ public class FundTransferRequest {
     private String otp;
 
     private String pin;
+
+    private String description;
 }

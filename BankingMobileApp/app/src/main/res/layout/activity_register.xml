@@ -2,136 +2,200 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg"
+    android:background="@drawable/bg_nlubank"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
 
     <LinearLayout
-        style="@style/ScreenRoot">
-
-        <TextView
-            style="@style/MutedText"
-            android:text="NLU Banking" />
-
-        <TextView
-            style="@style/PageTitle"
-            android:layout_marginTop="2dp"
-            android:text="Tạo tài khoản khách hàng" />
-
-        <TextView
-            style="@style/MutedText"
-            android:layout_marginTop="8dp"
-            android:text="Sau khi tạo tài khoản, bạn cần nhập mã OTP được gửi qua email để hoàn tất đăng ký." />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
 
         <LinearLayout
-            style="@style/Panel"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:contentDescription="NLU Bank"
+                android:scaleType="centerInside"
+                android:src="@drawable/nlu_logo" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="NLU Bank"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ngân hàng số cho sinh viên NLU"
+                    android:textColor="@color/nlu_mint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Tạo tài khoản khách hàng"
+            android:textColor="@android:color/white"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingExtra="2dp"
+            android:text="Điền thông tin bên dưới. Mã OTP xác thực sẽ được gửi đến email của bạn."
+            android:textColor="#DDF5E7"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/register_panel_bg"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:padding="18dp">
 
             <TextView
-                style="@style/SectionTitle"
-                android:text="Thông tin cá nhân" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Thông tin cá nhân"
+                android:textColor="@color/nlu_green_deep"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
-                style="@style/FieldLabel"
-                android:text="Họ và tên đệm" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="14dp"
+                android:text="Thông tin cần trùng khớp với giấy tờ định danh."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
 
+            <TextView style="@style/RegisterFieldLabel" android:text="Họ và tên đệm" />
             <EditText
                 android:id="@+id/lastNameInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:hint="Ví dụ: Nguyễn Văn"
                 android:inputType="textCapWords" />
 
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Tên" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Tên" />
             <EditText
                 android:id="@+id/firstNameInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:hint="Ví dụ: An"
                 android:inputType="textCapWords" />
 
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Số điện thoại" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Số điện thoại" />
             <EditText
                 android:id="@+id/phoneInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:hint="0xxx xxx xxx"
                 android:inputType="phone" />
-
             <TextView
                 android:id="@+id/phoneErrorText"
-                style="@style/HelperText"
-                android:textColor="@color/danger"
+                style="@style/RegisterHelperText"
                 android:visibility="gone" />
 
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Số CCCD" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Số CCCD" />
             <EditText
                 android:id="@+id/cccdInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:hint="Nhập 12 chữ số CCCD"
                 android:inputType="number"
                 android:maxLength="12" />
-
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Email" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Email" />
             <EditText
                 android:id="@+id/emailInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:hint="tenban@email.com"
                 android:inputType="textEmailAddress" />
-
             <TextView
                 android:id="@+id/emailErrorText"
-                style="@style/HelperText"
-                android:textColor="@color/danger"
+                style="@style/RegisterHelperText"
                 android:visibility="gone" />
 
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Mật khẩu" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Mật khẩu" />
             <EditText
                 android:id="@+id/passwordInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:drawableEnd="@drawable/ic_visibility_off"
+                android:drawableTint="@color/text_secondary"
                 android:hint="Tạo mật khẩu đăng nhập"
                 android:inputType="textPassword" />
 
-            <TextView
-                style="@style/FieldLabel"
-                android:text="Nhập lại mật khẩu" />
-
+            <TextView style="@style/RegisterFieldLabel" android:text="Nhập lại mật khẩu" />
             <EditText
                 android:id="@+id/confirmPasswordInput"
-                style="@style/Input"
+                style="@style/RegisterInput"
                 android:drawableEnd="@drawable/ic_visibility_off"
+                android:drawableTint="@color/text_secondary"
                 android:hint="Nhập lại mật khẩu"
                 android:inputType="textPassword" />
 
             <Button
                 android:id="@+id/registerButton"
-                style="@style/PrimaryButton"
-                android:text="Tạo tài khoản" />
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/account_primary_action_bg"
+                android:backgroundTint="@null"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
+                android:text="Tạo tài khoản"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/loginButton"
-                style="@style/TextButton"
-                android:text="Đã có tài khoản? Đăng nhập" />
-        </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="Đã có tài khoản? Đăng nhập"
+                android:textAllCaps="false"
+                android:textColor="@color/nlu_green_deep"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/resultText"
-            style="@style/ResultBox"
-            android:text=""
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/resultText"
+                style="@style/ResultBox"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

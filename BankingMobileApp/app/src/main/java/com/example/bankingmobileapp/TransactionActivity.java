@@ -41,7 +41,7 @@ public class TransactionActivity extends Activity {
         depositButton = findViewById(R.id.depositButton);
         withdrawButton = findViewById(R.id.withdrawButton);
 
-        transactionTypeInput.setText("DEPOSIT");
+        transactionTypeInput.setText("NẠP TIỀN");
         if (AppSession.hasAccount(this)) {
             accountNumberInput.setText(AppSession.getAccountNumber(this));
             resultText.setText("Đã chọn tài khoản mặc định. Bạn chỉ cần nhập số tiền và nội dung.");
@@ -77,7 +77,7 @@ public class TransactionActivity extends Activity {
             return;
         }
 
-        transactionTypeInput.setText(type);
+        transactionTypeInput.setText("DEPOSIT".equals(type) ? "NẠP TIỀN" : "RÚT TIỀN");
         AppSession.saveAccountNumber(this, accountNumber);
         TransactionRequest request = new TransactionRequest(
                 accountNumber,
