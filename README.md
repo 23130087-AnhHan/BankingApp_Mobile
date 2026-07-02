@@ -1,130 +1,96 @@
-<h1 align="center">🌟 Spring-Boot-Microservices-Banking-Application 🌟</h1>
-<h2>📋 Table of Contents</h2>
+# 🌟 Hệ thống Ngân hàng Trực tuyến NLU Banking 🌟
 
-- [🔍 About](#-about)
-- [🏛️ Architecture](#-architecture)
-- [🚀 Microservices](#-microservices)
-- [🚀 Getting Started](#-getting-started)
-- [📖 Documentation](#-documentation)
-- [⌚ Future Enhancement](#-future-enhancement)
-- [🤝 Contribution](#-contribution)
-- [📞 Contact Information](#-contact-information)
+Dự án này là một ứng dụng ngân hàng số được thiết kế theo kiến trúc **Microservices** hiện đại, kết hợp với ứng dụng di động **Android** dành cho khách hàng. Hệ thống sử dụng các công nghệ Java mới nhất để đảm bảo tính mở rộng, bảo mật và độc lập giữa các dịch vụ.
 
-## 🔍 About
-<p>
-    The Banking Application is built using a microservices architecture, incorporating the Spring Boot framework along with other Spring technologies such as Spring Data JPA, Spring Cloud, and Spring Security, alongside tools like Maven for dependency management. These technologies play a crucial role in establishing essential components like Service Registry, API Gateway, and more.<br><br>
-    Moreover, they enable us to develop independent microservices such as the user service for user management, the account service for account generation and other related functionalities, the fund transfer service for various transfer operations, and the transaction service for viewing transactions and facilitating withdrawals and deposits. These technologies not only streamline development but also enhance scalability and maintainability, ensuring a robust and efficient banking system.
-</p>
+---
 
-## 🏛️ Architecture
+## 🏛️ Kiến trúc & Công nghệ sử dụng
 
-- **Service Registry:** The microservices uses the discovery service for service registration and service discovery, this helps the microservices to discovery and communicate with other services, without needing to hardcode the endpoints while communicating with other microservices.
+Hệ thống bao gồm **7 dịch vụ backend (Spring Boot)** độc lập và **1 ứng dụng di động (Android - Java)**:
 
-- **API Gateway:** This microservices uses the API gateway to centralize the API endpoint, where all the endpoints have common entry point to all the endpoints. The API Gateway also facilitates the Security inclusion where the Authorization and Authentication for the Application.
+1. **Service Registry (Eureka Server - Port 8761):** Quản lý đăng ký dịch vụ động và khám phá dịch vụ giữa các microservices.
+2. **API Gateway (Port 8080):** Cổng kết nối trung tâm, phân tuyến yêu cầu (routing) và bảo mật cuộc gọi API từ ứng dụng di động.
+3. **User Service (Port 8082):** Quản lý thông tin người dùng, kết nối trực tiếp với Keycloak để đăng ký, đăng nhập và xác thực OTP.
+4. **Account Service (Port 8081):** Quản lý tài khoản ngân hàng của người dùng, truy vấn số dư và trạng thái tài khoản.
+5. **Sequence Generator (Port 8083):** Sinh mã số tài khoản và mã định danh tự động duy nhất trên toàn hệ thống.
+6. **Transaction Service (Port 8084):** Thực hiện các giao dịch nạp tiền, rút tiền từ tài khoản.
+7. **Fund Transfer Service (Port 8085):** Quản lý giao dịch chuyển tiền nội bộ giữa các tài khoản, xác thực OTP trước khi chuyển khoản.
+8. **BankingMobileApp:** Ứng dụng Android viết bằng Java (SDK Platform 35) cung cấp giao diện người dùng mượt mà, hỗ trợ tạo tài khoản, chuyển tiền và quét mã QR.
 
-- **Database per Microservice:** Each of the microservice have there own dedicated database. Here for this application for all the microservices we are incorparating the MySQL database. This helps us to isolate each of the services from each other which facilitates each services to have their own data schemas and scale each of the database when required.
+---
 
+## 🚀 Hướng dẫn khởi chạy hệ thống
 
-<h2>🚀 Microservices</h2>
+### 1. Yêu cầu môi trường
+Để chạy được hệ thống trên máy tính của bạn, cần chuẩn bị sẵn:
+- **Java 17 (JDK 17)** cài đặt và cấu hình đường dẫn `JAVA_HOME`.
+- **Docker Desktop** (khuyên dùng để khởi động nhanh MySQL và Keycloak). Nếu không dùng Docker, bạn phải tự cài MySQL 8.0 và Keycloak 22+ local trên cổng `8571`.
+- **Android Studio** (để chạy ứng dụng di động).
 
-- **🌐 Service Registry (Eureka):** Acts as a service discovery server, allowing microservices to find and communicate with each other dynamically.
+---
 
-- **🛡️ API Gateway:** The central entry point for all client requests. It handles routing to appropriate microservices and manages security (authentication and authorization).
+### 2. Bước 1: Khởi động MySQL & Keycloak (Docker)
+Để đơn giản hóa quá trình cài đặt cơ sở dữ liệu và máy chủ xác thực, dự án đã cấu hình sẵn tệp `docker-compose.yml` chạy đồng thời MySQL và Keycloak.
 
-- **👤 User Service:** The user microservice provides functionalities for user management. This includes user registration, updating user details, viewing user information, and accessing all accounts associated with the user. Additionally, this microservice handles user authentication and authorization processes.
-
-- **💼 Account Service:** The account microservice manages account-related APIs. It enables users to modify account details, view all accounts linked to the user profile, access transaction histories for each account, and supports the account closure process.
-
-- **💸 Fund Transfer Service:** The fund transfer microservice facilitates various fund transfer-related functionalities. Users can initiate fund transfers between different accounts, access detailed fund transfer records, and view specific details of any fund transfer transaction.
-
-- **💳 Transactions Service:** The transaction service offers a range of transaction-related services. Users can view transactions based on specific accounts or transaction reference IDs, as well as make deposits or withdrawals from their accounts.
-
-- **🔢 Sequence Generator Service:** Responsible for generating unique sequences for various entities across the banking application.
-
-<h2>🚀 Getting Started</h2>
-
-To get started, follow these steps to run the application on your local system:
-
-### 1. Prerequisites
-- **Java 17** installed.
-- **Maven** installed.
-- **WampServer** (đã chạy MySQL trên port 3306).
-- **Keycloak** (bạn cần tải và chạy thủ công hoặc dùng Docker nếu muốn).
-
-### 2. Khởi tạo Database (WampServer)
-Bạn hãy mở **phpMyAdmin** hoặc dùng tool SQL (như Navicat, DBeaver) và tạo các database sau:
-- `user_service`
-- `account_service`
-- `transaction_service`
-- `fund_transfer_service`
-- `sequence_generator`
-
-*Lưu ý: Mặc định code đang để user là `root` và password là `123456`. Nếu Wamp của bạn để trống password, hãy cập nhật trong các file `application.yml` của từng service.*
-
-### 3. Chạy các Microservices
-Bạn có thể dùng file script PowerShell tôi đã tạo để chạy tất cả service theo đúng thứ tự:
-
-```powershell
-./run-services.ps1
+Tại thư mục gốc của dự án, mở Terminal (cmd hoặc powershell) và chạy lệnh:
+```bash
+docker-compose up -d
 ```
+> [!NOTE]
+> Lệnh này sẽ tự động tải các ảnh Docker tương ứng, tạo các cơ sở dữ liệu trống cần thiết (`user_service`, `account_service`, v.v.) dựa trên tệp khởi tạo `init-db.sql`.
 
-Script này sẽ:
-1. Chạy **Service Registry** (Cổng 8761) và đợi nó sẵn sàng.
-2. Chạy **API Gateway** (Cổng 8080).
-3. Chạy tất cả các service còn lại trong các cửa sổ riêng biệt.
+---
 
-<h3>💡 PowerShell Shortcut</h3>
+### 3. Bước 2: Cấu hình Keycloak
+Sau khi Docker khởi động thành công, Keycloak sẽ chạy tại địa chỉ: `http://localhost:8571`
 
-If you are on Windows, you can use this PowerShell "trick" to start all microservices at once in separate windows. Run this command in the project root:
+Hãy cấu hình Keycloak theo các bước sau để hệ thống hoạt động:
+1. Truy cập [http://localhost:8571](http://localhost:8571), chọn **Administration Console** và đăng nhập với tài khoản:
+   - **Username:** `admin`
+   - **Password:** `admin`
+2. Tạo Realm mới: Di chuột vào dropdown góc trên bên trái, chọn **Create Realm**, điền tên realm là `banking-service` và nhấn **Create**.
+3. Tạo Client cho Backend:
+   - Vào mục **Clients** -> Chọn **Create client**.
+   - Chọn **OpenID Connect**, nhập Client ID là `banking-service-api-client` và nhấn **Next**.
+   - Bật các cấu hình quan trọng sau:
+     - **Client authentication:** `ON` (Bắt buộc)
+     - **Service accounts roles:** `ON` (Bắt buộc để dịch vụ backend gọi Admin API của Keycloak)
+     - **Direct access grants:** `ON` (Bắt buộc để đăng nhập bằng tài khoản/mật khẩu trực tiếp từ Android)
+   - Nhấn **Save**.
+4. Cấp quyền quản lý cho Service Account:
+   - Trong giao diện Client vừa tạo, mở tab **Service account roles** -> Chọn **Assign role**.
+   - Chuyển bộ lọc hiển thị sang dạng Client roles (search theo client `realm-management`).
+   - Gán các role sau cho Client:
+     - `manage-users`
+     - `view-users`
+     - `query-users`
+   - Nhấn **Assign**.
+5. Lấy Client Secret:
+   - Mở tab **Credentials** của client `banking-service-api-client`.
+   - Copy giá trị của **Client Secret** để điền vào script khởi động ở bước sau (Secret mặc định được cấu hình trong code là `TjeQGZma15XGmLGIMI6M84oBU9549Sf9`).
 
-```powershell
-Get-ChildItem -Filter pom.xml -Recurse | ForEach-Object { Start-Process powershell -ArgumentList "cd $($_.DirectoryName); mvn spring-boot:run" }
+---
+
+### 4. Bước 3: Khởi chạy các Dịch vụ Backend
+Thư mục gốc chứa tệp chạy tự động duy nhất `run-services.cmd`. Hãy double-click (hoặc chạy từ cmd) tệp tin này:
+```cmd
+run-services.cmd
 ```
+**Quy trình chạy của Script:**
+- Script sẽ kiểm tra môi trường Java của máy tính.
+- Yêu cầu nhập Keycloak Client Secret (Nếu bạn đã cấu hình client secret trùng khớp với mặc định là `TjeQGZma15XGmLGIMI6M84oBU9549Sf9`, chỉ cần nhấn **Enter** để bỏ qua).
+- Script sẽ tự động mở 7 cửa sổ dòng lệnh riêng biệt để chạy lần lượt các microservices theo thứ tự tối ưu (Khởi chạy Eureka trước, đợi 15 giây, khởi chạy API Gateway, sau đó khởi chạy tất cả dịch vụ nghiệp vụ khác).
 
-Alternatively, you can run the provided `run-services.ps1` script (if available) which handles the startup order (starting Service Registry first).
+Kiểm tra trạng thái hoạt động của các dịch vụ tại **Eureka Dashboard**: [http://localhost:8761](http://localhost:8761) (Trạng thái của các dịch vụ phải là `UP`).
 
-<h2>📖 Documentation</h2>
-<h3>📂 Microservices Documentation</h3>
+---
 
-For detailed information about each microservice, refer to their respective README files:
+### 5. Bước 4: Khởi chạy Ứng dụng Android
+1. Mở **Android Studio**.
+2. Chọn **Open** và dẫn tới thư mục `BankingMobileApp` trong dự án.
+3. Chờ Gradle tải các thư viện và đồng bộ hóa cấu hình (Sync Project).
+4. Kết nối thiết bị thực qua USB (đã bật USB Debugging) hoặc chạy trên Máy ảo Android Emulator.
+5. Nhấn **Run** để cài đặt và trải nghiệm ứng dụng.
 
-- [👤 User Service](./User-Service/README.md)
-- [💼 Account Service](./Account-Service/README.md)
-- [💸 Fund Transfer Service](./Fund-Transfer/README.md)
-- [💳 Transactions Service](./Transaction-Service/README.md)
-- [🔢 Sequence Generator Service](./Sequence-Generator/README.md)
-- [🌐 Service Registry](./Service-Registry/README.md)
-- [🛡️ API Gateway](./API-Gateway/README.md)
-
-<h3>📖 API Documentation</h3>
-
-For a detailed guide on API endpoints and usage instructions, explore our comprehensive [API Documentation](https://app.theneo.io/student/spring-boot-microservices-banking-application). This centralized resource offers a holistic view of the entire banking application, making it easier to understand and interact with various services.
-
-<h3>📚 Java Documentation (JavaDocs)</h3>
-
-Explore the linked [Java Documentation](https://kartik1502.github.io/Spring-Boot-Microservices-Banking-Application/) to delve into detailed information about classes, methods, and variables across all microservices. These resources are designed to empower developers by providing clear insights into the codebase and facilitating seamless development and maintenance tasks.
-
-## ⌚ Future Enhancement
-
-As part of our ongoing commitment to improving the banking application, we are planning several enhancements to enrich user experience and expand functionality:
-
-- Implementing a robust notification system will keep users informed about important account activities, such as transaction updates, account statements, and security alerts. Integration with email and SMS will ensure timely and relevant communication.
-- Adding deposit and investment functionalities will enable users to manage their savings and investments directly through the banking application. Features such as fixed deposits, recurring deposits, and investment portfolio tracking will empower users to make informed financial decisions.
-- and more....
-
-<h2>🤝 Contribution</h2>
-
-Contributions to this project are welcome! Feel free to open issues, submit pull requests, or provide feedback to enhance the functionality and usability of this banking application. Follow the basic PR specification while creating a PR.
-
-Let's build a robust and efficient banking system together using Spring Boot microservices!
-
-Happy Banking! 🏦💰
-
-<h2>📞 Contact Information</h2>
-
-If you have any questions, feedback, or need assistance with this project, please feel free to reach out to me:
-
-[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/6361921186)
-[![GMAIL](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:kartikkulkarni1411@gmail.com)
-
-We appreciate your interest in our project and look forward to hearing from you. Happy coding!
+> [!TIP]
+> - Hệ thống sẽ tự động gửi mã OTP xác thực đăng ký tài khoản hoặc giao dịch về log console của `User-Service` hoặc `Fund-Transfer` dịch vụ để bạn lấy mã kiểm tra thử nghiệm mà không cần cấu hình SMTP thật.
