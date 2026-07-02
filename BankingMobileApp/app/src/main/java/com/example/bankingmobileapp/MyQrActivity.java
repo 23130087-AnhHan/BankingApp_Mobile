@@ -77,12 +77,12 @@ public class MyQrActivity extends Activity {
 
     private void renderAccountInfo() {
         if (!AppSession.hasAccount(this)) {
-            accountInfoText.setText("Bạn chưa có tài khoản thanh toán. Hãy quay lại dashboard để đồng bộ tài khoản.");
+            accountInfoText.setText("Bạn chưa có tài khoản thanh toán. Hãy quay lại trang chủ để đồng bộ tài khoản.");
             generateQrButton.setEnabled(false);
             return;
         }
         if (!AppSession.isPaymentAccount(AppSession.getAccountType(this))) {
-            accountInfoText.setText("Tài khoản hiện tại không phải PAYMENT_ACCOUNT. Hãy làm mới dashboard trước khi tạo QR.");
+            accountInfoText.setText("Tài khoản hiện tại không phải tài khoản thanh toán. Hãy làm mới trang chủ trước khi tạo QR.");
             generateQrButton.setEnabled(false);
             return;
         }

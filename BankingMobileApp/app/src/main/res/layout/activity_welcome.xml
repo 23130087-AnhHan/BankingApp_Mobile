@@ -88,12 +88,12 @@
 
         <Space
             android:layout_width="1dp"
-            android:layout_height="210dp" />
+            android:layout_height="80dp" />
 
         <!-- Form đăng nhập -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="370dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/welcome_glass_panel"
             android:elevation="8dp"
             android:orientation="vertical"

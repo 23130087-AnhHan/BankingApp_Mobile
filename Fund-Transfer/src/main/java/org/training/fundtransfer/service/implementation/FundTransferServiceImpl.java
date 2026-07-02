@@ -82,7 +82,7 @@ public class FundTransferServiceImpl implements FundTransferService {
              throw new AccountUpdateException("Invalid OTP provided", GlobalErrorCode.BAD_REQUEST);
         }
 
-        String transactionId = internalTransfer(fromAccount, toAccount, fundTransferRequest.getAmount());
+        String transactionId = internalTransfer(fromAccount, toAccount, fundTransferRequest.getAmount(), fundTransferRequest.getDescription());
         FundTransfer fundTransfer = FundTransfer.builder()
                 .transferType(TransferType.INTERNAL)
                 .amount(fundTransferRequest.getAmount())
@@ -204,7 +204,7 @@ public class FundTransferServiceImpl implements FundTransferService {
      * @param amount The amount of funds to transfer.
      * @return The transaction reference number.
      */
-    private String internalTransfer(Account fromAccount, Account toAccount, BigDecimal amount) {
+    private String internalTransfer(Account fromAccount, Account toAccount, BigDecimal amount, String note) {
 
         fromAccount.setAvailableBalance(fromAccount.getAvailableBalance().subtract(amount));
         accountService.updateAccount(fromAccount.getAccountNumber(), fromAccount);
@@ -212,18 +212,19 @@ public class FundTransferServiceImpl implements FundTransferService {
         toAccount.setAvailableBalance(toAccount.getAvailableBalance().add(amount));
         accountService.updateAccount(toAccount.getAccountNumber(), toAccount);
 
+        String userNote = (note == null || note.trim().isEmpty()) ? "Chuyen khoa" : note.trim();
         List<Transaction> transactions = List.of(
                 Transaction.builder()
                         .accountId(fromAccount.getAccountNumber())
                         .transactionType("INTERNAL_TRANSFER")
                         .amount(amount.negate())
-                        .description("Internal fund transfer from "+fromAccount.getAccountNumber()+" to "+toAccount.getAccountNumber())
+                        .description(userNote)
                         .build(),
                 Transaction.builder()
                         .accountId(toAccount.getAccountNumber())
                         .transactionType("INTERNAL_TRANSFER")
                         .amount(amount)
-                        .description("Internal fund transfer received from: "+fromAccount.getAccountNumber()).build());
+                        .description(userNote).build());
 
         String transactionReference = UUID.randomUUID().toString();
         transactionService.makeInternalTransactions(transactions, transactionReference);

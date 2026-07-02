@@ -123,15 +123,23 @@ public class QuickLoginActivity extends FragmentActivity {
         biometricPrompt.authenticate(promptInfo);
     }
 
+    private boolean resetPasswordLoading;
+
     private void requestPasswordReset() {
+        if (resetPasswordLoading) return;
         String email = AppSession.getUserEmail(this);
         if (email.isEmpty()) {
             Ui.openAndClear(this, WelcomeActivity.class);
             return;
         }
+        resetPasswordLoading = true;
+        View forgotBtn = findViewById(R.id.forgotPasswordButton);
+        if (forgotBtn != null) forgotBtn.setEnabled(false);
         ApiClient.getAuthApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
+                resetPasswordLoading = false;
+                if (forgotBtn != null) forgotBtn.setEnabled(true);
                 Toast.makeText(QuickLoginActivity.this,
                         "Mã xác thực OTP đã được gửi đến email của bạn.",
                         Toast.LENGTH_LONG).show();
@@ -143,6 +151,8 @@ public class QuickLoginActivity extends FragmentActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable throwable) {
+                resetPasswordLoading = false;
+                if (forgotBtn != null) forgotBtn.setEnabled(true);
                 showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }
         });

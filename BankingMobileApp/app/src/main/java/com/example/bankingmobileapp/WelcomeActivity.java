@@ -75,16 +75,24 @@ public class WelcomeActivity extends Activity {
         Toast.makeText(this, "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show();
     }
 
+    private boolean resetPasswordLoading;
+
     private void requestPasswordReset() {
+        if (resetPasswordLoading) return;
         String email = Ui.text(emailInput).toLowerCase(Locale.ROOT);
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailInput.setError("Nhập email hợp lệ để đặt lại mật khẩu");
             emailInput.requestFocus();
             return;
         }
+        resetPasswordLoading = true;
+        View forgotBtn = findViewById(R.id.txtForgot);
+        if (forgotBtn != null) forgotBtn.setEnabled(false);
         ApiClient.getAuthApi().forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
+                resetPasswordLoading = false;
+                if (forgotBtn != null) forgotBtn.setEnabled(true);
                 Toast.makeText(WelcomeActivity.this,
                         "Mã xác thực OTP đã được gửi đến email của bạn.",
                         Toast.LENGTH_LONG).show();
@@ -96,6 +104,8 @@ public class WelcomeActivity extends Activity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable throwable) {
+                resetPasswordLoading = false;
+                if (forgotBtn != null) forgotBtn.setEnabled(true);
                 showMessage(ApiErrorUtils.networkError(TAG, throwable));
             }
         });

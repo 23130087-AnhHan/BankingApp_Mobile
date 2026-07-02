@@ -172,14 +172,14 @@ public class TransferActivity extends Activity {
 
     private void renderSourceAccount() {
         if (!AppSession.hasAccount(this)) {
-            sourceAccountText.setText("Bạn chưa có tài khoản thanh toán. Hãy quay lại dashboard để hệ thống cấp tài khoản.");
+            sourceAccountText.setText("Bạn chưa có tài khoản thanh toán. Hãy quay lại trang chủ để hệ thống cấp tài khoản.");
             resultText.setText("Không thể chuyển tiền khi chưa có tài khoản nguồn.");
             transferButton.setEnabled(false);
             return;
         }
         if (!"PAYMENT_ACCOUNT".equalsIgnoreCase(AppSession.getAccountType(this))) {
             sourceAccountText.setText("Tài khoản nguồn hiện tại không phải tài khoản thanh toán.");
-            resultText.setText("Chuyển tiền chỉ dùng PAYMENT_ACCOUNT.");
+            resultText.setText("Chuyển tiền chỉ dùng tài khoản thanh toán.");
             transferButton.setEnabled(false);
             return;
         }
